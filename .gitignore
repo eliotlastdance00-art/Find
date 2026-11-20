@@ -1,0 +1,41 @@
+# secrets — never commit
+.kaggle/
+access_token
+kaggle.json
+.env
+*.key
+
+# runtime data
+data/
+uploads/
+*.db
+*.db-wal
+*.db-shm
+
+# model weights: only the released files under weights/ and the bundled face detector are tracked
+*.pth
+*.pt
+*.onnx
+!weights/**/*.pth
+!src/dfd/infrastructure/media/assets/*.onnx
+.cache/
+
+# generated
+kaggle/_build/
+dist/
+build/
+*.egg-info/
+htmlcov/
+.coverage
+coverage.xml
+
+# python / tooling
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.DS_Store
+.idea/
+.vscode/

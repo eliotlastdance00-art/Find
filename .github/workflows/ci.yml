@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TORCH_INDEX: https://download.pytorch.org/whl/cpu
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  test:
+    name: Lint, types, tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python: "3.13"   # the pinned, production set of dependencies
+            constraints: "--constraint constraints.txt"
+          - python: "3.11"   # oldest supported interpreter, latest dependencies
+            constraints: ""
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            constraints.txt
+
+      - name: Install
+        run: |
+          pip install --extra-index-url "$TORCH_INDEX" ${{ matrix.constraints }} torch torchvision
+          pip install --extra-index-url "$TORCH_INDEX" ${{ matrix.constraints }} -e ".[dev]"
+
+      - name: Ruff (lint)
+        run: ruff check --output-format=github .
+
+      - name: Ruff (format)
+        run: ruff format --check .
+
+      - name: Mypy (strict)
+        run: mypy
+
+      - name: Front-end syntax
+        run: |
+          for file in src/dfd/presentation/static/js/*.js; do node --check "$file"; done
+
+      - name: Tests
+        run: pytest --cov=dfd --cov-report=term --cov-report=xml --cov-fail-under=85
+
+      - name: Upload coverage
+        if: matrix.python == '3.13'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.xml
+
+  docker:
+    name: Docker image (build, run, smoke test)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start with docker compose
+        run: docker compose up --build --detach
+
+      - name: Smoke test against the running container
+        run: python3 scripts/smoke_test.py http://localhost:8000
+
+      - name: Container runs unprivileged with a read-only root filesystem
+        run: |
+          test "$(docker compose exec -T dfd id -u)" = "10001"
+          ! docker compose exec -T dfd touch /app/should-not-be-writable
+          docker compose exec -T dfd dfd models
+
+      - name: Data survives a restart
+        run: |
+          docker compose restart dfd
+          python3 scripts/smoke_test.py http://localhost:8000
+          docker compose exec -T dfd test -f /data/dfd.db
+
+      - name: Logs
+        if: always()
+        run: docker compose logs --no-color | tail -n 200
+
+      - name: Stop
+        if: always()
+        run: docker compose down --volumes
