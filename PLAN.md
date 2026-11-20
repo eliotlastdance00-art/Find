@@ -366,3 +366,15 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   `--eval-only`, arhiwden ýüzleri dikeltmek. 8 täze unit test (jemi 118).
 - Kaggle: `dfd-train-visual` **v2** 22:27 UTC-de işe goýberildi
   (`--epochs 12 --save-faces --time-budget-min 300`). Garaşylýan wagt ~3,2 sagat.
+
+### 2026-11-20 (7) — Türkmen ses, 1-nji ädim tamamlandy (mümkinçilik barlagy)
+
+- Kaggle `dfd-tk-probe` v1: 11 generatoryň hemmesi işledi we düşnükli türkmençe ses berdi
+  (MMS-ASR boýunça CER 4–18 %): 3 wokoder (HiFi-GAN, UnivNet, Vocos), 4 kodek (DAC, Mimi,
+  EnCodec 3/6 kbps), 3 TTS (MMS, OmniVoice, VoxCPM2 + Anadil), 1 ses öwrüji (kNN-VC).
+- OmniVoice we VoxCPM2 CPU-da gaty haýal (RTF ≈ 44) — 2-nji ädimde GPU gerek.
+- Maglumat meýilnamasy: hakyky = TurkmenSpeech (wideo boýunça bölünýär) + Common Voice 22 `tk`
+  (gepleýji boýunça) + ASVspoof 2019 LA train; galp = ýokardaky generatorlar + ASVspoof train.
+  **Türgenleşdirişe goşulmaýanlar:** OmniVoice (görülmedik TTS) we Vocos (görülmedik wokoder).
+- Ygtyýarnama: TurkmenSpeech, MMS, OmniVoice agramlary CC BY-NC → netije model diňe täjirçilik
+  däl maksat üçin (diplom işi üçin bolýar). DAC, EnCodec, kNN-VC ygtyýarnamalary barlanmady.
