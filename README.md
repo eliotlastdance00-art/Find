@@ -74,7 +74,34 @@ Jikme-jik: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Modeller we ölçenen netijeler
 
-<!-- METRICS -->
+Bu ýerde diňe hakykatdan ölçenen sanlar ýazylýar. Çig maglumatlar: `docs/metrics/`.
+
+### Ses — AASIST (deslapky ölçeg)
+
+Awtorlaryň resmi agramlary (gaýtadan okadylmady). ASVspoof 2019 LA toplumynyň **tötänleýin
+böleginde** ölçendi: dev-den 3000 ýazgy (temperatura we bosagalary saýlamak üçin), eval-dan
+3000 ýazgy (synag üçin; 304 hakyky, 2696 galp). Doly toplum bilen ölçeg entek geçirilmedi,
+şonuň üçin model karty `provisional` diýlip bellenen.
+
+| Görkeziji | dev (3000) | eval (3000) |
+|---|---|---|
+| AUC | 0.9998 | 0.9991 |
+| EER | 0.38 % | 1.62 % |
+
+Eval böleginde höküm (bosagalar: ≤ 3.0 % — Hakyky, ≥ 99.0 % — Galp, arasy — Şübheli):
+
+| Hakykatda | Hakyky | Şübheli | Galp |
+|---|---|---|---|
+| Hakyky ses (304) | 96.4 % | 3.6 % | 0 % |
+| Galp ses (2696) | 0.7 % | 34.8 % | 64.6 % |
+
+Galp sesleriň üçden biri «Şübheli» bolýar: eval böleginde bosagalar saýlananda görülmedik
+13 usul (A07–A19) bar. Iň kyn usullar: A18 (EER 4.9 %), A17 (3.0 %).
+
+### Şekil — EfficientNet-B4
+
+FaceForensics++ (c23) toplumynda okadylýar. Netijeler okuw gutarandan soň şu ýere goşular;
+şoňa çenli `weights/visual/` boş we ulgam surat/wideo üçin «model ýok» diýip habar berýär.
 
 ## Çäklendirmeler (dogruçyl bellik)
 

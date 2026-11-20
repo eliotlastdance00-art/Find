@@ -314,7 +314,7 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
 | 5. Backend + 7 menýu | ✅ | FastAPI + SPA, tk/ru/en, açyk/garaňky |
 | 6. Wizual model | 🟡 okuw Kaggle-da gidýär | `eliotalderson00/dfd-train-visual` v1; netije gelýänçä `weights/visual/` boş |
 | 7. Grad-CAM | ✅ kod | hakyky model bilen göz bilen barlamaly |
-| 8. Ses modeli | 🟡 | AASIST işleýär; kalibrleme `dfd-eval-audio-cpu` v2 gidýär (3000 faýl — bölekleýin; doly GPU işi gerek) |
+| 8. Ses modeli | 🟡 deslapky kart goýuldy | 3000+3000 ýazgyda ölçendi: eval AUC 0.9991, EER 1.62 %; T=1.448, bosagalar 3.0 % / 99.0 %. Doly toplum (GPU) entek edilmedi |
 | 9. Birleşdirme we höküm | ✅ kod | bosagalar hakyky kartlardan gelmeli |
 | 10. PDF hasabat | ✅ | tk/ru/en; soňky ýerleşiş düzedişi göz bilen gaýtadan barlanmady |
 | 11. Berkitmek | 🟡 | howpsuzlyk sözbaşylary, çäkler, testler 95 %; brauzer e2e soňky refaktordan soň gaýtalanmady |
@@ -328,6 +328,7 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
 5. `js/i18n.js`: `err.not_found`, `err.method_not_allowed` goşmak; ulanylmaýan 11 açary aýyrmak.
 6. Brauzer e2e-ni gaýtalamak (rus dilinde gapdal menýu, telefon ekrany).
 7. Ses: doly ASVspoof LA dev+eval (GPU) bilen kalibrleme; gürleýiş däl ses üçin duýduryş.
+   Şeýle hem: uzyn sesde ýat sarp edilişini ölçemek (AASIST, batch 8) we konteýneriň 4 GB çägine sygýandygyny barlamak.
 8. Umumylaşdyrma synagy: Celeb-DF ýa-da başga toplumda ölçemek we dogruçyl ýazmak.
 9. `docs/THEORY.md`, diplom ýazgysy, prezentasiýa.
 
@@ -339,3 +340,4 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
 ### Gündelik
 - **2026-11-20 (1):** Ýumuş kagyzy seljerildi. Kaggle birikdirildi, GPU smoke test geçdi. Toplumlar we taýýar agramlar tapyldy. Plan ýazyldy.
 - **2026-11-20 (2):** Ulanyjynyň täze görkezmeleri (0a). Tutuş taslama ýazyldy: domain/application/infrastructure/presentation, 7 menýu, üç dil, PDF, Grad-CAM, AASIST, okuw skriptleri, Docker, CI, 110 test (95 %), ruff + mypy strict arassa. Wheel arassa venv-e gurlup, `scripts/smoke_test.py` geçdi. Kaggle: CUDA «misaligned address» tapyldy we aýlanyp geçildi; wizual okuw işe goýberildi.
+- **2026-11-20 (3):** GitHub-a push edildi (`main`), CI ýaşyl (ulanyjynyň aýtmagyna görä). `dfd-eval-audio-cpu` v2 gutardy (1 sag 53 min, CPU-da 1 ýazgy/s). Kart `weights/audio/model_card.json`, çig sanlar `docs/metrics/audio_aasist_subset.json`. Hakyky serwer arkaly 16 ASVspoof ýazgysy: 16/16 dogry. **Tapyndy:** AASIST 3 bölekli ýazgyda prosesiň ýady 1.1 GB-a ýetdi — uzyn seslerde batch 8 bilen ýady ölçemeli, zerur bolsa batch-y kiçeltmeli.
