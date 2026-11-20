@@ -350,3 +350,19 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   **v2-den öň hökman düzetmeli (`training/train_visual.py`):** (a) her gowulaşmada iň gowy agramlary + wagtlaýyn karty `/kaggle/working`-e ýazmak; (b) `faces.tar`-y ýüzler kesilen badyna ýazmak (soňky işlerde `--kernel-source` bilen 76 minudy tygşytlamak); (c) doňmagy tutýan gözegçi: ýürek urgusy ýok bolsa stack-i çap edip prosesi öldürmek, ene proses bolsa soňky nokatdan dowam etdirmek ýa-da iň gowy agram bilen kalibrleme/synaga geçmek.
   Kaggle GPU kwotasy hepdede çäkli (takmynan 30 sagat diýip bilýärin, barlamaly); v1 ~5.7 sagat sarp etdi.
 
+
+### 2026-11-20 (6) — Wizual türgenleşdiriş v2 işe goýberildi
+
+- `training/train_visual.py` täzeden guruldy: iş çaga prosesde gidýär, **gözegçi (supervisor)** bolsa
+  `--stall-min` (15 min) dowamynda çykyş bolmasa stack-leri çap edip prosesi öldürýär we
+  `--resume` bilen soňky epohadan dowam edýär. Iki gezek yzly-yzyna öňe gidişlik bolmasa,
+  iň gowy checkpoint bilen diňe kalibrleme + test edilýär (`--eval-only`).
+- Her epohada `last.pt` (dowam etmek üçin), her gowulaşmada `best.pt` + `weights.pth` +
+  wagtlaýyn `model_card.json` (`provisional: true`) ýazylýar.
+- `faces.tar` ýüz kesilenden **derrew** soň ýazylýar; soňky işe goýberişler ony
+  `/kaggle/input` içinden awtomatik tapýar (`--kernel-source eliotalderson00/dfd-train-visual`).
+- DataLoader: `timeout=600`, işçilerde OpenCV akymlary öçürildi.
+- Ýerli barlag: doly akym, doňdurma (SIGSTOP) → öldürme → 23-nji epohadan dowam, SIGKILL → dowam,
+  `--eval-only`, arhiwden ýüzleri dikeltmek. 8 täze unit test (jemi 118).
+- Kaggle: `dfd-train-visual` **v2** 22:27 UTC-de işe goýberildi
+  (`--epochs 12 --save-faces --time-budget-min 300`). Garaşylýan wagt ~3,2 sagat.
