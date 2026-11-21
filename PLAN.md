@@ -468,3 +468,20 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
     Netije: macOS 134 geçdi, Windows 132 geçdi + 4 geçirildi, ikisinde-de smoke test geçdi.
   - Barlanmadyk: Windows-da PowerShell buýruklary (`winget`, `py`, `Activate.ps1`) — CI bash ulanýar;
     Intel Mac; Windows-da `secret.key` faýlynyň rugsatlary çäklendirilmeýär (papkanyň ACL-i miras alynýar).
+- **2026-11-21 (7) — doly emeli döredilen suratlar (täze mesele, 1-nji ädim: gözleg + synag).**
+  Ulanyjynyň nägileligi: README suratyndaky emeli portret «Hakyky» (0.0 %) çykdy. Sebäbi: şekil modeli
+  diňe FF++ ýüz çalşygyny öwrendi. Çözgüt ugry: ikinji şekil modeli — «emeli döredilen surat» detektory.
+  - Gözleg: garaşsyz deňeşdirme (arXiv 2602.07814) — açyk detektorlaryň iň gowusy (Community Forensics)
+    ortaça 75 %, iň täze generatorlarda 35–42 %. Abacus.AI Smaug (Apache-2.0, 439M parametr, 880 MB;
+    öz karty boýunça AUC 0.97–0.99, hakyky suratlaryň 0.4–3 %-i ýalňyş bellenýär).
+  - Kiçi synag (ölçeg däl!): 4 emeli portret (häzirki generator) + 2 DALL-E 2 + 16 hakyky surat (Wikimedia Commons).
+    | Model | ölçegi | 4 täze emeli | 16 hakyky (>0.5) |
+    |---|---|---|---|
+    | CommFor-384 (MIT) | 87 MB | 0.00–0.10 (0/4) | 0 |
+    | Detectra v3 (MIT) | 44 MB | 1/4 | 1 |
+    | detectra-openfake (CC BY-NC) | 30 MB | 3/4 (portret 0.10) | 2 |
+    | **Smaug web ONNX (Apache-2.0, `21amd21/smaug-ai-image-detector-web`)** | 181 MB | **0.991–1.000 (4/4)** | **0 (iň ulusy 0.002)** |
+    Smaug: 2 ýadroda bir kesim ≈3 s; köne DALL-E 2-de gowşak (0.59, 0.005). Synag faýllary: `/home/user/probe/`.
+  - Meýilnama: (2) `onnxruntime` + model birikdirmek (surat: tutuş kadr; wideo: birnäçe kadr), aýratyn kart we
+    höküm düzgüni, model GitHub-a sygmaýar (>100 MB) → gurnamada dowam etdirip ýüklemek; (3) Kaggle-da hakyky
+    ölçeg + bosagalar (OpenFake synag bölegi, FF++ hakyky kadrlar); (4) README/UI täzelemek. Kepillik ýok.
