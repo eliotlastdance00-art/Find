@@ -32,6 +32,15 @@ export const icons = {
   search: path('<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.200-4.200"/>'),
   plus: path('<path d="M12 5v14M5 12h14"/>'),
   info: path('<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5v.1"/>'),
+  globe: path('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.600 2.500 3.900 5.500 3.900 9s-1.300 6.500-3.900 9c-2.600-2.500-3.900-5.500-3.900-9S9.400 5.500 12 3z"/>'),
+  chevron: path('<path d="m7 10 5 5 5-5"/>'),
+  updown: path('<path d="m8 9.500 4-4 4 4M8 14.500l4 4 4-4"/>'),
+  side: path('<path d="m14 7-5 5 5 5"/>'),
+  monitor: path('<rect x="3.500" y="4.500" width="17" height="12" rx="2.500"/><path d="M9 20h6M12 16.500V20"/>'),
+  folder: path('<path d="M3.500 7.500a2 2 0 0 1 2-2h4l2 2.500h7a2 2 0 0 1 2 2v7.500a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>'),
+  lens: path('<circle cx="10.500" cy="10.500" r="6"/><path d="m15 15 5.500 5.500"/>'),
+  pin: path('<path d="M12 21s6.500-5.600 6.500-10.500a6.500 6.500 0 0 0-13 0C5.500 15.400 12 21 12 21z"/><circle cx="12" cy="10.500" r="2.300"/>'),
+  seal: path('<path d="M9 13.500V11a3 3 0 1 1 6 0v2.500"/><path d="M6 13.500h12v3H6zM5 20h14"/>'),
 };
 
 export const VERDICT_ICON = { real: "check", suspicious: "alert", fake: "x", inconclusive: "question" };

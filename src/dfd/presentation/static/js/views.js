@@ -1,7 +1,9 @@
 // One function per screen. Each receives a context and may return a cleanup callback.
 import { api, auth, media } from "./api.js";
 import { errorText, lang, LANGS, t } from "./i18n.js";
+import { sceneWorld } from "./fx.js";
 import { countTo, detectMedia, extensionOf, previewFile, wait } from "./motion.js";
+import { investigate, narrator } from "./sleuth.js";
 import {
   confirmDialog, emptyState, esc, formatBytes, formatDate, formatDuration, gauge, icons, pct,
   ring, spinner, timeline, toast, typeIcon, verdictBadge, zoneBar,
@@ -10,6 +12,7 @@ import {
 const KINDS = ["image", "video", "audio"];
 const ACCEPT = "image/*,video/*,audio/*,.mkv,.flac,.m4a,.webm";
 const STAGES = ["preprocessing", "analyzing", "explaining", "done"];
+const STAGE_ICON = { preprocessing: "folder", analyzing: "lens", explaining: "pin", done: "seal" };
 const ACTIVE = new Set(["queued", "preprocessing", "analyzing", "explaining"]);
 
 const fail = (error) => toast(errorText(error.code ?? "error"), "error");
@@ -110,6 +113,7 @@ export function login(ctx) {
     ctx.root.innerHTML = `
       <div class="auth">
         <section class="auth-hero">
+          <canvas class="scene-world" aria-hidden="true"></canvas>
           <div class="brand">${icons.logo}<div><div class="brand-name">${esc(t("app.name"))}</div><div class="brand-tag">${esc(t("app.tagline"))}</div></div></div>
           <div>
             <h1>${esc(t("hero.title"))}</h1>
@@ -121,7 +125,7 @@ export function login(ctx) {
             </ul>
           </div>
           <div class="brand-tag">v${esc(ctx.state.meta?.version ?? "")}</div>
-          <div class="hero-mark" aria-hidden="true">${icons.logo}</div>
+          <div class="hero-mark" aria-hidden="true"><span class="halo"><i></i><i></i><i></i></span>${icons.logo}<i class="hero-glint"></i></div>
         </section>
         <section class="auth-panel">
           <div class="auth-top">${ctx.controls()}</div>
@@ -164,16 +168,30 @@ export function login(ctx) {
       button.disabled = true;
       errorBox.hidden = true;
       try {
-        auth.set(await (mode === "login" ? api.login(username, password) : api.register(username, password)));
-        ctx.navigate("upload");
+        const session = await (mode === "login" ? api.login(username, password) : api.register(username, password));
+        auth.set(session);
+        await ctx.enter(session.user, button);
       } catch (error) {
         errorBox.textContent = errorText(error.code);
         errorBox.hidden = false;
         button.disabled = false;
       }
     });
+    // The scene: its own night sky, and layers that shift a little with the pointer.
+    scene?.destroy();
+    scene = sceneWorld(ctx.root.querySelector(".scene-world"));
+    const stage = ctx.root.querySelector(".auth");
+    stage.addEventListener("pointermove", (event) => {
+      const x = (event.clientX / window.innerWidth) * 2 - 1;
+      const y = (event.clientY / window.innerHeight) * 2 - 1;
+      stage.style.setProperty("--mx", x.toFixed(3));
+      stage.style.setProperty("--my", y.toFixed(3));
+      scene?.look(x, y);
+    }, { passive: true });
   };
+  let scene = null;
   render();
+  return () => scene?.destroy();
 }
 
 /* ----------------------------------------------------------------- upload */
@@ -184,7 +202,7 @@ export async function upload(ctx) {
     ${modelBanners(ctx.state.meta)}
     <div class="dropzone" data-state="idle" tabindex="0" role="button" aria-label="${esc(t("upload.browse"))}">
       <div class="dz-idle">
-        <div class="dz-orbit" aria-hidden="true"><i></i><i></i><div class="dz-icon">${icons.upload}</div></div>
+        <div class="dz-orbit" aria-hidden="true"><i></i><i></i><i></i><div class="dz-icon">${icons.upload}</div></div>
         <div>
           <div class="dz-title"><span class="for-mouse">${esc(t("upload.drop"))}</span><span class="for-touch">${esc(t("upload.tap"))}</span></div>
           <div class="muted for-mouse">${esc(t("upload.or"))}</div>
@@ -337,10 +355,11 @@ function previewOf(scan) {
   const phase = ACTIVE.has(scan.status) ? scan.status : "idle";
   const fx = `
     <div class="fx" aria-hidden="true">
-      <i class="fx-grid"></i><i class="fx-line"></i><i class="fx-heat"></i>
-      <i class="fx-corner tl"></i><i class="fx-corner tr"></i><i class="fx-corner bl"></i><i class="fx-corner br"></i>
+      <i class="fx-shade"></i>
+      <div class="lens" data-lens><div class="lens-glass"><div class="lens-zoom"></div><i class="lens-glint"></i></div><i class="lens-handle"></i></div>
       <span class="fx-chip"><i></i><span data-fx-label>${esc(phase === "idle" ? "" : t(`scan.fx.${phase}`))}</span></span>
-    </div>`;
+    </div>
+    <div class="stamp" data-stamp hidden></div>`;
   if (scan.media_type === "image") return `<div class="preview" data-kind="image" data-phase="${phase}"><img src="${src}" alt="${esc(scan.filename)}">${fx}</div>`;
   if (scan.media_type === "video") return `<div class="preview" data-kind="video" data-phase="${phase}"><video src="${src}" controls preload="metadata" playsinline></video>${fx}</div>`;
   const bars = Array.from({ length: EQ_BARS }, (_, i) => `<i style="--i:${i};--h:${(0.3 + 0.7 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.6))).toFixed(2)}"></i>`).join("");
@@ -366,7 +385,7 @@ function stepper(status) {
   const position = status === "done" ? STAGES.length : Math.max(0, STAGES.indexOf(status));
   return `<div class="stepper">${STAGES.map((stage, i) => {
     const state = i < position ? "done" : (i === position && ACTIVE.has(status) ? "active" : "");
-    return `<div class="stage ${state}"><span class="stage-dot">${state === "done" ? icons.check : i + 1}</span><div><b>${esc(t(`scan.stage.${stage}`))}</b><small>${esc(t(`scan.stage.${stage}.d`))}</small></div></div>`;
+    return `<div class="stage ${state}"><span class="stage-dot">${state === "done" ? icons.check : icons[STAGE_ICON[stage]]}</span><div><b>${esc(t(`scan.stage.${stage}`))}</b><small>${esc(t(`scan.stage.${stage}.d`))}</small></div></div>`;
   }).join("")}</div>`;
 }
 
@@ -375,6 +394,36 @@ export async function scan(ctx) {
   if (!current) return undefined;
   const controller = new AbortController();
   let pollTimer;
+  let glass = null;
+  let voice = null;
+  let spoken = null;
+
+  // What the detective says in each stage: first what is being done, then an aside or two.
+  const linesFor = (status) => {
+    if (status === "done") return [t("sleuth.done")];
+    if (status === "queued") return [t("sleuth.queued")];
+    if (status === "explaining") return [t("sleuth.explaining"), t("sleuth.flavour.3")];
+    const own = t(`sleuth.${status}.${current.media_type}`);
+    return status === "analyzing" ? [own, t("sleuth.flavour.1"), own, t("sleuth.flavour.2")] : [own];
+  };
+  const speak = (status) => {
+    const node = ctx.root.querySelector("[data-sub]");
+    if (!node) return;
+    if (spoken?.node === node && spoken.status === status) return;
+    voice?.stop();
+    voice = narrator(node);
+    spoken = { node, status };
+    voice.say(linesFor(status));
+  };
+  // The verdict lands on the file like a rubber stamp.
+  const stamp = () => {
+    const node = ctx.root.querySelector("[data-stamp]");
+    if (!node || current.status !== "done" || !node.hidden) return;
+    const verdict = current.verdict ?? "inconclusive";
+    node.className = `stamp tone-${verdict}`;
+    node.innerHTML = `<b>${esc(t(`verdict.${verdict}`))}</b><small>${esc(t("stamp.closed"))}</small>`;
+    node.hidden = false;
+  };
 
   const panel = () => {
     const { status } = current;
@@ -389,12 +438,16 @@ export async function scan(ctx) {
     const done = status === "done";
     const stage = done ? "done" : status;
     return `
-      <div class="scan-hero ${done ? `is-done tone-${esc(current.verdict ?? "inconclusive")}` : "is-live"}">
-        ${ring(done ? 1 : current.progress)}
-        <div class="scan-hero-text">
-          <b data-label>${esc(done ? t("scan.done") : t(`scan.stage.${stage}`))}</b>
-          <span data-sub>${esc(done ? t("scan.stage.done.d") : stage === "queued" ? t("scan.fx.queued") : t(`scan.stage.${stage}.d`))}</span>
+      <div class="case ${done ? `is-done tone-${esc(current.verdict ?? "inconclusive")}` : "is-live"} scan-hero">
+        <div class="case-top">
+          <span class="sleuth" aria-hidden="true"><i></i>${icons.logo}</span>
+          <div class="scan-hero-text">
+            <small class="case-no">${esc(t("case.no"))} ${esc(current.id.slice(0, 6).toUpperCase())}</small>
+            <b data-label>${esc(done ? t("scan.done") : t(`scan.stage.${stage}`))}</b>
+          </div>
+          ${ring(done ? 1 : current.progress)}
         </div>
+        <p class="case-say" data-sub aria-live="polite"></p>
       </div>
       <div data-stepper>${stepper(status)}</div>
       ${done ? `<div class="row scan-outcome">${verdictBadge(current.verdict, true)}<a class="btn btn-primary" href="#/result/${esc(current.id)}">${esc(t("scan.view"))}${icons.arrow}</a></div>` : ""}`;
@@ -421,6 +474,9 @@ export async function scan(ctx) {
         </div>
       </div>`;
     bind();
+    glass?.stop();
+    glass = investigate(ctx.root.querySelector(".preview"));
+    stamp();
   };
 
   const updateProgress = (event) => {
@@ -429,12 +485,12 @@ export async function scan(ctx) {
     setPhase(event.status);
     const box = ctx.root.querySelector("[data-panel]");
     if (!box) return;
-    if (!box.querySelector("[data-stepper]") || !ACTIVE.has(event.status)) { box.innerHTML = panel(); bind(); return; }
+    if (!box.querySelector("[data-stepper]") || !ACTIVE.has(event.status)) { box.innerHTML = panel(); bind(); stamp(); return; }
     const value = Math.round(event.progress * 100);
     box.querySelector(".ring-value").setAttribute("stroke-dasharray", `${value} 100`);
     countTo(box.querySelector("[data-pct]"), value, { from: before, duration: 450 });
     box.querySelector("[data-label]").textContent = t(`scan.stage.${event.status}`);
-    box.querySelector("[data-sub]").textContent = event.status === "queued" ? t("scan.fx.queued") : t(`scan.stage.${event.status}.d`);
+    speak(event.status);
     box.querySelector("[data-stepper]").innerHTML = stepper(event.status);
   };
 
@@ -443,11 +499,12 @@ export async function scan(ctx) {
     if (!ctx.alive()) return;
     ctx.setCurrent(current);
     if (current.status === "done") {
-      setTimeout(() => { if (ctx.alive()) ctx.navigate(`result/${current.id}`); }, 1500);
+      setTimeout(() => { if (ctx.alive()) ctx.navigate(`result/${current.id}`); }, 2600);
     }
     setPhase(current.status);
     const box = ctx.root.querySelector("[data-panel]");
     if (box) { box.innerHTML = panel(); bind(); }
+    stamp();
   };
 
   // After two missed polls the screen says so instead of animating as if work continued.
@@ -458,7 +515,8 @@ export async function scan(ctx) {
     hero.classList.toggle("is-offline", offline);
     ctx.root.querySelector(".preview")?.classList.toggle("is-paused", offline);
     const sub = hero.querySelector("[data-sub]");
-    if (sub && offline) sub.textContent = t("err.network");
+    if (sub && offline) { voice?.stop(); spoken = null; sub.textContent = t("err.network"); }
+    if (sub && !offline) speak(current.status);
   };
 
   const poll = () => {
@@ -488,12 +546,14 @@ export async function scan(ctx) {
   };
 
   function bind() {
+    if (ACTIVE.has(current.status) || current.status === "done") speak(current.status);
     ctx.root.querySelector("[data-start]")?.addEventListener("click", async (event) => {
       event.currentTarget.disabled = true;
       try {
         current = await api.start(current.id);
         setPhase(current.status);
         ctx.root.querySelector("[data-panel]").innerHTML = panel();
+        speak(current.status);
         follow();
       } catch (error) {
         fail(error);
@@ -510,7 +570,7 @@ export async function scan(ctx) {
 
   render();
   if (ACTIVE.has(current.status)) follow();
-  return () => { controller.abort(); clearTimeout(pollTimer); };
+  return () => { controller.abort(); clearTimeout(pollTimer); glass?.stop(); voice?.stop(); };
 }
 
 /* ----------------------------------------------------------------- result */

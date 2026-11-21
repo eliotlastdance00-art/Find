@@ -26,8 +26,25 @@ def test_index_and_static_assets(client: TestClient) -> None:
     index = client.get("/")
     assert index.status_code == 200 and "text/html" in index.headers["content-type"]
     assert '<script type="module" src="/static/js/app.js">' in index.text
-    for asset in ("js/app.js", "js/api.js", "js/views.js", "js/ui.js", "js/i18n.js", "js/motion.js",
-                  "js/theme.js", "js/logo.js", "css/app.css", "favicon.svg"):  # fmt: skip
+    assets = [
+        "app",
+        "api",
+        "views",
+        "ui",
+        "i18n",
+        "motion",
+        "theme",
+        "logo",
+        "fx",
+        "menus",
+        "sleuth",
+    ]
+    for asset in (
+        *(f"js/{name}.js" for name in assets),
+        "css/app.css",
+        "css/world.css",
+        "favicon.svg",
+    ):
         response = client.get(f"/static/{asset}")
         assert response.status_code == 200, asset
         # Unversioned file names: the browser must revalidate, or an update shows a stale UI.

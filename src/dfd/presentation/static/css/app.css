@@ -526,34 +526,6 @@ td.date { color: var(--muted); white-space: nowrap; }
 .fx { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; opacity: 0; transition: opacity .45s; --fx: #22d3ee; }
 .preview:not([data-phase="idle"]) .fx { opacity: 1; }
 .fx > i { position: absolute; }
-.fx-grid {
-  inset: -44px; opacity: .2;
-  background-image: linear-gradient(var(--fx) 1px, transparent 1px), linear-gradient(90deg, var(--fx) 1px, transparent 1px);
-  background-size: 44px 44px; animation: grid-drift 3.5s linear infinite;
-}
-@keyframes grid-drift { to { transform: translate3d(44px, 44px, 0); } }
-.fx-line {
-  inset: 0; animation: line-y 2.3s ease-in-out infinite alternate;
-  background: linear-gradient(to bottom, transparent calc(50% - 110px), color-mix(in srgb, var(--fx) 30%, transparent) calc(50% - 2px), #fff calc(50% - 1px), #fff calc(50% + 1px), transparent calc(50% + 2px));
-  filter: drop-shadow(0 0 10px var(--fx));
-}
-@keyframes line-y { from { transform: translateY(-50%); } to { transform: translateY(50%); } }
-.fx-corner { width: 30px; height: 30px; border: 3px solid var(--fx); filter: drop-shadow(0 0 6px var(--fx)); animation: corner 1.6s ease-in-out infinite alternate; }
-.fx-corner.tl { top: 14px; left: 14px; border-right: 0; border-bottom: 0; border-top-left-radius: 10px; --cx: 5px; --cy: 5px; }
-.fx-corner.tr { top: 14px; right: 14px; border-left: 0; border-bottom: 0; border-top-right-radius: 10px; --cx: -5px; --cy: 5px; }
-.fx-corner.bl { bottom: 14px; left: 14px; border-right: 0; border-top: 0; border-bottom-left-radius: 10px; --cx: 5px; --cy: -5px; }
-.fx-corner.br { bottom: 14px; right: 14px; border-left: 0; border-top: 0; border-bottom-right-radius: 10px; --cx: -5px; --cy: -5px; }
-@keyframes corner { to { transform: translate(var(--cx), var(--cy)); } }
-.fx-heat {
-  inset: 0; opacity: 0; mix-blend-mode: screen; transition: opacity .6s;
-  background: radial-gradient(28% 32% at 42% 38%, rgba(255,70,40,.75), rgba(255,180,0,.35) 55%, transparent 75%),
-              radial-gradient(22% 24% at 62% 58%, rgba(255,200,0,.6), rgba(255,90,0,.25) 55%, transparent 75%);
-  animation: heat 2.2s ease-in-out infinite alternate;
-}
-@keyframes heat { from { transform: scale(.92) translate(-2%, 1%); filter: blur(6px); } to { transform: scale(1.1) translate(2%, -2%); filter: blur(12px); } }
-.preview[data-phase="explaining"] .fx-heat { opacity: 1; }
-.preview[data-phase="explaining"] .fx-line, .preview[data-phase="explaining"] .fx-grid { opacity: 0; }
-.preview[data-phase="queued"] .fx-line, .preview[data-phase="preprocessing"] .fx-line { animation-duration: 3.4s; opacity: .6; }
 .fx-chip {
   position: absolute; top: 14px; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
   padding: 6px 13px 6px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: #fff;
@@ -561,13 +533,6 @@ td.date { color: var(--muted); white-space: nowrap; }
 }
 .fx-chip > i { width: 8px; height: 8px; border-radius: 50%; background: var(--fx); box-shadow: 0 0 0 0 var(--fx); animation: dot 1.2s infinite; }
 @keyframes dot { to { box-shadow: 0 0 0 9px transparent; } }
-/* Sound has no picture to frame: the scanner crosses the level bars instead. */
-.preview[data-kind="audio"] .fx-grid, .preview[data-kind="audio"] .fx-corner, .preview[data-kind="audio"] .fx-heat { display: none; }
-.preview[data-kind="audio"] .fx-line {
-  animation-name: line-x; opacity: 1;
-  background: linear-gradient(to right, transparent calc(50% - 90px), color-mix(in srgb, var(--fx) 28%, transparent) calc(50% - 2px), #fff calc(50% - 1px), #fff calc(50% + 1px), transparent calc(50% + 2px));
-}
-@keyframes line-x { from { transform: translateX(-50%); } to { transform: translateX(50%); } }
 .preview-audio { padding-top: 56px; }
 .eq { display: flex; align-items: center; justify-content: center; gap: 3px; width: 100%; max-width: 420px; height: 110px; }
 .eq i {
@@ -690,7 +655,7 @@ td.date { color: var(--muted); white-space: nowrap; }
     animation-duration: .01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important;
     transition-duration: .01ms !important; scroll-behavior: auto !important;
   }
-  .fx-line, .fx-grid, .dz-sweep { display: none; }
+  .dz-sweep { display: none; }
 }
 @media print { .sidebar, .topbar { display: none; } .shell { display: block; } }
 

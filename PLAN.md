@@ -548,3 +548,20 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   --kernel-source eliotalderson00/dfd-tk-build --gpu -- --budget-min 240` (≈4.5–5 sag). Çykyş: `AASIST.pth`, `model_card.json`, `metrics.json`, `baseline.json`, `history.json`.
   **Soň (4-nji ädim):** netijä görä `weights/audio`-a goýmak; `max_verdict` çägini diňe hakyky türkmen sesinde ýalňyş duýduryş pes bolsa aýyrmak.
 
+- **2026-11-21 (11) — interfeýs: «dünýä», menýular, Şerlok derňewi (ulanyjynyň 5 belligi boýunça).**
+  **Bellikler:** (1) dil çalşyjy halanmady; (2) gapdal menýu ýygnanmaly; (3) aşakdaky «çykmak» has ösen bolmaly, başga näme goýup bolar — pikirlenmeli;
+  (4) animasiýa gowşak: girende wirtual dünýä/oýun başlan ýaly bolmaly, diňe dörtburç çarçuwalar gowy däl; seljerme «kompýuter skaneri» däl-de, Şerlok derňeýän ýaly bolmaly; (5) her işden öň pikirlenmeli.
+  **Analiz we saýlanan çözgütler:**
+  - *Dil:* üç harply segment (TK/RU/EN) ýerine globus nyşanly düwme + açylýan sanaw; diller öz dilinde ýazylýar («Türkmençe», «Русский», «English»), baýdak ýok
+    (çeşmeler: baýdak ýurdy aňladýar, dili däl; öz dilindäki at — standart). Ret edildi: baýdaklar; diňe hasap menýusynda gizlemek (giriş sahypasynda hem gerek).
+  - *Gapdal menýu:* nyşanly inçe zolaga (76 px) ýygnanýar, düwme + `Ctrl/⌘+B`, ýagdaý `localStorage`-da; ýygnalanda atlar gapdalynda çykýar. Ret edildi: doly gizlemek (nawigasiýa ýitýär). Telefonda aşaky zolak öňküsi ýaly.
+  - *Hasap menýusy («çykmak» ýerine):* ulanyjy kartasy → açylýan menýu: at, rol, hakyky sanlar (`/api/stats`), reňk tertibi (Ýagty/Garaňky/Awto), dil, «Ulgam barada» (wersiýa, modelleriň hakyky ýagdaýy, çäkler), «Çykmak» (tassyklama + geçiş). Üstünde ulgam ýagdaýy (modeller ýüklenenmi). Parol üýtgetmek goýulmady — API ýok.
+  - *Dünýä:* (a) fon — çuňlukly nokatlar meýdany (canvas 2D, görüjä tarap ýuwaş akýar, görkeziji bilen süýşýär); (b) açylyş — logo garaňkydan gelýär, at harp-harp ýygnanýar, ýükleýji hakyky başlangyja bagly, soň lupanyň içinden «uçup» girilýär (bir wkladkada bir gezek, islendik düwme geçirýär);
+    (c) giriş/çykyş — tegelek perde + «Hoş geldiňiz, …». (d) kartalar görkezijiniň astynda ýagtylanýar; sahypalar çuňlukdan gelýär; ýüklemekde dörtburç «ping» ýerine orbitalar. Ret edildi: three.js/WebGL (CSP `self`, daşky kitaphana, agyr); wideo fon (ölçeg).
+    Başlangyç tertip indi garaňky (gijeki sahna); «Awto» aýdyň saýlanýar.
+  - *Şerlok derňewi:* skaner çyzygy, tor, burç çarçuwalary we ýasama «ýylylyk tegmilleri» aýryldy. Ýerine: faýlyň üstünde gezýän lupa — astyndakyny hakykatdanam ulaldýar (surat: nusga; wideo: kadr; ses: tolkun), Şerlogyň ýazylyp çykýan sözleri (her tapgyrda serweriň hakykatdan edýän işi + Holmsdan jümleler), «iş №», yz zynjyry, ahyrynda höküm möhüri.
+    **Dogruçyllyk:** lupanyň duran ýeri «tapyndy» däl — bezeg; şonuň üçin belgi/pin goýulmaýar, sözler diňe tapgyry beýan edýär.
+  **Faýllar:** `static/js/fx.js`, `menus.js`, `sleuth.js`, `css/world.css` (täze); `app.js`, `views.js`, `ui.js`, `i18n.js` (täze açarlar, 3 dilde), `theme.js`, `css/app.css` (köne skaner aýryldy).
+  **Barlag:** Playwright bilen 1440×900 we 390×800: açylyş, giriş, dil sanawy, geçiş, hasap menýusy, ýygnalan menýu, «Ulgam barada», çykyş soragy, surat/wideo/ses üstünde lupa, möhür — konsol ýalňyşsyz. `prefers-reduced-motion`-da kod boýunça öçýär (aýratyn synalmady).
+  **Barlanmadyk:** hakyky telefon, Safari/Firefox; README suratlary köne görnüşde.
+
