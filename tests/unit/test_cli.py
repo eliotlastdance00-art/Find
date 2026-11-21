@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -46,5 +47,6 @@ def test_secret_key_is_generated_once_and_kept_private(tmp_path: Path) -> None:
     key = settings.resolved_secret_key()
     assert len(key) >= 48
     assert settings.resolved_secret_key() == key
-    assert (tmp_path / "secret.key").stat().st_mode & 0o777 == 0o600
+    if os.name == "posix":  # Windows has no permission bits; the file inherits the folder's ACL
+        assert (tmp_path / "secret.key").stat().st_mode & 0o777 == 0o600
     assert Settings(_env_file=None, secret_key="explicit").resolved_secret_key() == "explicit"  # type: ignore[call-arg]

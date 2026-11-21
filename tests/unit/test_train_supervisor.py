@@ -14,6 +14,9 @@ from training import train_visual as tv
 
 FAR_FUTURE = 4_000_000_000.0
 
+# The watchdog relies on SIGUSR1, process groups and faulthandler.register; training runs on Linux.
+posix_only = pytest.mark.skipif(sys.platform == "win32", reason="the watchdog needs POSIX signals")
+
 
 @pytest.fixture(autouse=True)
 def _fast_polling(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -36,6 +39,7 @@ def test_child_failure_reports_exit_code() -> None:
     assert outcome == "exit code 3"
 
 
+@posix_only
 def test_silent_child_is_dumped_and_killed(capfd: pytest.CaptureFixture[str]) -> None:
     code = (
         "import faulthandler, signal, time\n"
@@ -50,6 +54,7 @@ def test_silent_child_is_dumped_and_killed(capfd: pytest.CaptureFixture[str]) ->
     assert "most recent call first" in capfd.readouterr().out
 
 
+@posix_only
 def test_hard_time_limit_kills_a_talkative_child() -> None:
     code = "import time\nwhile True:\n    print('tick', flush=True)\n    time.sleep(0.05)\n"
     outcome = tv._run_child(_python(code), dict(os.environ), 30, time.time() + 0.5)

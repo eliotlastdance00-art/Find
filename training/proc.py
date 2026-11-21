@@ -82,7 +82,9 @@ def run_watched(
                     os.kill(proc.pid, signal.SIGUSR1)
                     time.sleep(DUMP_GRACE_SECONDS)
                     os.killpg(proc.pid, signal.SIGKILL)  # the whole group: workers too
-                except ProcessLookupError:
+                except (ProcessLookupError, PermissionError):
+                    # Already gone. macOS answers EPERM, not ESRCH, when the group holds only a
+                    # zombie: a child without a SIGUSR1 handler dies from the dump signal itself.
                     pass
                 proc.wait()
         reader.join(timeout=10)
