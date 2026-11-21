@@ -35,6 +35,8 @@
     "evaluated_on": "ASVspoof 2019 LA eval, random subset of 3000 utterances",
     "source": "https://github.com/clovaai/aasist/raw/main/models/weights/AASIST.pth",
     "created_at": "2026-11-20T15:26:19+00:00",
-    "note": "Provisional: measured on a subset; rerun training/eval_audio.py without --limit for final values."
-  }
+    "note": "Provisional: measured on a subset; rerun training/eval_audio.py without --limit for final values.",
+    "max_verdict_reason": "Unreliable on Turkmen speech (0 of 60 real clips judged real, AUC 0.38-0.55 against MMS-TTS); limit stays until a model trained on Turkmen is deployed."
+  },
+  "max_verdict": "suspicious"
 }

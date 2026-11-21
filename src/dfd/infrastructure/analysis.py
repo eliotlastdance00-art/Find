@@ -292,7 +292,10 @@ class TorchMediaAnalyzer:
                 card.thresholds_for("audio"),
                 card.label,
                 card.provisional,
+                card.max_verdict,
             )
+            if card.max_verdict is not None:
+                analysis.notes.append("audio_capped")
             analysis.segments = [
                 SegmentFinding(span[0], span[1], p)
                 for span, p in zip(spans, probabilities, strict=True)

@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 
+from dfd.container import build_container
+from dfd.presentation.app import create_app
 from tests.api.helpers import run_scan, upload
-from tests.conftest import register
+from tests.conftest import CentreFace, make_settings, register
 
 VERDICTS = {"real", "suspicious", "fake"}
 
@@ -98,6 +101,27 @@ def test_audio_scan_and_silence(
     silent = run_scan(client, auth, media["silence"])
     assert silent["status"] == "done" and silent["verdict"] == "inconclusive"
     assert silent["prob_fake"] is None and "audio_silent" in silent["details"]["notes"]
+
+
+def test_capped_audio_model_never_says_fake_and_explains_why(
+    tmp_path: Path, weights_dir: Path, media: dict[str, Path]
+) -> None:
+    weights = tmp_path / "weights"
+    shutil.copytree(weights_dir, weights)
+    card = weights / "audio" / "model_card.json"
+    data = json.loads(card.read_text())
+    data["thresholds"] = {"audio": {"real_max": 0.0, "fake_min": 0.0}}  # anything is "fake"
+    data["max_verdict"] = "suspicious"
+    card.write_text(json.dumps(data))
+    container = build_container(make_settings(tmp_path, weights), faces=CentreFace())
+    with TestClient(create_app(container=container)) as capped:
+        auth = register(capped)
+        scan = run_scan(capped, auth, media["audio"])
+        assert scan["status"] == "done" and scan["verdict"] == "suspicious"
+        assert scan["details"]["audio"]["capped"] is True
+        assert "audio_capped" in scan["details"]["notes"]
+        report = capped.get(f"/api/scans/{scan['id']}/report.pdf?lang=tk", headers=auth)
+        assert report.status_code == 200 and report.content.startswith(b"%PDF")
 
 
 def test_events_stream_reports_progress_until_done(

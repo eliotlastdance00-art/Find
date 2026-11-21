@@ -1,9 +1,20 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 import pytest
 
-from dfd.domain.entities import MediaType, Thresholds, Verdict
-from dfd.domain.scoring import aggregate_scores, classify, fuse, headline_probability
+from dfd.application.scans import apply_analysis
+from dfd.domain.entities import (
+    Analysis,
+    MediaType,
+    ModalityResult,
+    Scan,
+    ScanStatus,
+    Thresholds,
+    Verdict,
+)
+from dfd.domain.scoring import aggregate_scores, cap, classify, fuse, headline_probability
 
 BAND = Thresholds(0.3, 0.7)
 
@@ -77,3 +88,43 @@ def test_headline_probability_follows_primary_modality() -> None:
     assert headline_probability(0.2, 0.9, MediaType.AUDIO) == 0.9
     assert headline_probability(None, 0.9, MediaType.VIDEO) == 0.9
     assert headline_probability(None, None, MediaType.IMAGE) is None
+
+
+@pytest.mark.parametrize(
+    ("verdict", "limit", "expected"),
+    [
+        (Verdict.FAKE, Verdict.SUSPICIOUS, Verdict.SUSPICIOUS),
+        (Verdict.SUSPICIOUS, Verdict.SUSPICIOUS, Verdict.SUSPICIOUS),
+        (Verdict.REAL, Verdict.SUSPICIOUS, Verdict.REAL),
+        (Verdict.FAKE, None, Verdict.FAKE),
+    ],
+)
+def test_cap_limits_how_strong_a_verdict_may_be(
+    verdict: Verdict, limit: Verdict | None, expected: Verdict
+) -> None:
+    assert cap(verdict, limit) is expected
+
+
+def _scan(media_type: MediaType) -> Scan:
+    created = datetime(2026, 1, 1, tzinfo=UTC)
+    return Scan("id", 1, "a.wav", "a.wav", "0" * 64, 10, media_type, ScanStatus.ANALYZING, created)
+
+
+def test_a_capped_audio_model_cannot_call_a_file_fake() -> None:
+    scan = _scan(MediaType.AUDIO)
+    result = ModalityResult(0.999, BAND, "aasist 1.0.0", max_verdict=Verdict.SUSPICIOUS)
+    apply_analysis(scan, Analysis(audio=result, notes=["audio_capped"]))
+    assert scan.verdict is Verdict.SUSPICIOUS
+    assert scan.prob_fake == 0.999  # the measured probability itself is still shown
+    assert scan.details["audio"]["verdict"] == "suspicious"
+    assert scan.details["audio"]["capped"] is True
+    assert "audio_capped" in scan.details["notes"]
+
+
+def test_a_cap_leaves_weaker_verdicts_and_uncapped_models_alone() -> None:
+    scan = _scan(MediaType.AUDIO)
+    capped = ModalityResult(0.1, BAND, "m", max_verdict=Verdict.SUSPICIOUS)
+    apply_analysis(scan, Analysis(audio=capped))
+    assert scan.verdict is Verdict.REAL and scan.details["audio"]["capped"] is False
+    apply_analysis(scan, Analysis(audio=ModalityResult(0.999, BAND, "m")))
+    assert scan.verdict is Verdict.FAKE and scan.details["audio"]["capped"] is False

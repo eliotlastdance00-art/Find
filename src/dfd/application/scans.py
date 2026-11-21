@@ -29,7 +29,7 @@ from dfd.domain.ports import (
     ScanFilter,
     ScanRepository,
 )
-from dfd.domain.scoring import classify, fuse, headline_probability
+from dfd.domain.scoring import cap, classify, fuse, headline_probability
 
 log = logging.getLogger(__name__)
 
@@ -132,10 +132,12 @@ class ScanService:
 def _modality(result: ModalityResult | None) -> tuple[dict[str, Any] | None, Verdict | None]:
     if result is None:
         return None, None
-    verdict = classify(result.prob_fake, result.thresholds)
+    uncapped = classify(result.prob_fake, result.thresholds)
+    verdict = cap(uncapped, result.max_verdict)
     return {
         "prob": result.prob_fake,
         "verdict": verdict.value,
+        "capped": verdict is not uncapped,
         "real_max": result.thresholds.real_max,
         "fake_min": result.thresholds.fake_min,
         "model": result.model,

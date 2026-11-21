@@ -97,6 +97,7 @@ class ModalityResult:
     thresholds: Thresholds
     model: str
     provisional: bool = False
+    max_verdict: Verdict | None = None  # the model's card forbids anything stronger
 
 
 @dataclass(slots=True)

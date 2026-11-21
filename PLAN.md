@@ -393,3 +393,17 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   1 Şübheli; ýüz suraty → Hakyky. Wideo ~10 s (CPU), serweriň RSS-i 1194 MB.
 - `faces.tar` (2 GB) Kaggle çykyşynda bar — indiki okuwlar ýüz kesmegi gaýtalamaz.
 - Galan iş: başga toplumda (cross-dataset) ölçeg ýok; 12-nji epohadaky öldürilmegiň sebäbi.
+
+### 2026-11-21 (2) — Ses üçin wagtlaýyn gorag + türkmen ses toplumyny gurujy
+
+- **Gorag:** model kartasyna `max_verdict` meýdany goşuldy (`ModelCard`, `ModalityResult`,
+  `scoring.cap`). `weights/audio/model_card.json` → `"max_verdict": "suspicious"`: ses modeli
+  ýeke özi «Galp» diýip bilmeýär, netijede/PDF-de üç dilde düşündiriş belligi (`audio_capped`)
+  görkezilýär. Täze (türkmençe okadylan) modeliň kartasynda bu çäk bolmaz. 8 täze test.
+- **Gurujy:** `training/tk_audio/` — `sources.py` (TurkmenSpeech + Common Voice), `plan.py`
+  (haýsy galp haýsy hakyky ýazgydan; bölünişler arassa, OmniVoice/Vocos diňe testde),
+  `gen_*.py` (9 generator), `check_asr.py`, `build.py` (her ädim aýratyn prosesde, gözegçi,
+  dowam etdirmek, her generatordan soň arhiw). `training/proc.py` — umumy gözegçi.
+- Ýerli synag (CPU, 20 hakyky ýazgy): sources → resynth (5 generator) → MMS işledi, 67 ýazgy.
+- Kaggle `dfd-tk-build` v1 (kiçi GPU synagy, ~400 hakyky ýazgy, 55 min çäk) 04:06 UTC-de goýberildi.
+  Maksat: GPU-da ähli generatorlaryň işleýändigini we tizligini ölçemek, soň doly gurluş.

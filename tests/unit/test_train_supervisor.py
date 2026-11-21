@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 
 import pytest
+from training import proc
 from training import train_visual as tv
 
 FAR_FUTURE = 4_000_000_000.0
@@ -16,8 +17,8 @@ FAR_FUTURE = 4_000_000_000.0
 
 @pytest.fixture(autouse=True)
 def _fast_polling(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(tv, "POLL_SECONDS", 0.05)
-    monkeypatch.setattr(tv, "DUMP_GRACE_SECONDS", 0.3)
+    monkeypatch.setattr(proc, "POLL_SECONDS", 0.05)
+    monkeypatch.setattr(proc, "DUMP_GRACE_SECONDS", 0.3)
 
 
 def _python(code: str) -> list[str]:

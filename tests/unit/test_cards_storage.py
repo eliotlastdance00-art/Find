@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from dfd.domain import errors
-from dfd.domain.entities import Thresholds
+from dfd.domain.entities import Thresholds, Verdict
 from dfd.infrastructure.ml.cards import (
     IMAGENET_MEAN,
     ModelCard,
@@ -58,6 +58,18 @@ def test_card_defaults_apply_when_fields_are_missing() -> None:
     assert card.mean == IMAGENET_MEAN
     assert card.temperature == 1.0
     assert card.provisional is False
+
+
+def test_card_verdict_limit_roundtrips_and_is_validated(tmp_path: Path) -> None:
+    weights = tmp_path / "w.pth"
+    weights.write_bytes(b"weights")
+    data = _card(weights).to_json()
+    assert "max_verdict" not in data  # absent unless a limit is set
+    limited = ModelCard.from_json({**data, "max_verdict": "suspicious"})
+    assert limited.max_verdict is Verdict.SUSPICIOUS
+    assert ModelCard.from_json(limited.to_json()) == limited
+    with pytest.raises(ValueError, match="max_verdict"):
+        ModelCard.from_json({**data, "max_verdict": "fake"})
 
 
 def test_card_requires_thresholds() -> None:

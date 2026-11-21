@@ -133,6 +133,9 @@ geçirilmedi; adatça şeýle modelleriň takyklygy nätanyş maglumatlarda ep-e
   (meselem, doly emeli döredilen suratlar, diffuziýa modelleri, täze face-swap programmalary)
   ýasalan materiallarda takyklyk ep-esli pes bolup biler.
 * Güýçli gysylan, kiçi ýa-da garaňky wideolarda hakyky faýl «Şübheli» diýlip bilner.
+* Ses modeli diňe **iňlis** dilinde ölçenen. Türkmen dilindäki synagda ol ýalňyşdy (60 hakyky
+  ýazgynyň hiç biri «Hakyky» çykmady), şonuň üçin türkmen dilinde okadylan model taýýar bolýança
+  ses boýunça höküm «Şübheli» derejesinden ýokary çykarylmaýar (`model_card.json` → `max_verdict`).
 * Ses modeli **gürleýiş** üçin okadylan. Aýdym-saz, şowhun ýa-da arassa ton ýaly gürleýiş däl
   seslerde netijä ynanmaly däl (şonuň üçin wideoda ses hökümi «Galp» edip bilmeýär).
 * Ulgam diňe ýüzi barlaýar; ýüz ýok bolsa şekil boýunça baha berilmeýär.

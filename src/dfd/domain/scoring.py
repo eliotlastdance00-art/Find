@@ -39,6 +39,17 @@ def classify(prob_fake: float, thresholds: Thresholds) -> Verdict:
     return Verdict.SUSPICIOUS
 
 
+def cap(verdict: Verdict, limit: Verdict | None) -> Verdict:
+    """Never report more than ``limit``.
+
+    A model card can carry such a limit when its model is known to be unreliable in some
+    setting; a detector that cannot be trusted to say "fake" may then say "suspicious" at most.
+    """
+    if limit is None or _SEVERITY[verdict] <= _SEVERITY[limit]:
+        return verdict
+    return limit
+
+
 def fuse(media_type: MediaType, visual: Verdict | None, audio: Verdict | None) -> Verdict:
     """Combine per-modality verdicts into the final one.
 

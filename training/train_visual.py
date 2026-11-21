@@ -21,16 +21,12 @@ from __future__ import annotations
 
 import argparse
 import csv
-import faulthandler
 import json
 import math
 import os
 import random
-import signal
-import subprocess
 import sys
 import tarfile
-import threading
 import time
 from collections import defaultdict
 from datetime import UTC, datetime
@@ -47,6 +43,7 @@ from dfd.domain.scoring import aggregate_scores
 from dfd.infrastructure.ml import metrics as M
 from dfd.infrastructure.ml.cards import ModelCard, file_sha256, save_card
 from dfd.infrastructure.ml.visual import build_backbone
+from training import proc
 from training.augment import augment
 from training.ffpp import FaceRow, discover, extract_faces, find_root, read_manifest
 
@@ -202,8 +199,6 @@ def save_roc(path: Path, curves: dict[str, tuple[np.ndarray, np.ndarray]]) -> No
 
 TRAINED_ON = "FaceForensics++ c23 (Deepfakes, Face2Face, FaceSwap, NeuralTextures, FaceShifter)"
 DEADLINE_ENV = "DFD_TRAIN_DEADLINE"
-POLL_SECONDS = 5.0  # how often the supervisor looks at its worker
-DUMP_GRACE_SECONDS = 10.0  # time the worker gets to print its stacks before it is killed
 
 
 def _worker_init(_: int) -> None:
@@ -334,7 +329,7 @@ def export_model(
 
 def run(args: argparse.Namespace) -> None:
     """The actual work: faces, training with checkpoints, calibration, evaluation, export."""
-    faulthandler.register(signal.SIGUSR1, all_threads=True)
+    proc.enable_stack_dumps()
     started = time.time()
     deadline = float(os.environ.get(DEADLINE_ENV, started + args.time_budget_min * 60.0))
     random.seed(args.seed + args.attempt)
@@ -610,48 +605,8 @@ def run(args: argparse.Namespace) -> None:
 
 
 def _run_child(cmd: list[str], env: dict[str, str], stall_s: float, kill_at: float) -> str:
-    """Run one worker; return "ok" or the reason it ended. Silence counts as a stall."""
-    proc = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        bufsize=1,
-        env=env,
-        start_new_session=True,
-    )
-    last_output = [time.time()]
-
-    def pump() -> None:
-        assert proc.stdout is not None
-        for line in proc.stdout:
-            sys.stdout.write(line)
-            sys.stdout.flush()
-            last_output[0] = time.time()
-
-    reader = threading.Thread(target=pump, daemon=True)
-    reader.start()
-    reason = ""
-    while proc.poll() is None:
-        time.sleep(POLL_SECONDS)
-        silent = time.time() - last_output[0]
-        if silent > stall_s:
-            reason = f"no output for {silent / 60:.0f} min"
-        elif time.time() > kill_at:
-            reason = "hard time limit"
-        if reason:
-            print(f"[supervisor] {reason}: dumping stacks, then killing the worker", flush=True)
-            try:
-                os.kill(proc.pid, signal.SIGUSR1)  # faulthandler prints every thread's stack
-                time.sleep(DUMP_GRACE_SECONDS)
-                os.killpg(proc.pid, signal.SIGKILL)  # the whole group: DataLoader workers too
-            except ProcessLookupError:
-                pass
-            proc.wait()
-    reader.join(timeout=10)
-    if reason:
-        return reason
-    return "ok" if proc.returncode == 0 else f"exit code {proc.returncode}"
+    """Run one worker under the watchdog; return "ok" or the reason it ended."""
+    return proc.run_watched(cmd, env, stall_s, kill_at)
 
 
 def supervise(argv: list[str], args: argparse.Namespace) -> None:

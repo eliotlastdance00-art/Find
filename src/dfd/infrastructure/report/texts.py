@@ -97,6 +97,17 @@ TEXTS: dict[str, dict[str, str]] = {
         "ru": "Звуковую дорожку не удалось прочитать.",
         "en": "The sound track could not be decoded.",
     },
+    "note_audio_capped": {
+        "tk": "Ses modeli diňe iňlis dilindäki gürleýişde ölçenen; türkmen dilinde ol "
+        "ýalňyşýar. Şonuň üçin täze model taýýar bolýança ses boýunça höküm «Şübheli» "
+        "derejesinden ýokary çykarylmaýar, «Hakyky» netijä-de doly ynanmaly däl.",
+        "ru": "Аудиомодель проверена только на английской речи; на туркменской она ошибается. "
+        "Поэтому до выхода новой модели вердикт по звуку не поднимается выше "
+        "«Подозрительный», а результату «Подлинный» не следует полностью доверять.",
+        "en": "The audio model has been measured on English speech only; on Turkmen speech it "
+        "is unreliable. Until the new model is ready, an audio verdict is never stronger "
+        "than “Suspicious”, and a “Real” result should not be fully trusted either.",
+    },
     "note_provisional": {
         "tk": "Model synag görnüşinde: bosagalar entek doly barlanmadyk.",
         "ru": "Модель в пробном режиме: пороги ещё не откалиброваны полностью.",

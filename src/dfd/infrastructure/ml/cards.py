@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from dfd.domain.entities import Thresholds
+from dfd.domain.entities import Thresholds, Verdict
 
 CARD_FILE = "model_card.json"
 
@@ -33,6 +33,9 @@ class ModelCard:
     trained_on: str = ""
     metrics: dict[str, Any] = field(default_factory=dict)
     extra: dict[str, Any] = field(default_factory=dict)
+    # Strongest verdict this model may give on its own; None means no limit. Set while a model
+    # is known to be unreliable on part of its expected input (see docs: Turkmen speech).
+    max_verdict: Verdict | None = None
 
     @property
     def label(self) -> str:
@@ -61,6 +64,7 @@ class ModelCard:
             },
             "metrics": self.metrics,
             "extra": self.extra,
+            **({"max_verdict": self.max_verdict.value} if self.max_verdict else {}),
         }
 
     @classmethod
@@ -73,6 +77,9 @@ class ModelCard:
             raise ValueError("model card has no thresholds")
         mean = tuple(float(v) for v in data.get("mean", IMAGENET_MEAN))
         std = tuple(float(v) for v in data.get("std", IMAGENET_STD))
+        limit = data.get("max_verdict")
+        if limit is not None and limit not in (Verdict.REAL.value, Verdict.SUSPICIOUS.value):
+            raise ValueError(f"model card has an unsupported max_verdict: {limit!r}")
         return cls(
             name=str(data["name"]),
             version=str(data["version"]),
@@ -89,6 +96,7 @@ class ModelCard:
             trained_on=str(data.get("trained_on", "")),
             metrics=dict(data.get("metrics", {})),
             extra=dict(data.get("extra", {})),
+            max_verdict=Verdict(limit) if limit is not None else None,
         )
 
 
