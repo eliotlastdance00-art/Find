@@ -12,6 +12,7 @@ from __future__ import annotations
 import io
 import json
 import math
+import os
 import secrets
 import struct
 import sys
@@ -30,6 +31,9 @@ def call(
     content_type: str | None = None,
 ) -> tuple[int, bytes]:  # fmt: skip
     request = urllib.request.Request(BASE + path, data=body, method=method)
+    for line in filter(None, os.environ.get("SMOKE_HEADERS", "").split("\n")):
+        name, _, value = line.partition(":")  # e.g. the token a private forwarded port wants
+        request.add_header(name.strip(), value.strip())
     if token:
         request.add_header("Authorization", f"Bearer {token}")
     if content_type:
