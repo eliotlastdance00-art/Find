@@ -515,4 +515,21 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   Docker gurnamada özi ýükleýär (0a.3 «bir buýruk» saklanýar); (b) Git LFS — mugt çägi dar, ret; (c) repo içinde bölekläp — klon agyrlaşýar, ret.
   **Indiki ädimler:** (2) birikdirmek + testler; (3) Kaggle-da ölçeg we bosagalar; (4) README, suratlar, çäklendirmeler.
   Ugur B: `dfd-tk-build` v2 11:09 UTC-de COMPLETE — netijesi entek barlanmady.
+- **2026-11-21 (9) — türkmen ses toplumy (2-nji ädim) tamamlandy we barlandy.** `dfd-tk-build` v2: COMPLETE, 187.5 min, ähli tapgyr `ok`.
+  Çykyş Kaggle-da galýar (kernel output, 2.9 GB tar); ýerli nusga: `/home/user/tk_build_out/tkset/` (report, manifest, asr_check, logs, samples — tar-syz).
+  - **Sanlar:** 28 969 kesim ≈ 49.6 sag. Hakyky 7 060 (12.0 sag): Common Voice 2 961 (124 gürleýji), TW/YouTube 4 099 (411 wideo).
+    Galp 21 909 (37.6 sag), 11 generator: kodek/wokoder gaýtadan sintez (dac, encodec, hifigan, mimi, univnet, vocos) 15 166;
+    TTS MMS 2 118; MMS+kNN-VC 887; ses klonlama VoxCPM 919 + OmniVoice 1 020; ses öwürmek kNN-VC 1 799.
+    Bölünişi (hakyky/galp): train 5 119 / 14 393, dev 895 / 2 531, test 1 046 / 4 985.
+  - **Syzma ýok (özüm manifestden barladym):** hiç bir gürleýji/wideo topary iki bölekde däl (535 topar); hiç bir «ene» kesimiň önümi başga bölekde däl;
+    klonlama/VC nusga gürleýjisi şol bir bölekden; gizlin generatorlar (`rs_vocos`, `tts_omnivoice`) diňe testde.
+  - **Düşnüklilik (MMS ASR, hakyky kesime görä CER, n=25):** gaýtadan sintez 5–10 %, TTS 14–16 %, kNN-VC 20–23 % (pes däl, ýöne ulanarlyk).
+  - **Kemçilikler (3-nji ädimde çözülmeli):**
+    1. Ses derejesi tapawutly: `tts_mms`, `tts_mms_knnvc`, `vc_knnvc` rms ≈ 0.13–0.16, hakyky ≈ 0.05–0.065 → model «gaty ses = galp» öwrenip biler.
+       Çözgüt: okuwda iki synp üçin hem RMS deňlemek + tötän güýçlendirme. (Faýllar kesilmedik: ýazyjy 0.99-a çenli kiçeldýär.)
+    2. Synp deňagramsyzlygy 1 : 3 → deňagramly saýlama ýa-da agramly ýitgi.
+    3. VoxCPM haýal (RTF 2.3): meýilleşdirilen 2 473-den 919 kesim; OmniVoice 1 046-dan 1 020.
+    4. Hakyky test sözlemleriniň 202-si (1 046-dan) okuwda hem bar (başga gürleýji) — tekst syzmasy, gürleýji däl; hasabatda bellemeli.
+    5. Spektr/zolak giňligi synplar boýunça barlanmady (ýerli gurallar ýok) — okuw skriptinde barlamaly.
+  - **Indiki (3-nji ädim):** AASIST-i bilelikde öwretmek (ASVspoof 2019 LA + bu toplum), skript entek ýazylmady.
 
