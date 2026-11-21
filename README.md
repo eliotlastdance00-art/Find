@@ -1,69 +1,249 @@
-# Deepfake Detektor — dipfeýkleri kesgitleýän ulgam
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.png">
+    <img src="docs/assets/logo-light.png" alt="Deepfake Detektor" width="200">
+  </picture>
+</p>
 
-[![CI](https://github.com/eliotlastdance00-art/Find/actions/workflows/ci.yml/badge.svg)](https://github.com/eliotlastdance00-art/Find/actions/workflows/ci.yml)
+<h1 align="center">Deepfake Detektor</h1>
 
-Wideo, surat we ses faýllarynyň hakykydygyny ýa-da emeli usulda üýtgedilendigini barlaýan
-web ulgam. Ýüz çalşylan (face swap) wideolary we suratlary, emeli döredilen ýa-da üýtgedilen
-sesi kesgitleýär, galp bolmak ähtimallygyny göterimde görkezýär, **Hakyky / Şübheli / Galp**
-diýen netije berýär, şübheli ýerleri ýylylyk kartasy (heatmap) bilen belleýär we PDF hasabat
-taýýarlaýar.
+<p align="center">
+  <b>Wideo, surat we sesiň hakykydygyny ýa-da galpdygyny barlaýan web ulgam</b><br>
+  ýüz çalşygyny we emeli sesi kesgitleýär · ähtimallygy göterimde görkezýär · şübheli ýerleri belleýär · PDF hasabat berýär
+</p>
 
-*English summary: [see below](#english).*
+<p align="center">
+  <a href="https://github.com/eliotlastdance00-art/Find/actions/workflows/ci.yml"><img src="https://github.com/eliotlastdance00-art/Find/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/Python-3.11%20%E2%80%93%203.13-3776AB?logo=python&logoColor=white" alt="Python 3.11–3.13">
+  <img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-555" alt="macOS · Linux · Windows">
+  <img src="https://img.shields.io/badge/dil-TK%20%C2%B7%20RU%20%C2%B7%20EN-6f5cff" alt="TK · RU · EN">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/ygty%C3%BDarnama-MIT-green" alt="MIT"></a>
+</p>
 
-## Mümkinçilikler
+<p align="center">
+  <a href="#install">Gurnamak</a> &nbsp;•&nbsp;
+  <a href="#features">Mümkinçilikler</a> &nbsp;•&nbsp;
+  <a href="#how">Nähili işleýär</a> &nbsp;•&nbsp;
+  <a href="#results">Ölçenen netijeler</a> &nbsp;•&nbsp;
+  <a href="#limits">Çäklendirmeler</a> &nbsp;•&nbsp;
+  <a href="#english">English</a>
+</p>
 
-| № | Menýu | Näme edýär |
+<p align="center">
+  <img src="docs/assets/screen-scan.jpg" alt="Barlag sahypasy: suratyň üstünde skaner, göterim we tapgyrlar" width="860">
+</p>
+
+<p align="center">
+  <img src="docs/assets/screen-phone.png" alt="Telefonda: faýl ýüklemek, faýlyň tanalmagy, netije" width="640">
+</p>
+
+<p align="center"><sub>
+  Suratlar işläp duran ulgamdan alyndy. Mysaldaky portret emeli aň bilen <b>doly döredilen</b>, emma model ony
+  «Hakyky» diýýär: ol diňe ýüz çalşygyny tanamagy öwrendi. Bu — ulgamyň hakyky çägi, seret: <a href="#limits">Çäklendirmeler</a>.
+</sub></p>
+
+<a id="features"></a>
+## ✨ Mümkinçilikler
+
+| | Menýu | Näme edýär |
 |---|---|---|
-| 1 | **Giriş** | Hasaba girmek / hasap döretmek (Argon2id, JWT) |
-| 2 | **Faýl ýüklemek** | Wideo, surat, ses — süýräp goýmak ýa-da saýlamak; faýlyň görnüşi mazmuny boýunça barlanýar |
-| 3 | **Barlag** | Kadrlara bölmek → ýüzi tapyp kesmek → sesi taýýarlamak → neýron tor; ädimler göni wagtda görkezilýär |
-| 4 | **Netije** | Galp bolmak ähtimallygy (%), höküm, kadrlar we ses bölekleri boýunça grafikler |
-| 5 | **Bellenen ýerler** | Grad-CAM ýylylyk kartalary: modeliň ünsüni çeken ýerler |
-| 6 | **Hasabat** | PDF hasabat — türkmen, rus ýa-da iňlis dilinde |
-| 7 | **Taryh** | Öňki barlaglar, gözleg, süzgüçler, statistika (SQLite) |
+| 🔐 | **Giriş** | Hasaba girmek / hasap döretmek (Argon2id, JWT) |
+| 📤 | **Faýl ýüklemek** | Wideo, surat ýa-da ses — süýräp goýmak ýa-da saýlamak. Faýlyň görnüşi adyna däl-de, mazmunyna görä tanalýar; ýaramaýan faýl düşnükli habar bilen yzyna gaýtarylýar |
+| 🔬 | **Barlag** | Kadrlara bölmek → ýüzi tapyp kesmek → sesi taýýarlamak → neýron tor. Ädimler göni wagtda görkezilýär |
+| 📊 | **Netije** | Galp bolmak ähtimallygy (%), höküm (**Hakyky / Şübheli / Galp**), kadrlar we ses bölekleri boýunça grafikler |
+| 🔥 | **Bellenen ýerler** | Grad-CAM ýylylyk kartalary: modeliň ünsüni çeken ýerler |
+| 📄 | **Hasabat** | PDF hasabat — türkmen, rus ýa-da iňlis dilinde |
+| 🕘 | **Taryh** | Öňki barlaglar, gözleg, süzgüçler, statistika (SQLite) |
 
-Interfeýs üç dilde: **türkmençe, rusça, iňlisçe**; açyk we garaňky reňk tertibi; telefon
-ekranyna uýgunlaşýar.
+Interfeýs üç dilde (**türkmençe, rusça, iňlisçe**), açyk we garaňky reňk tertibinde, telefon
+ekranyna uýgunlaşýar. Ähli zat öz kompýuteriňizde işleýär: faýllar hiç ýere iberilmeýär.
 
-## Çalt başlamak (Docker)
+<a id="install"></a>
+## 🚀 Gurnamak
 
-Diňe [Docker](https://docs.docker.com/get-docker/) gerek. Modeller eýýäm ammaryň içinde.
+Modeller ammaryň içinde — aýratyn ýüklemek gerek däl. Usuly saýlaň:
+
+| Usul | Haçan laýyk | Näme gerek |
+|---|---|---|
+| 🍎 [macOS](#macos) · 🐧 [Linux](#linux) · 🪟 [Windows](#windows) | öz kompýuteriňizde işletmek | Python 3.11–3.13, Git |
+| 🐳 [Docker](#docker) | bir buýruk bilen, ulgama hiç zat gurmazdan | Docker |
+| ☁️ [GitHub Codespaces](#codespaces) | brauzerde synap görmek, hiç zat ýüklemän | mugt GitHub hasaby |
+
+**Talaplar:** 2 GB boş operatiw ýat (ulgam ≈1,2 GB ulanýar), ≈2 GB disk, ilkinji gurnama üçin
+internet (≈300 MB ýüklenýär). GPU gerek däl. FFmpeg aýratyn gurmak gerek däl.
+
+<a id="macos"></a>
+<details open>
+<summary><b>🍎 macOS</b> (Apple Silicon: M1 we täzeler)</summary>
+
+<br>
+
+1\. Python we Git bardygyny barlaň:
 
 ```bash
-git clone https://github.com/eliotlastdance00-art/Find.git
+python3 --version    # 3.11, 3.12 ýa-da 3.13 bolmaly
+git --version        # ýok bolsa, macOS özi gurmagy teklip eder
+```
+
+Python ýok ýa-da köne bolsa: [python.org/downloads](https://www.python.org/downloads/) ýa-da `brew install python@3.13`.
+
+2\. Ýükläň we gurnaň:
+
+```bash
+git clone --depth 1 https://github.com/eliotlastdance00-art/Find.git
+cd Find
+python3 -m venv .venv
+source .venv/bin/activate
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install -e .
+```
+
+3\. Işlediň:
+
+```bash
+dfd serve
+```
+
+Brauzerde <http://localhost:8000> açyň. macOS-da buýruk `python` däl-de, **`python3`**.
+Intel prosessorly Mac üçin [Docker](#docker) ulanyň (PyTorch-yň täze wersiýalary ony goldamaýar).
+
+</details>
+
+<a id="linux"></a>
+<details>
+<summary><b>🐧 Linux</b> (Debian, Ubuntu we beýlekiler)</summary>
+
+<br>
+
+1\. Python we Git:
+
+```bash
+sudo apt update && sudo apt install -y python3 python3-venv python3-pip git   # Debian / Ubuntu
+# Fedora: sudo dnf install -y python3 git
+```
+
+2\. Ýükläň we gurnaň:
+
+```bash
+git clone --depth 1 https://github.com/eliotlastdance00-art/Find.git
+cd Find
+python3 -m venv .venv
+source .venv/bin/activate
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install -e .
+```
+
+3\. Işlediň:
+
+```bash
+dfd serve
+```
+
+Brauzerde <http://localhost:8000> açyň. Başga kompýuterden girmek üçin: `dfd serve --host 0.0.0.0`.
+
+</details>
+
+<a id="windows"></a>
+<details>
+<summary><b>🪟 Windows</b> 10 / 11 (PowerShell)</summary>
+
+<br>
+
+1\. Python we Git (eýýäm bar bolsa, geçiň). Gurlandan soň PowerShell-i ýapyp, täzeden açyň:
+
+```powershell
+winget install -e --id Python.Python.3.13
+winget install -e --id Git.Git
+```
+
+2\. Ýükläň we gurnaň:
+
+```powershell
+git clone --depth 1 https://github.com/eliotlastdance00-art/Find.git
+cd Find
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install -e .
+```
+
+3\. Işlediň:
+
+```powershell
+dfd serve
+```
+
+Brauzerde <http://localhost:8000> açyň. `Activate.ps1` «running scripts is disabled» diýse, bir gezek
+şuny işlediň: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+
+</details>
+
+<a id="docker"></a>
+<details>
+<summary><b>🐳 Docker</b> (islendik ulgam)</summary>
+
+<br>
+
+```bash
+git clone --depth 1 https://github.com/eliotlastdance00-art/Find.git
 cd Find
 docker compose up --build
 ```
 
-Soňra brauzerde <http://localhost:8000> açyň. Ilkinji döredilen hasap administrator bolýar.
+Brauzerde <http://localhost:8000> açyň. Maglumatlar `dfd-data` tomunda saklanýar.
+Sazlamak isleseňiz: `cp .env.example .env` we içini düzediň.
 
-Sazlamalar hökmany däl. Üýtgetmek isleseňiz: `cp .env.example .env` we içini düzediň
-(administrator hasaby, faýl çägi, kadr sany we ş.m.). Maglumatlar `dfd-data` tomunda saklanýar.
+</details>
 
-## Docker-siz işletmek
+### Gurnandan soň
 
-Python 3.11+ gerek (FFmpeg aýratyn gurmak gerek däl — `imageio-ffmpeg` bilen gelýär).
+| Näme | Nädip |
+|---|---|
+| Ilkinji giriş | Giriş sahypasynda hasap dörediň — **ilkinji hasap administrator bolýar** |
+| Indiki gezek işletmek | `cd Find`, soň `source .venv/bin/activate` (Windows: `.venv\Scripts\Activate.ps1`), soň `dfd serve` |
+| Duruzmak | Terminalda `Ctrl + C` |
+| Täzelemek | `git pull`, soň `pip install -e .` |
+| Başga port | `dfd serve --port 8080` |
+| Hasap döretmek (terminaldan) | `dfd create-user <at> --admin` |
+| Gurlan modelleri görmek | `dfd models` |
+
+### 🩹 Näsazlyk çyksa
+
+| Alamat | Sebäbi we çözgüdi |
+|---|---|
+| `command not found: python` | macOS / Linux-da `python3`, Windows-da `py` ýazyň |
+| `command not found: dfd` | Gurşaw işjeň däl ýa-da gurnama tamamlanmady: gurşawy işjeňleşdiriň, soň `pip install -e .` |
+| `IncompleteRead`, `Connection broken` (PyTorch ýüklenende) | Internet kesildi. Aşakdaky «Haýal internet» usulyny ulanyň |
+| `RPC failed; curl 18` (`git clone`-da) | Internet kesildi. `--depth 1` bilen synaň ýa-da [ZIP](https://github.com/eliotlastdance00-art/Find/archive/refs/heads/main.zip) ýükläň |
+| `Address already in use` | 8000-nji port eýeli: `dfd serve --port 8080` |
+| Ilkinji barlag haýal | Model ýada ilkinji barlagda ýüklenýär; soňkular çalt (wideo ≈10 s) |
+
+<details>
+<summary><b>🐢 Haýal ýa-da durnuksyz internet</b> — PyTorch-y kesilse dowam edýän usul bilen ýüklemek</summary>
+
+<br>
+
+`pip` kesilen ýüklemäni başdan başlaýar, `curl` bolsa galan ýerinden dowam edýär. Faýlyň anyk
+adyny `pip`-iň `Downloading torch-…whl` diýen setirinden alyň, soň:
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate     # Windows: py -m venv .venv; .venv\Scripts\activate
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-pip install -e .
-dfd serve                                               # http://localhost:8000
-```
-
-Internet durnuksyz bolsa PyTorch (≈140 MB) ýüklenişi kesilip biler (`IncompleteRead`). Onda faýly
-`curl` bilen aýratyn ýükläň — kesilse, şol buýrugy gaýtalaň, ol galan ýerinden dowam edýär:
-
-```bash
-# faýlyň anyk adyny pip-iň "Downloading torch-…whl" setirinden alyň
+# macOS / Linux — kesilse, şol buýrugy gaýtalaň
 curl -L -C - --retry 20 --retry-all-errors -O https://download.pytorch.org/whl/cpu/<torch-…>.whl
-pip install ./torch-*.whl && pip install -e .
+pip install ./torch-*.whl
+pip install -e .
 ```
 
-Beýleki buýruklar: `dfd create-user <at> --admin`, `dfd models`. API resminamasy:
-<http://localhost:8000/api/docs>.
+```powershell
+# Windows (curl.exe diýip ýazmaly)
+curl.exe -L -C - --retry 20 -O https://download.pytorch.org/whl/cpu/<torch-…>.whl
+pip install (Get-Item .\torch-*.whl).FullName
+pip install -e .
+```
 
-## Bulutda mugt synap görmek (GitHub Codespaces)
+</details>
+
+<a id="codespaces"></a>
+### ☁️ Bulutda mugt synap görmek (GitHub Codespaces)
 
 Kompýutere hiç zat gurmazdan, brauzerde işledip görmek üçin. Mugt GitHub hasaby ýeterlik
 (bank karty gerek däl): aýda 60 sagat, 2 ýadro, 8 GB RAM.
@@ -74,9 +254,11 @@ Kompýutere hiç zat gurmazdan, brauzerde işledip görmek üçin. Mugt GitHub h
 2. Birinji gezek 4–5 minut garaşyň: baglylyklar gurulýar we serwer öz-özünden işe başlaýar
    (soňky açylyşlarda 1–2 minut).
 3. Terminalda salgy we administrator paroly çykýar (islendik wagt: `bash scripts/codespace.sh info`).
-   Salgyny **Ports** goýmasyndaky 8000-nji portdan hem açyp bolýar.
 
-Bilmeli zatlar:
+<details>
+<summary>Bilmeli zatlar: açyk salgy, çäkler, täzelemek</summary>
+
+<br>
 
 - Salgy (`https://<codespace-ady>-8000.app.github.dev`) hemmelere açyk: GitHub hasaby gerek däl,
   ilkinji gezek GitHub-yň duýduryş sahypasynda **Continue** basmaly. Salgyny bilýän her kim
@@ -91,7 +273,25 @@ Bilmeli zatlar:
 - Täzelemek: `bash scripts/codespace.sh update` (GitHub-dan iň täze wersiýany alýar we serweri
   täzeden başlaýar). Codespace her gezek işe başlanda hem özi täzelenýär (`DFD_AUTO_UPDATE`).
 
-## Nähili işleýär
+</details>
+
+## ⚙️ Sazlamalar
+
+Hemmesi hökmany däl. Gurşaw üýtgeýjileri hökmünde ýa-da ammaryň düýbündäki `.env` faýlynda
+berilýär (doly sanaw: [.env.example](.env.example)).
+
+| Üýtgeýji | Başlangyç | Manysy |
+|---|---|---|
+| `DFD_ADMIN_USERNAME`, `DFD_ADMIN_PASSWORD` | — | Başlangyçda döredilýän administrator. Berilmese, ilkinji hasap administrator bolýar |
+| `DFD_ALLOW_REGISTRATION` | `true` | Giriş sahypasynda hasap döretmäge rugsat |
+| `DFD_MAX_UPLOAD_MB` | `200` | Faýlyň iň uly ölçegi |
+| `DFD_MAX_DURATION_S` | `600` | Wideo / sesiň iň uzyn dowamlylygy (sekunt) |
+| `DFD_VIDEO_FRAMES` | `24` | Wideodan alynýan kadr sany |
+| `DFD_DEVICE` | `auto` | `auto`, `cpu` ýa-da `cuda` |
+| `DFD_DATA_DIR` | `data` | Maglumat bazasy we ýüklenen faýllar saklanýan papka |
+
+<a id="how"></a>
+## 🧠 Nähili işleýär
 
 ```
 faýl ─► görnüşini anyklamak ─► taýýarlamak ─────────────► seljermek ───────────► netije
@@ -109,9 +309,20 @@ faýl ─► görnüşini anyklamak ─► taýýarlamak ───────�
 
 Jikme-jik: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Modeller we ölçenen netijeler
+<a id="results"></a>
+## 📊 Modeller we ölçenen netijeler
 
 Bu ýerde diňe hakykatdan ölçenen sanlar ýazylýar. Çig maglumatlar: `docs/metrics/`.
+
+| Model | Maglumat | AUC | EER | Bellik |
+|---|---|---|---|---|
+| Şekil — EfficientNet-B4 | FaceForensics++ c23, synag bölegi (840 wideo) | 0.9914 | 3.00 % | wideo boýunça |
+| Ses — AASIST | ASVspoof 2019 LA, eval-dan 3000 ýazgy | 0.9991 | 1.62 % | deslapky; diňe iňlis dili |
+
+<details>
+<summary>Jikme-jik jedweller</summary>
+
+<br>
 
 ### Ses — AASIST (deslapky ölçeg)
 
@@ -163,7 +374,10 @@ Bu sanlar diňe FaceForensics++ üçin dogry. Başga toplumlarda (meselem, Celeb
 geçirilmedi; adatça şeýle modelleriň takyklygy nätanyş maglumatlarda ep-esli peselýär.
 Çig maglumatlar we ROC egrisi: `docs/metrics/visual_effnet_b4_ffpp*`.
 
-## Çäklendirmeler (dogruçyl bellik)
+</details>
+
+<a id="limits"></a>
+## ⚠️ Çäklendirmeler (dogruçyl bellik)
 
 * Netije — awtomatiki modeliň bahasy, kepillik däl. Möhüm karar üçin hünärmeniň barlagy zerur.
 * Şekil modeli FaceForensics++ maglumatlaryndaky bäş usuly öwrendi. Başga usullar bilen
@@ -177,7 +391,7 @@ geçirilmedi; adatça şeýle modelleriň takyklygy nätanyş maglumatlarda ep-e
   seslerde netijä ynanmaly däl (şonuň üçin wideoda ses hökümi «Galp» edip bilmeýär).
 * Ulgam diňe ýüzi barlaýar; ýüz ýok bolsa şekil boýunça baha berilmeýär.
 
-## Işläp düzmek
+## 🛠 Işläp düzmek
 
 ```bash
 make install     # CPU PyTorch + taslama + gurallar
@@ -194,7 +408,7 @@ Modelleri gaýtadan okatmak (Kaggle GPU): `training/train_visual.py`, ses modeli
 kalibrlemek we bahalandyrmak: `training/eval_audio.py`; işe goýbermek üçin
 `scripts/kaggle_run.py`.
 
-## Gurluşy
+### Gurluşy
 
 ```
 src/dfd/domain          arassa logika: düzgünler, höküm, portlar
@@ -206,30 +420,43 @@ tests/                  unit we API testleri
 weights/                modeller we olaryň kartlary (model_card.json)
 ```
 
-## Ygtyýarnama
+## 📜 Ygtyýarnama
 
-MIT — `LICENSE`. Üçünji taraplaryň materiallary: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+MIT — [LICENSE](LICENSE). Üçünji taraplaryň materiallary: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ---
 
 <a id="english"></a>
-## English
+## 🇬🇧 English
 
 A web application that checks whether a video, image or audio file is genuine or
 manipulated: face-swap detection (EfficientNet-B4 trained on FaceForensics++), synthetic
 voice detection (AASIST, ASVspoof 2019), a fake probability with a three-way verdict
 (*Real / Suspicious / Fake*), Grad-CAM heatmaps, PDF reports and a scan history. The UI is
-available in Turkmen, Russian and English.
+available in Turkmen, Russian and English. Everything runs locally; files are not sent anywhere.
 
-**Run it:** `docker compose up --build`, then open <http://localhost:8000>. Model weights
-are in the repository; no other setup is required. Without Docker: install CPU PyTorch,
-`pip install -e .`, `dfd serve`. To try it in the browser without installing anything, open the
-repository in GitHub Codespaces (the dev container installs and starts the server on port 8000).
+**Run it** (Python 3.11–3.13; model weights are in the repository):
+
+```bash
+git clone --depth 1 https://github.com/eliotlastdance00-art/Find.git && cd Find
+python3 -m venv .venv && source .venv/bin/activate      # Windows: py -m venv .venv; .venv\Scripts\Activate.ps1
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install -e .
+dfd serve                                               # http://localhost:8000
+```
+
+Or `docker compose up --build`, or open the repository in GitHub Codespaces (the dev container
+installs and starts the server on port 8000).
 
 **Stack:** Python, FastAPI, SQLAlchemy/SQLite, PyTorch + timm, OpenCV (YuNet), FFmpeg,
 fpdf2; plain HTML/CSS/JS front end with no external assets. Clean architecture
 (domain / application / infrastructure / presentation), strict typing (mypy), ruff, and a
-test suite that runs the real pipeline on synthetic media. CI builds and smoke-tests the
-Docker image. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for design and security
-notes, and the *Çäklendirmeler* section above for the limitations: the verdict is a model
-estimate, not proof, and accuracy drops on manipulation methods unlike the training data.
+test suite that runs the real pipeline on synthetic media. CI runs the tests on Linux, macOS
+and Windows and builds and smoke-tests the Docker image. See
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for design and security notes.
+
+**Limitations:** the verdict is a model estimate, not proof. The visual model learned five
+face-swap methods and does not recognise fully generated pictures (the portrait in the
+screenshots above is AI-generated and is judged *Real*). The audio model was measured on
+English only; it fails on Turkmen speech, so audio verdicts are capped at *Suspicious* until a
+model trained on Turkmen is ready.

@@ -454,3 +454,17 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   - Barlandy: Playwright bilen telefon (390×844) we kompýuter (1280×800), ýagty/garaňky tema;
     surat, wideo, ses, nädogry faýl; konsolda ýalňyşlyk ýok. 136 test, ruff, mypy arassa.
   - Barlanmadyk: hakyky telefon (iOS Safari), animasiýalaryň hereketi (diňe kadrlar görüldi).
+- **2026-11-21 (6) — README, logo, platformalar** (ulanyjynyň islegi: macOS/Linux/Windows üçin gurnama,
+  «iň gowy README-ler ýaly», Sherlock görnüşli gara logo).
+  - Logo: `docs/assets/logo-light.png` (ýagty tema), `logo-dark.png` (garaňky tema); çeşme surat
+    emeli aň bilen döredildi, ulanyjy iki wariantdan birini saýlady.
+  - README täzeden guruldy: logo, nyşanlar, ekran suratlary, her ulgam üçin aýratyn ädimler,
+    «Gurnandan soň», «Näsazlyk çyksa» (ulanyjynyň hakykatdan duş gelen ýalňyşlyklary), sazlamalar.
+  - Ekran suratlaryndaky portret emeli aň bilen döredilen; model ony «Hakyky» diýýär (0.0 %) —
+    README-de açyk ýazyldy (model diňe ýüz çalşygyny tanaýar).
+  - CI-a `platforms` işi goşuldy: macOS (arm64) we Windows-da gurnama, testler, serwer + smoke test.
+    Ilkinji işledişde tapylan ýalňyşlyklar: macOS-da `training/proc.py` (`killpg` → EPERM, düzedildi);
+    Windows-da POSIX-a degişli 3 test (indi geçirilýär: faýl rugsatlary, okuw gözegçisi).
+    Netije: macOS 134 geçdi, Windows 132 geçdi + 4 geçirildi, ikisinde-de smoke test geçdi.
+  - Barlanmadyk: Windows-da PowerShell buýruklary (`winget`, `py`, `Activate.ps1`) — CI bash ulanýar;
+    Intel Mac; Windows-da `secret.key` faýlynyň rugsatlary çäklendirilmeýär (papkanyň ACL-i miras alynýar).
