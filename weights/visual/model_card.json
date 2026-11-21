@@ -1,0 +1,42 @@
+{
+  "name": "effnet-b4-ffpp",
+  "version": "1.0.0",
+  "kind": "visual",
+  "arch": "tf_efficientnet_b4.ns_jft_in1k",
+  "weights_file": "weights.pth",
+  "sha256": "acfc3b841a9bea69807385376c6d19358c0ef33dd567ca7024be2abd52480254",
+  "temperature": 2.246744590544169,
+  "input_size": 288,
+  "mean": [
+    0.485,
+    0.456,
+    0.406
+  ],
+  "std": [
+    0.229,
+    0.224,
+    0.225
+  ],
+  "provisional": false,
+  "trained_on": "FaceForensics++ c23 (Deepfakes, Face2Face, FaceSwap, NeuralTextures, FaceShifter)",
+  "thresholds": {
+    "image": {
+      "real_max": 0.579685584183833,
+      "fake_min": 0.6427173120715832
+    },
+    "video": {
+      "real_max": 0.525603927796946,
+      "fake_min": 0.8284032106015875
+    }
+  },
+  "metrics": {
+    "test_frame_auc": 0.9831881178252551,
+    "test_video_auc": 0.9913775510204079,
+    "test_video_eer": 0.03000000000000002
+  },
+  "extra": {
+    "face_margin": 1.3,
+    "face_detector": "yunet_2023mar",
+    "created_at": "2026-11-21T01:47:25+00:00"
+  }
+}

@@ -312,7 +312,7 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
 | 3. Ýüzleri kesmek | ✅ | YuNet, okuwda we serwerde şol bir kod |
 | 4. Media kitaphanasy | ✅ | FFmpeg (imageio-ffmpeg), kadrlar, 16 kHz ses bölekleri |
 | 5. Backend + 7 menýu | ✅ | FastAPI + SPA, tk/ru/en, açyk/garaňky |
-| 6. Wizual model | 🔴 v1 şowsuz, gaýtadan okatmaly | `dfd-train-visual` v1: 12-nji (soňky) epohanyň 700-nji ädiminden soň doňup galdy, 2.6 sagatdan soň «Killed». Agramlar diňe ahyrda saklanýardy → model ýitdi. Galan ölçeg: val wideo AUC 0.9931 (7-nji epoha), val kadr AUC 0.988. Test ölçegi ýok |
+| 6. Wizual model | ✅ v2 tamamlandy, ulgama goýuldy | `dfd-train-visual` v2 (199 min). Test: wideo AUC 0.9914, EER 3.0 %; kadr AUC 0.9832, EER 5.27 %. `weights/visual/`, `docs/metrics/visual_effnet_b4_ffpp.json` |
 | 7. Grad-CAM | ✅ kod | hakyky model bilen göz bilen barlamaly |
 | 8. Ses modeli | 🟡 deslapky kart goýuldy | 3000+3000 ýazgyda ölçendi: eval AUC 0.9991, EER 1.62 %; T=1.448, bosagalar 3.0 % / 99.0 %. Doly toplum (GPU) entek edilmedi |
 | 9. Birleşdirme we höküm | ✅ kod | bosagalar hakyky kartlardan gelmeli |
@@ -378,3 +378,18 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   **Türgenleşdirişe goşulmaýanlar:** OmniVoice (görülmedik TTS) we Vocos (görülmedik wokoder).
 - Ygtyýarnama: TurkmenSpeech, MMS, OmniVoice agramlary CC BY-NC → netije model diňe täjirçilik
   däl maksat üçin (diplom işi üçin bolýar). DAC, EnCodec, kNN-VC ygtyýarnamalary barlanmady.
+
+### 2026-11-21 (1) — Wizual model v2 tamamlandy
+
+- Kaggle `dfd-train-visual` v2: COMPLETE, 199 minut. 12-nji epohanyň ~600-nji ädiminde işçi proses
+  ýene öldürildi (`exit code -9`, v1-däki ýaly şol ýerde) — gözegçi ony 11-nji epohadan dowam
+  etdirdi we iş tamamlandy. Sebäbi anyklanmady (çak: ýadyň ýuwaş-ýuwaşdan dolmagy; barlanmady).
+- Iň gowy epoha 7. Temperatura 2.247. Bosagalar: surat 0.580 / 0.643, wideo 0.526 / 0.828.
+- **Test (resmi bölüniş, 140 hakyky + 700 galp wideo):** wideo AUC 0.9914, EER 3.00 %, takyklyk
+  96.55 %; kadr AUC 0.9832, EER 5.27 %, takyklyk 95.10 %.
+- Höküm (wideo): hakyky → 93.6 / 5.7 / 0.7 % (Hakyky/Şübheli/Galp); galp → 2.3 / 4.1 / 93.6 %.
+- Agramlar `weights/visual/weights.pth` (34 MB, float16) + `model_card.json` (`provisional: false`).
+- HTTP API arkaly barlag (synag böleginden 5 wideo + 1 surat): 2 hakyky → Hakyky; 3 galp → 2 Galp,
+  1 Şübheli; ýüz suraty → Hakyky. Wideo ~10 s (CPU), serweriň RSS-i 1194 MB.
+- `faces.tar` (2 GB) Kaggle çykyşynda bar — indiki okuwlar ýüz kesmegi gaýtalamaz.
+- Galan iş: başga toplumda (cross-dataset) ölçeg ýok; 12-nji epohadaky öldürilmegiň sebäbi.

@@ -100,8 +100,31 @@ Galp sesleriň üçden biri «Şübheli» bolýar: eval böleginde bosagalar sa�
 
 ### Şekil — EfficientNet-B4
 
-FaceForensics++ (c23) toplumynda okadylýar. Netijeler okuw gutarandan soň şu ýere goşular;
-şoňa çenli `weights/visual/` boş we ulgam surat/wideo üçin «model ýok» diýip habar berýär.
+FaceForensics++ (c23) toplumynda okadyldy (`training/train_visual.py`, Kaggle 2×T4, 12 epoha,
+iň gowy — 7-nji epoha). Toplumyň **resmi bölünişi** ulanyldy: okuw 4320 wideo, barlag
+(validation) 840, synag (test) 840; bir adam diňe bir bölekde bar. Temperatura we bosagalar
+barlag böleginde saýlandy, aşakdaky sanlar bolsa modeliň hiç görmedik **synag böleginde** ölçendi
+(140 hakyky + 700 galp wideo; 2240 + 11200 kadr).
+
+| Görkeziji | Kadr (surat) | Wideo |
+|---|---|---|
+| AUC | 0.9832 | 0.9914 |
+| EER | 5.27 % | 3.00 % |
+| Takyklyk (bosaga 0.5) | 95.10 % | 96.55 % |
+
+Synag böleginde wideo boýunça höküm (bosagalar: ≤ 52.6 % — Hakyky, ≥ 82.8 % — Galp):
+
+| Hakykatda | Hakyky | Şübheli | Galp |
+|---|---|---|---|
+| Hakyky wideo (140) | 93.6 % | 5.7 % | 0.7 % |
+| Galp wideo (700) | 2.3 % | 4.1 % | 93.6 % |
+
+Usullar boýunça wideo AUC: Deepfakes 0.997, FaceShifter 0.996, Face2Face 0.992,
+FaceSwap 0.991, NeuralTextures 0.982 (iň kyny).
+
+Bu sanlar diňe FaceForensics++ üçin dogry. Başga toplumlarda (meselem, Celeb-DF) ölçeg
+geçirilmedi; adatça şeýle modelleriň takyklygy nätanyş maglumatlarda ep-esli peselýär.
+Çig maglumatlar we ROC egrisi: `docs/metrics/visual_effnet_b4_ffpp*`.
 
 ## Çäklendirmeler (dogruçyl bellik)
 

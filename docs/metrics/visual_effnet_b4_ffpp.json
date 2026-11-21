@@ -1,0 +1,235 @@
+{
+  "dataset": "FaceForensics++ c23, official video-level splits",
+  "data": {
+    "train": {
+      "faces_real": 23034,
+      "faces_fake": 28796,
+      "videos": 4320
+    },
+    "val": {
+      "faces_real": 2240,
+      "faces_fake": 11200,
+      "videos": 840
+    },
+    "test": {
+      "faces_real": 2240,
+      "faces_fake": 11200,
+      "videos": 840
+    }
+  },
+  "best_epoch": 7,
+  "temperature": 2.246744590544169,
+  "validation": {
+    "frame": {
+      "auc": 0.9882493821747449,
+      "eer": 0.04598214285714286,
+      "accuracy_at_0.5": 0.9574404761904762,
+      "n_real": 2240,
+      "n_fake": 11200
+    },
+    "video": {
+      "auc": 0.9934693877551021,
+      "eer": 0.02785714285714285,
+      "accuracy_at_0.5": 0.9738095238095238,
+      "n_real": 140,
+      "n_fake": 700
+    }
+  },
+  "test": {
+    "frame": {
+      "auc": 0.9831881178252551,
+      "eer": 0.05267857142857145,
+      "accuracy_at_0.5": 0.9509672619047619,
+      "n_real": 2240,
+      "n_fake": 11200
+    },
+    "video": {
+      "auc": 0.9913775510204079,
+      "eer": 0.03000000000000002,
+      "accuracy_at_0.5": 0.9654761904761905,
+      "n_real": 140,
+      "n_fake": 700
+    },
+    "per_method": {
+      "Deepfakes": {
+        "frame_auc": 0.9895469945790816,
+        "video_auc": 0.9973469387755102
+      },
+      "Face2Face": {
+        "frame_auc": 0.9858825932716837,
+        "video_auc": 0.991530612244898
+      },
+      "FaceShifter": {
+        "frame_auc": 0.9865735610650509,
+        "video_auc": 0.9956122448979592
+      },
+      "FaceSwap": {
+        "frame_auc": 0.9842740553252551,
+        "video_auc": 0.9908673469387755
+      },
+      "NeuralTextures": {
+        "frame_auc": 0.9696633848852041,
+        "video_auc": 0.9815306122448979
+      }
+    },
+    "verdicts_frame": {
+      "real": {
+        "as_real": 0.9522321428571429,
+        "as_suspicious": 0.011607142857142858,
+        "as_fake": 0.03616071428571429,
+        "count": 2240.0
+      },
+      "fake": {
+        "as_real": 0.05526785714285714,
+        "as_suspicious": 0.007232142857142857,
+        "as_fake": 0.9375,
+        "count": 11200.0
+      }
+    },
+    "verdicts_video": {
+      "real": {
+        "as_real": 0.9357142857142857,
+        "as_suspicious": 0.05714285714285714,
+        "as_fake": 0.007142857142857143,
+        "count": 140.0
+      },
+      "fake": {
+        "as_real": 0.022857142857142857,
+        "as_suspicious": 0.041428571428571426,
+        "as_fake": 0.9357142857142857,
+        "count": 700.0
+      }
+    }
+  },
+  "thresholds": {
+    "image": {
+      "real_max": 0.579685584183833,
+      "fake_min": 0.6427173120715832
+    },
+    "video": {
+      "real_max": 0.525603927796946,
+      "fake_min": 0.8284032106015875
+    }
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.7746703263708334,
+      "val_frame_auc": 0.963344108737245,
+      "val_video_auc": 0.9808367346938774,
+      "minutes": 87.50183412631353
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.25232763460875296,
+      "val_frame_auc": 0.9773315529336734,
+      "val_video_auc": 0.9881938775510203,
+      "minutes": 96.3715874115626
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.1672600425218033,
+      "val_frame_auc": 0.9836590999681123,
+      "val_video_auc": 0.9906020408163265,
+      "minutes": 105.28142005205154
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.12706530540352698,
+      "val_frame_auc": 0.9849694874043367,
+      "val_video_auc": 0.9906632653061224,
+      "minutes": 114.14926348129909
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.100876761189396,
+      "val_frame_auc": 0.9859568120216836,
+      "val_video_auc": 0.9927857142857143,
+      "minutes": 123.46122202475865
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.08467747626437061,
+      "val_frame_auc": 0.9842497807716837,
+      "val_video_auc": 0.9901836734693876,
+      "minutes": 132.5484622001648
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.06743091761424667,
+      "val_frame_auc": 0.9882493821747449,
+      "val_video_auc": 0.9931224489795918,
+      "minutes": 142.17711058060328
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.05492770630228523,
+      "val_frame_auc": 0.9866881776147959,
+      "val_video_auc": 0.9906224489795918,
+      "minutes": 151.97284299532572
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.048257921842515136,
+      "val_frame_auc": 0.9872523915816327,
+      "val_video_auc": 0.9908673469387754,
+      "minutes": 161.51293288469316
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.040388831062926206,
+      "val_frame_auc": 0.9875455596301019,
+      "val_video_auc": 0.9914285714285713,
+      "minutes": 170.89999296665192
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.036928688439889376,
+      "val_frame_auc": 0.9879633689413265,
+      "val_video_auc": 0.9921326530612244,
+      "minutes": 180.30543862581254
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.033960349502301534,
+      "val_frame_auc": 0.9873297592474489,
+      "val_video_auc": 0.9913061224489796,
+      "minutes": 189.8395841797193
+    }
+  ],
+  "restarts": 1,
+  "args": {
+    "ffpp_root": "/kaggle/input",
+    "faces_dir": "/tmp/dfd_faces",
+    "out": "/kaggle/working",
+    "arch": "tf_efficientnet_b4.ns_jft_in1k",
+    "name": "effnet-b4-ffpp",
+    "version": "1.0.0",
+    "size": "288",
+    "store_size": "320",
+    "epochs": "12",
+    "batch": "64",
+    "lr": "0.0002",
+    "weight_decay": "0.01",
+    "frames_real": "32",
+    "frames_fake": "8",
+    "frames_eval": "16",
+    "workers": "4",
+    "limit_videos": "None",
+    "time_budget_min": "300.0",
+    "seed": "20261120",
+    "smoke": "False",
+    "no_pretrained": "False",
+    "save_faces": "True",
+    "faces_tar": "None",
+    "state_dir": "/tmp/dfd_state",
+    "stall_min": "15.0",
+    "max_restarts": "4",
+    "in_process": "False",
+    "child": "True",
+    "resume": "True",
+    "eval_only": "False",
+    "attempt": "1"
+  },
+  "minutes_total": 191.58132301568986
+}
