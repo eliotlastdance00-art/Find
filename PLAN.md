@@ -532,4 +532,19 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
     4. Hakyky test sözlemleriniň 202-si (1 046-dan) okuwda hem bar (başga gürleýji) — tekst syzmasy, gürleýji däl; hasabatda bellemeli.
     5. Spektr/zolak giňligi synplar boýunça barlanmady (ýerli gurallar ýok) — okuw skriptinde barlamaly.
   - **Indiki (3-nji ädim):** AASIST-i bilelikde öwretmek (ASVspoof 2019 LA + bu toplum), skript entek ýazylmady.
+- **2026-11-21 (10) — ses modeli, 3-nji ädim: bilelikde öwretmek skripti (`training/train_audio.py`) ýazyldy we Kaggle-da işe goýberildi.**
+  **Pikir (0a.7):** wariantlar — (1) diňe türkmen toplumynda öwretmek: iňlisçäni unudar; (2) diňe soňky gatlagy öwretmek: türkmen
+  hakyky sesini tanamaga ýetmez (häzirki model 60-dan 0); (3) **resmi agramlardan başlap, LA train + türkmen toplumynda ähli gatlaklary
+  bilelikde öwretmek** — saýlandy. Uly öňünden öwredilen modeller (wav2vec2/XLS-R + AASIST) has takyk, ýöne 300 MB+ we CPU-da haýal — ret (2 GB RAM).
+  **Toplumdaky gysga ýollara garşy:** (a) ses derejesi → iki synpa hem tötän dereje (peak 0.02–0.99); (b) gysyş taryhy (hakyky türkmen
+  sesi MP3/AAC/Opus-dan geçen, galplaryň köpüsi arassa) → tötän kodek (mp3/aac/opus), galpda 0.7, hakykyda 0.3 ähtimallyk; (c) synp we
+  generator ölçegi → partiýa: 60 % türkmen / 40 % LA, hakyky/galp 50/50, generatorlar deň; (d) galmagal 0.3.
+  **Okuw:** Adam 1e-4 → 5e-6 kosinus, batch 24 (GPU ýadyna sygmasa awtomat ýarpylanýar), 1000 ädim/epoha, wagt býujeti 240 min
+  (1-nji epohadan soň epoha sany býujete görä kesgitlenýär), saýlaw: türkmen-dev EER + LA-dev EER ortaçasy. Gözegçi + `--resume`.
+  **Ölçeg (serweriň öz penjireleme kody bilen):** öňki model (baseline.json), dev-de temperatura + bosagalar, türkmen test (görlen /
+  görülmedik generatorlar aýratyn, generator boýunça, hakyky çeşme boýunça), LA eval doly, durnuklylyk: ýuwaş / gaty / MP3 64k.
+  **Barlag:** emeli kiçi toplumda ýerli doly geçiş (CPU, kodekler bilen) — başdan ahyra işledi; 8 birlik test; ruff arassa; 143 test geçdi.
+  **Kaggle:** `python3 scripts/kaggle_run.py training.train_audio --kernel dfd-train-audio --dataset anishsarkar22/asvpoof-2019-dataset-la
+  --kernel-source eliotalderson00/dfd-tk-build --gpu -- --budget-min 240` (≈4.5–5 sag). Çykyş: `AASIST.pth`, `model_card.json`, `metrics.json`, `baseline.json`, `history.json`.
+  **Soň (4-nji ädim):** netijä görä `weights/audio`-a goýmak; `max_verdict` çägini diňe hakyky türkmen sesinde ýalňyş duýduryş pes bolsa aýyrmak.
 

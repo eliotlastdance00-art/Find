@@ -21,6 +21,7 @@ import random
 import time
 import urllib.request
 from collections import defaultdict
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -38,9 +39,10 @@ from dfd.infrastructure.ml.cards import ModelCard, save_card
 
 WEIGHTS_URL = "https://github.com/clovaai/aasist/raw/main/models/weights/AASIST.pth"
 WEIGHTS_SHA256 = "51d2d9cf0738172f61e2a384ec50a54a55363240f67c971ed55a92435bc1a1c0"
-PROTOCOL = "ASVspoof2019.LA.cm.{part}.trl.txt"
+PROTOCOL = "ASVspoof2019.LA.cm.{part}.{kind}.txt"  # kind: "trn" for train, else "trl"
 
 Item = tuple[str, Path, int, str]  # utterance id, path, label (1 = spoof), attack id
+Transform = Callable[[np.ndarray], np.ndarray]
 
 
 def fetch_weights(target: Path) -> Path:
@@ -54,14 +56,15 @@ def fetch_weights(target: Path) -> Path:
 
 
 def find_root(search: Path) -> Path:
-    hits = sorted(search.rglob(PROTOCOL.format(part="dev")))
+    hits = sorted(search.rglob(PROTOCOL.format(part="dev", kind="trl")))
     if not hits:
         raise SystemExit(f"ASVspoof 2019 LA protocols not found under {search}")
     return hits[0].parent.parent
 
 
 def read_protocol(root: Path, part: str) -> list[Item]:
-    protocol = root / "ASVspoof2019_LA_cm_protocols" / PROTOCOL.format(part=part)
+    kind = "trn" if part == "train" else "trl"
+    protocol = root / "ASVspoof2019_LA_cm_protocols" / PROTOCOL.format(part=part, kind=kind)
     folder = root / f"ASVspoof2019_LA_{part}" / "flac"
     items: list[Item] = []
     for line in protocol.read_text().splitlines():
@@ -71,8 +74,9 @@ def read_protocol(root: Path, part: str) -> list[Item]:
 
 
 class Utterances(Dataset[tuple[int, torch.Tensor]]):
-    def __init__(self, items: list[Item]) -> None:
+    def __init__(self, items: list[Item], transform: Transform | None = None) -> None:
         self.items = items
+        self.transform = transform  # applied to the whole clip (robustness checks)
 
     def __len__(self) -> int:
         return len(self.items)
@@ -85,6 +89,8 @@ class Utterances(Dataset[tuple[int, torch.Tensor]]):
             raise ValueError(f"unexpected sample rate {rate}")
         # Same conversion as the server's read_wav(): 16-bit PCM -> mono float32.
         mono = (samples.astype(np.float32) / 32768.0).mean(axis=1)
+        if self.transform is not None:
+            mono = self.transform(mono)
         batch, _ = windows(mono, rate, WINDOW, WINDOW // 2)
         return index, torch.from_numpy(batch)
 
@@ -96,11 +102,16 @@ def collate(samples: list[tuple[int, torch.Tensor]]) -> tuple[torch.Tensor, torc
 
 @torch.inference_mode()
 def score(
-    model: torch.nn.Module, items: list[Item], device: torch.device, batch: int, workers: int
+    model: torch.nn.Module,
+    items: list[Item],
+    device: torch.device,
+    batch: int,
+    workers: int,
+    transform: Transform | None = None,
 ) -> list[list[float]]:
     """Raw spoof logits of every window of every utterance."""
     loader = DataLoader(
-        Utterances(items), batch_size=batch, num_workers=workers, collate_fn=collate
+        Utterances(items, transform), batch_size=batch, num_workers=workers, collate_fn=collate
     )
     logits: list[list[float]] = [[] for _ in items]
     started, done = time.time(), 0
