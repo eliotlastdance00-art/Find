@@ -7,6 +7,11 @@
   // 2 cores is the smallest machine; the application needs about 1.2 GB of memory.
   "hostRequirements": { "cpus": 2 },
 
+  // The GitHub CLI is what lets the start script open the port to visitors without a GitHub
+  // login. Set DFD_PUBLIC_PORT to "false" to keep the address private to the owner.
+  "features": { "ghcr.io/devcontainers/features/github-cli:1": {} },
+  "containerEnv": { "DFD_PUBLIC_PORT": "true" },
+
   "postCreateCommand": "bash scripts/codespace.sh setup",
   "postStartCommand": "bash scripts/codespace.sh start",
   "postAttachCommand": "bash scripts/codespace.sh info",

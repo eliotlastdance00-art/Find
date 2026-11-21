@@ -10,6 +10,7 @@
 # State lives in .codespace/ (git-ignored): the database and uploads, the log, and the
 # administrator password generated on first start. Set DFD_ADMIN_USERNAME and
 # DFD_ADMIN_PASSWORD (for example as Codespaces secrets) to choose the login yourself.
+# With DFD_PUBLIC_PORT=true (the dev container default) the address works without a GitHub login.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -31,6 +32,25 @@ address() {
   else
     echo "http://localhost:$PORT"
   fi
+}
+
+publish() {
+  # Codespaces makes every forwarded port private again at each start, so this runs every time.
+  [[ -n "${CODESPACE_NAME:-}" && "${DFD_PUBLIC_PORT:-false}" == "true" ]] || return 0
+  if ! command -v gh >/dev/null 2>&1; then
+    echo "gh is not installed: the address stays private" >&2
+    return 0
+  fi
+  for _ in $(seq 10); do
+    if gh codespace ports visibility "$PORT:public" --codespace "$CODESPACE_NAME" \
+      >>"$STATE/publish.log" 2>&1; then
+      touch "$STATE/public"
+      return 0
+    fi
+    sleep 3
+  done
+  rm -f "$STATE/public"
+  echo "Could not make port $PORT public; see $STATE/publish.log" >&2
 }
 
 setup() {
@@ -69,6 +89,13 @@ info() {
   echo
   echo "  Deepfake Detektor: $state"
   echo "  Salgy / address:   $(address)"
+  if [[ -n "${CODESPACE_NAME:-}" ]]; then
+    if [[ -f "$STATE/public" ]]; then
+      echo "                     hemmelere açyk / open to anyone with the link"
+    else
+      echo "                     diňe size açyk / private to you"
+    fi
+  fi
   if [[ -f "$ADMIN_FILE" ]]; then
     echo "  Administrator:     $(sed -n 's/^DFD_ADMIN_USERNAME=//p' "$ADMIN_FILE")" \
       "/ $(sed -n 's/^DFD_ADMIN_PASSWORD=//p' "$ADMIN_FILE")"
@@ -80,7 +107,9 @@ info() {
 }
 
 start() {
+  mkdir -p "$STATE"
   if healthy; then
+    publish
     info
     return
   fi
@@ -102,6 +131,7 @@ start() {
     tail -n 40 "$LOG" >&2 || true
     exit 1
   fi
+  publish
   info
 }
 
