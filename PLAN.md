@@ -433,3 +433,8 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   `smoke_test.py` geçdi; FF++ hakyky wideo → «Hakyky» (13 s), Deepfakes → «Galp» (11 s);
   dur/başla aýlawyndan soň serwer ~75 s-de özi işe başlady, hasap saklanyp galdy.
 - Barlanmadyk: portuň «Public» görnüşi; brauzerde janly öňe gidişlik (SSE) proksiniň üsti bilen.
+- Goşmaça (ulanyjynyň islegi: «göni URL bilen girer ýaly»): port her başlangyçda awtomatik
+  «Public» edilýär (`gh codespace ports visibility`, dev container-de `github-cli` goşuldy).
+  Barlandy: täze codespace-da tokensiz `smoke_test.py` geçdi; dur/başla aýlawyndan 68 s soň
+  salgy ýene tokensiz açyldy. Çäk (GitHub resminamasy): ulanylmasa durýar, iň köp 12 sagat
+  yzygiderli, duran gurşawy diňe eýesi açyp bilýär — hakyky önümçilik üçin VPS gerek.

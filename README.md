@@ -69,11 +69,15 @@ Kompýutere hiç zat gurmazdan, brauzerde işledip görmek üçin. Mugt GitHub h
 
 Bilmeli zatlar:
 
-- Bu hemişelik hosting däl: gurşaw 30 minut ulanylmasa durýar (GitHub sazlamalarynda 240 minuda
-  çenli uzaldyp bolýar). Gaýtadan açanyňyzda serwer özi işe başlaýar, maglumatlar saklanýar.
-- Salgy başda diňe size açyk. Başgalara görkezmek üçin: **Ports → 8000 → sag düwme →
-  Port Visibility → Public**. Şonda salgyny bilýän her kim hasap açyp biler; islemeseňiz
-  ammaryň düýbünde `.env` faýlyna `DFD_ALLOW_REGISTRATION=false` ýazyp, `restart` ediň.
+- Salgy (`https://<codespace-ady>-8000.app.github.dev`) hemmelere açyk: GitHub hasaby gerek däl,
+  ilkinji gezek GitHub-yň duýduryş sahypasynda **Continue** basmaly. Salgyny bilýän her kim
+  hasap açyp biler; islemeseňiz ammaryň düýbünde `.env` faýlyna `DFD_ALLOW_REGISTRATION=false`
+  ýazyp, `restart` ediň. Salgyny diňe özüňize galdyrmak üçin `.devcontainer/devcontainer.json`
+  içinde `DFD_PUBLIC_PORT`-y `"false"` ediň.
+- Bu hemişelik hosting däl. Salgy diňe gurşaw işläp durka açylýar; gurşaw ulanylmasa durýar
+  (30 minut, GitHub sazlamalarynda 240 minuda çenli) we iň köp 12 sagat yzygiderli işleýär.
+  Duran gurşawy diňe eýesi <https://github.com/codespaces> sahypasyndan açyp bilýär; şonda
+  serwer özi işe başlaýar, maglumatlar saklanýar, salgy üýtgemeýär.
 - Dolandyryş: `bash scripts/codespace.sh {start|stop|restart|info|logs}`.
 
 ## Nähili işleýär
