@@ -110,7 +110,7 @@ svg { width: 1.15em; height: 1.15em; flex: none; }
   padding: 18px 12px; border-right: 1px solid var(--border); background: var(--surface);
 }
 .brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 18px; }
-.brand svg { width: 34px; height: 34px; }
+.brand svg { width: 44px; height: 44px; flex: none; color: var(--text); }
 .brand-name { font-weight: 700; letter-spacing: -.01em; line-height: 1.15; }
 .brand-tag { font-size: 11.5px; color: var(--muted); line-height: 1.25; }
 .nav { display: grid; gap: 2px; }
@@ -203,8 +203,11 @@ svg { width: 1.15em; height: 1.15em; flex: none; }
 .auth-hero ul { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 12px; }
 .auth-hero li { display: flex; align-items: center; gap: 12px; font-weight: 540; }
 .auth-hero li i { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: rgba(255,255,255,.14); backdrop-filter: blur(6px); font-style: normal; }
-.auth-hero .brand { padding: 0; }
+.auth-hero .brand { padding: 0; gap: 12px; }
+.auth-hero .brand svg { width: 56px; height: 56px; color: #fff; }
 .auth-hero .brand-tag { color: rgba(255,255,255,.7); }
+.auth-hero > .hero-mark { position: absolute; z-index: 0; right: -34px; bottom: -22px; width: min(78%, 330px); color: #fff; opacity: .13; pointer-events: none; }
+.hero-mark svg { display: block; width: 100%; height: auto; }
 .auth-panel { display: flex; flex-direction: column; padding: 24px 32px 40px; }
 .auth-top { display: flex; justify-content: flex-end; gap: 8px; }
 .auth-box { width: 100%; max-width: 380px; margin: auto; display: grid; gap: 20px; }
@@ -400,9 +403,14 @@ td.date { color: var(--muted); white-space: nowrap; }
   .filters { grid-template-columns: 1fr 1fr; }
   .filters .search { grid-column: 1 / -1; }
   .mobile-logout { display: inline-flex !important; }
+  .topbar-brand { display: block !important; }
   .toast { bottom: 100px; }
 }
 .mobile-logout { display: none; }
+.topbar-brand { display: none; color: var(--text); flex: none; }
+.topbar-brand svg { display: block; width: 30px; height: 30px; }
+/* Narrow phones: the mark stands in for the page title (the heading below repeats it). */
+@media (max-width: 480px) { .crumb > [data-crumb-title], .crumb [data-crumb-file] > span { display: none; } }
 
 /* =====================================================================================
    Motion. Everything below is feedback: what was chosen, what is happening, what changed.
@@ -673,7 +681,7 @@ td.date { color: var(--muted); white-space: nowrap; }
     animation: aurora 9s ease-in-out infinite alternate;
   }
   .auth-brand { display: flex; align-items: center; gap: 12px; }
-  .auth-brand svg { width: 46px; height: 46px; filter: drop-shadow(0 10px 18px rgba(109,94,252,.5)); animation: float 3.4s ease-in-out infinite; }
+  .auth-brand svg { width: 60px; height: 60px; flex: none; color: var(--text); filter: drop-shadow(0 10px 18px rgba(109,94,252,.35)); animation: float 3.4s ease-in-out infinite; }
 }
 @keyframes aurora { from { transform: translate3d(-6%, -4%, 0) rotate(-6deg); } to { transform: translate3d(8%, 6%, 0) rotate(8deg); } }
 

@@ -121,6 +121,7 @@ export function login(ctx) {
             </ul>
           </div>
           <div class="brand-tag">v${esc(ctx.state.meta?.version ?? "")}</div>
+          <div class="hero-mark" aria-hidden="true">${icons.logo}</div>
         </section>
         <section class="auth-panel">
           <div class="auth-top">${ctx.controls()}</div>

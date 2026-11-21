@@ -25,6 +25,10 @@ Aşakdaky bölümlerde bulara gapma-garşy zat bar bolsa, **şu ýer dogry**:
 4. **Interfeýs üç dilde:** türkmen (esasy), rus, iňlis. PDF hasabat hem.
 5. **Repo:** <https://github.com/eliotlastdance00-art/Find> (şaha `main`).
 6. Hemme zady ädimme-ädim etmeli, hiç zady taşlamaly däl, taýýar bolanda push etmeli.
+7. **(2026-11-21) Her işden öň pikirlenmeli.** Hiç bir işe gönüden-göni başlamaly däl. Tertip:
+   (a) meseläni analiz et — näme gerek, näme üçin; (b) başga nähili usullar bar — gerek bolsa internetden gözle;
+   (c) usullary deňeşdir, iň gowusyny saýla we sebäbini ýaz; (d) diňe şondan soň ýerine ýetir; (e) netijäni barla.
+   Saýlanan çözgüt we ret edilen wariantlar şu faýlyň gündeligine (10-njy bölüm) ýazylýar.
 
 Hakyky kod gurluşy (5-nji bölümdäki köne çyzgynyň ýerine): `docs/ARCHITECTURE.md`.
 Hakyky kararlar (4-nji bölüme goşmaça):
@@ -485,3 +489,30 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   - Meýilnama: (2) `onnxruntime` + model birikdirmek (surat: tutuş kadr; wideo: birnäçe kadr), aýratyn kart we
     höküm düzgüni, model GitHub-a sygmaýar (>100 MB) → gurnamada dowam etdirip ýüklemek; (3) Kaggle-da hakyky
     ölçeg + bosagalar (OpenFake synag bölegi, FF++ hakyky kadrlar); (4) README/UI täzelemek. Kepillik ýok.
+- **2026-11-21 (8) — logo web sahypada; emeli suratlar üçin usullaryň analizi (0a.7 boýunça: ilki pikir, soň iş).**
+  **A. Logo (ýerine ýetirildi).** Wariantlar: (1) PNG `<img>` — iki faýl (ýagty/garaňky), kiçi ölçegde bulaşyk;
+  (2) CSS mask — bir PNG, ýöne goşmaça sorag we Safari prefiksi; (3) **wektor SVG (potrace bilen yzarlanan)** —
+  islendik ölçegde dury, 7 KB, `currentColor` bilen tema özi uýgunlaşýar. Saýlanan: (3).
+  `static/js/logo.js` (ýol), `icons.logo`, `favicon.svg` (ak plitada gara şekil — ýagty we garaňky brauzerde görünýär).
+  Ýerleri: gapdal menýu (44 px), giriş sahypasy (56 px + uly ýarym dury suw belgisi), telefon giriş (60 px),
+  telefon ýokarky zolak (30 px; ≤480 px-de sahypa ady gizlenýär, sebäbi aşakda sözbaşy bar).
+  Playwright: 4 görnüş (kompýuter/telefon × ýagty/garaňky), konsol ýalňyşy ýok. README suratlary entek köne nyşanly — 4-nji ädimde täzelenýär.
+  **B. Ulgamdaky modeller (häzir 3 neýron tor):** YuNet (ýüz tapyjy, 0.2 MB) → EfficientNet-B4 `effnet-b4-ffpp`
+  (ýüz çalşygy, 34 MB; Grad-CAM — model däl, düşündiriş usuly) ; AASIST (ses, 1.3 MB). Goşuljak 4-nji: Smaug (emeli surat).
+  **C. Doly emeli suraty tanamagyň usullary — deňeşdirme:**
+  | # | Usul | Güýçli tarapy | Gowşak tarapy | Karar |
+  |---|---|---|---|---|
+  | 1 | Faýlyň içindäki gelip çykyş belligi: C2PA/JUMBF, IPTC `trainedAlgorithmicMedia`, PNG `parameters`/`prompt`, EXIF Software | takyk, mugt, 0 MB, hakyky surata ýalňyş bellik ýok | messenjer/skrinşot belligi pozýar; goly barlanmasa galplaşdyryp bolýar; biziň 4 synag suratymyzda ýok | **goşmaly (1-nji gatlak, subutnama setiri)** |
+  | 2 | Öwredilen klassifikator (Smaug web ONNX, Apache-2.0) | synagda 4/4, hakykyda 0/16; garaşsyz kiçi synag (TAYO): 197/200, 0/100 | 181 MB; iň täze generatorlary sypdyryp biler; köne DALL-E 2-de gowşak | **esasy usul (2-nji gatlak)** |
+  | 3 | Birnäçe klassifikatoryň ansambly | deňeşdirmede (arXiv 2602.07814) iň durnukly | MIT modeller täze suratlary sypdyrýar; galanlary CC BY-NC + ýalňyş duýduryş köp | ölçegden soň gaýtadan seretmeli |
+  | 4 | El bilen düzülen alamatlar (spektr, galmagal) | kiçi, düşnükli | täze generatorlarda tötänlige ýakyn (CNNSpot 37.5 %) | ret |
+  | 5 | Öwretmesiz, dikeldiş esasly (AEROBLADE we ş.m.) | täze generatorlara durnukly | birnäçe GB diffuziýa modeli + GPU gerek | ret (2 GB RAM) |
+  | 6 | Bulut hyzmatlary (Hive, SynthID Detector, Sightengine) | takyklygy ýokary | faýl daşary iberilýär, internet + töleg | ret (ulgam oflaýn işlemeli) |
+  | 7 | Öz modelimizi Kaggle-da öwretmek (OpenFake) | doly gözegçilik | uly iş; taýýar modelden gowy boljagy belli däl | diňe ölçeg zerurlygy görkezse |
+  **Karar: 1 + 2.** Höküm: emeli-surat bahasy aýratyn subutnama; jemleýji baha iki ugruň ulusy. Bosagalar ölçelýänçä
+  model `provisional` (kartdaky 0.5). Wideo kadrlary üçin Smaug barlanmadyk — ilki diňe surat, wideoda aýratyn ölçegden soň.
+  **181 MB-ny eltmek:** (a) GitHub Release faýly + `dfd models --download` (Range bilen dowam etdirmek, SHA-256) — **saýlandy**;
+  Docker gurnamada özi ýükleýär (0a.3 «bir buýruk» saklanýar); (b) Git LFS — mugt çägi dar, ret; (c) repo içinde bölekläp — klon agyrlaşýar, ret.
+  **Indiki ädimler:** (2) birikdirmek + testler; (3) Kaggle-da ölçeg we bosagalar; (4) README, suratlar, çäklendirmeler.
+  Ugur B: `dfd-tk-build` v2 11:09 UTC-de COMPLETE — netijesi entek barlanmady.
+

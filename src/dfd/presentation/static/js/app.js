@@ -109,6 +109,7 @@ function shell(route) {
       </aside>
       <div class="main">
         <header class="topbar">
+          <a class="topbar-brand" href="#/upload" aria-label="${esc(t("app.name"))}">${icons.logo}</a>
           <div class="crumb"><b data-crumb-title>${esc(t(`nav.${route}`))}</b><span data-crumb-file></span></div>
           <div class="topbar-actions">
             ${controls()}
