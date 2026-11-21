@@ -4,6 +4,7 @@
 #   bash scripts/codespace.sh setup    install into .venv (once, a few minutes)
 #   bash scripts/codespace.sh start    start the server in the background, if it is not running
 #   bash scripts/codespace.sh stop     stop it
+#   bash scripts/codespace.sh update   fetch the newest version from GitHub and restart
 #   bash scripts/codespace.sh info     print the address and the administrator login
 #   bash scripts/codespace.sh logs     follow the server log
 #
@@ -11,6 +12,8 @@
 # administrator password generated on first start. Set DFD_ADMIN_USERNAME and
 # DFD_ADMIN_PASSWORD (for example as Codespaces secrets) to choose the login yourself.
 # With DFD_PUBLIC_PORT=true (the dev container default) the address works without a GitHub login.
+# With DFD_AUTO_UPDATE=true (also the default there) every start first fetches the newest version,
+# so stopping and starting the codespace is enough to deploy what was pushed.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -106,6 +109,29 @@ info() {
   echo
 }
 
+# Fast-forwards the checkout. Never fatal: without network, or with local edits in the way, the
+# version already on disk keeps running.
+pull() {
+  local before after
+  before="$(git rev-parse HEAD)"
+  if ! git pull --quiet --ff-only 2>/dev/null; then
+    echo "update skipped: could not fast-forward (no network, or local changes)" >&2
+    return 0
+  fi
+  after="$(git rev-parse HEAD)"
+  if [[ "$before" == "$after" ]]; then
+    echo "already up to date ($(git log -1 --format=%h))"
+    return 0
+  fi
+  # The install is editable, so only a change of dependencies needs pip again.
+  if [[ -x .venv/bin/pip ]] &&
+    git diff --name-only "$before" "$after" | grep -qE '^(pyproject\.toml|constraints\.txt)$'; then
+    .venv/bin/pip install --quiet --extra-index-url "$TORCH_INDEX" --constraint constraints.txt \
+      --editable .
+  fi
+  echo "updated to $(git log -1 --format='%h %s')"
+}
+
 start() {
   mkdir -p "$STATE"
   if healthy; then
@@ -113,6 +139,7 @@ start() {
     info
     return
   fi
+  [[ "${DFD_AUTO_UPDATE:-false}" == "true" ]] && pull
   [[ -x .venv/bin/dfd ]] || setup
   credentials
   mkdir -p "$STATE/data"
@@ -148,15 +175,23 @@ stop() {
   rm -f "$PID_FILE"
 }
 
-case "${1:-start}" in
-  setup) setup ;;
-  start) start ;;
-  stop) stop ;;
-  restart) stop && start ;;
-  info) info ;;
-  logs) tail -n 100 -f "$LOG" ;;
-  *)
-    echo "usage: $0 {setup|start|stop|restart|info|logs}" >&2
-    exit 2
-    ;;
-esac
+# The dispatch is a function called from the last line, so bash has read the whole file before
+# `pull` can replace it on disk.
+main() {
+  case "${1:-start}" in
+    setup) setup ;;
+    start) start ;;
+    stop) stop ;;
+    restart) stop && start ;;
+    pull) pull ;;
+    update) pull && stop && start ;;
+    info) info ;;
+    logs) tail -n 100 -f "$LOG" ;;
+    *)
+      echo "usage: $0 {setup|start|stop|restart|update|info|logs}" >&2
+      exit 2
+      ;;
+  esac
+}
+
+main "$@"; exit $?

@@ -78,7 +78,9 @@ Bilmeli zatlar:
   (30 minut, GitHub sazlamalarynda 240 minuda çenli) we iň köp 12 sagat yzygiderli işleýär.
   Duran gurşawy diňe eýesi <https://github.com/codespaces> sahypasyndan açyp bilýär; şonda
   serwer özi işe başlaýar, maglumatlar saklanýar, salgy üýtgemeýär.
-- Dolandyryş: `bash scripts/codespace.sh {start|stop|restart|info|logs}`.
+- Dolandyryş: `bash scripts/codespace.sh {start|stop|restart|update|info|logs}`.
+- Täzelemek: `bash scripts/codespace.sh update` (GitHub-dan iň täze wersiýany alýar we serweri
+  täzeden başlaýar). Codespace her gezek işe başlanda hem özi täzelenýär (`DFD_AUTO_UPDATE`).
 
 ## Nähili işleýär
 

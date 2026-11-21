@@ -10,7 +10,8 @@
   // The GitHub CLI is what lets the start script open the port to visitors without a GitHub
   // login. Set DFD_PUBLIC_PORT to "false" to keep the address private to the owner.
   "features": { "ghcr.io/devcontainers/features/github-cli:1": {} },
-  "containerEnv": { "DFD_PUBLIC_PORT": "true" },
+  // DFD_AUTO_UPDATE: each start runs `git pull` first, so a stop + start deploys the newest push.
+  "containerEnv": { "DFD_PUBLIC_PORT": "true", "DFD_AUTO_UPDATE": "true" },
 
   "postCreateCommand": "bash scripts/codespace.sh setup",
   "postStartCommand": "bash scripts/codespace.sh start",
