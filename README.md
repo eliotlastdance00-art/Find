@@ -45,10 +45,19 @@ Sazlamalar hökmany däl. Üýtgetmek isleseňiz: `cp .env.example .env` we içi
 Python 3.11+ gerek (FFmpeg aýratyn gurmak gerek däl — `imageio-ffmpeg` bilen gelýär).
 
 ```bash
-python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
+python3 -m venv .venv && source .venv/bin/activate     # Windows: py -m venv .venv; .venv\Scripts\activate
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install -e .
 dfd serve                                               # http://localhost:8000
+```
+
+Internet durnuksyz bolsa PyTorch (≈140 MB) ýüklenişi kesilip biler (`IncompleteRead`). Onda faýly
+`curl` bilen aýratyn ýükläň — kesilse, şol buýrugy gaýtalaň, ol galan ýerinden dowam edýär:
+
+```bash
+# faýlyň anyk adyny pip-iň "Downloading torch-…whl" setirinden alyň
+curl -L -C - --retry 20 --retry-all-errors -O https://download.pytorch.org/whl/cpu/<torch-…>.whl
+pip install ./torch-*.whl && pip install -e .
 ```
 
 Beýleki buýruklar: `dfd create-user <at> --admin`, `dfd models`. API resminamasy:
