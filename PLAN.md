@@ -407,3 +407,16 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
 - Ýerli synag (CPU, 20 hakyky ýazgy): sources → resynth (5 generator) → MMS işledi, 67 ýazgy.
 - Kaggle `dfd-tk-build` v1 (kiçi GPU synagy, ~400 hakyky ýazgy, 55 min çäk) 04:06 UTC-de goýberildi.
   Maksat: GPU-da ähli generatorlaryň işleýändigini we tizligini ölçemek, soň doly gurluş.
+
+### 2026-11-21 (3) — Türkmen ses toplumy: GPU synagy geçdi, doly gurluş goýberildi
+
+- `dfd-tk-build` v1 (kiçi synag, 15 min, 2×T4): 11 generatoryň hemmesi GPU-da işledi, 1613 ýazgy,
+  OmniVoice/Vocos diňe testde. GPU tizligi (RTF): wokoder/kodek 0.02–0.06, MMS 0.04,
+  kNN-VC 0.09, OmniVoice 0.48 (~2.4 s/ýazgy), VoxCPM2+Anadil 2.36 (~11.5 s/ýazgy — iň haýal).
+- ASR barlagy (10 ýazgy/generator, CER): 0.05–0.16; kNN-VC 0.34–0.36 (pes hil).
+- Düzedişler: kNN-VC-de VAD öçürildi (ýuwaş ýazgylary boşadýardy, 4 ýalňyşlyk), salgy toplumy
+  8 → 20 ýazgy we her ses üçin bir gezek hasaplanýar; VoxCPM üçin ikinji işçi (GPU0 boşanda).
+- Bellik (3-nji ädim üçin): MMS we kNN-VC çykyşy hakyky sesden ~2 esse gaty (RMS 0.13–0.15 vs
+  0.06–0.07) → türgenleşdirişde iki synp üçin hem dereje deňleşdirmesi hökman.
+- `dfd-tk-build` **v2 (doly gurluş)** 07:05 UTC-de goýberildi: 482 wideo × 10 + Common Voice
+  (≤120/gepleýji), çäk 225 min. Garaşylýan: ~7 000 hakyky, ~22 000 galp ýazgy.
