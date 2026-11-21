@@ -216,6 +216,7 @@ Sazlamak isleseňiz: `cp .env.example .env` we içini düzediň.
 | `command not found: dfd` | Gurşaw işjeň däl ýa-da gurnama tamamlanmady: gurşawy işjeňleşdiriň, soň `pip install -e .` |
 | `... is not a supported wheel on this platform` | Ýüklenen `.whl` başga Python wersiýasy üçin (`cp313` = Python 3.13). `python --version` bilen deňeşdiriň; gurşawy `python3.13 -m venv .venv` bilen täzeden dörediň |
 | `JSONDecodeError`, `Unterminated string`, `incomplete-download` (pip-de) | Internet kesildi. Aşakdaky «Haýal internet» usulyny ulanyň (`scripts/fetch_wheels.py`) |
+| Gurnama üstünlikli, ýöne `ModuleNotFoundError: No module named 'dfd'` (macOS, Python 3.13+) | macOS `.venv` içindäki `.pth` faýlyny «gizlin» edip belleýär, Python 3.13 bolsa gizlin `.pth`-ni okamaýar. `-e`-siz guruň: `pip uninstall -y dfd`, soň `pip install .` (her `git pull`-dan soň gaýtalamaly) |
 | `IncompleteRead`, `Connection broken` (PyTorch ýüklenende) | Internet kesildi. Aşakdaky «Haýal internet» usulyny ulanyň |
 | `RPC failed; curl 18` (`git clone`-da) | Internet kesildi. `--depth 1` bilen synaň ýa-da [ZIP](https://github.com/eliotlastdance00-art/Find/archive/refs/heads/main.zip) ýükläň |
 | `Address already in use` | 8000-nji port eýeli: `dfd serve --port 8080` |
