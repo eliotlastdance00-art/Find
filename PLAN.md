@@ -565,3 +565,10 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   **Barlag:** Playwright bilen 1440×900 we 390×800: açylyş, giriş, dil sanawy, geçiş, hasap menýusy, ýygnalan menýu, «Ulgam barada», çykyş soragy, surat/wideo/ses üstünde lupa, möhür — konsol ýalňyşsyz. `prefers-reduced-motion`-da kod boýunça öçýär (aýratyn synalmady).
   **Barlanmadyk:** hakyky telefon, Safari/Firefox; README suratlary köne görnüşde.
 
+- **2026-11-21 (12) — Kaggle: ses okuwy (`dfd-train-audio`) başlamady, GPU nobatynda dur.**
+  v1 11:51 UTC-de iberildi, 13:49-da henizem `QUEUED` (ýalňyşlyk habary ýok). Kod we sazlama barlandy: LA bukjalary we `manifest.csv` + `audio_*.tar` gabat gelýär, `enable_gpu` açyk.
+  13:50-de gaýtadan iberildi (v2) — 17:00-da henizem `QUEUED`. CPU synag kerneli (`dfd-queue-probe`) derrew işläp gutardy → mesele diňe GPU-da.
+  Mümkin sebäpler: (a) hepdelik GPU kwotasy gutardy (CLI görkezmeýär, saýtda «Settings → Quotas»); (b) Kaggle-yň GPU nobaty (2026-11-15 senesindäki product-feedback 757624: T4 ×2 sessiýalary «Queued»-da galýar).
+  **Ölen ýol:** P100-e geçmek — CLI 2.2.5-de P100 «retired», serwer ony T4 bilen çalyşýar. Gaýtadan ibermek kömek etmeýär — indi iberme.
+  **Indiki:** ulanyjy saýtda kwotany barlaýar; kernel nobatda galýar; başlansa ≈4.5–5 sagat.
+
