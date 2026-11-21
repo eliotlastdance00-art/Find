@@ -54,6 +54,28 @@ dfd serve                                               # http://localhost:8000
 Beýleki buýruklar: `dfd create-user <at> --admin`, `dfd models`. API resminamasy:
 <http://localhost:8000/api/docs>.
 
+## Bulutda mugt synap görmek (GitHub Codespaces)
+
+Kompýutere hiç zat gurmazdan, brauzerde işledip görmek üçin. Mugt GitHub hasaby ýeterlik
+(bank karty gerek däl): aýda 60 sagat, 2 ýadro, 8 GB RAM.
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/eliotlastdance00-art/Find?quickstart=1)
+
+1. Ýokardaky düwmä basyň (ýa-da GitHub-da **Code → Codespaces → Create codespace on main**).
+2. Birinji gezek 4–5 minut garaşyň: baglylyklar gurulýar we serwer öz-özünden işe başlaýar
+   (soňky açylyşlarda 1–2 minut).
+3. Terminalda salgy we administrator paroly çykýar (islendik wagt: `bash scripts/codespace.sh info`).
+   Salgyny **Ports** goýmasyndaky 8000-nji portdan hem açyp bolýar.
+
+Bilmeli zatlar:
+
+- Bu hemişelik hosting däl: gurşaw 30 minut ulanylmasa durýar (GitHub sazlamalarynda 240 minuda
+  çenli uzaldyp bolýar). Gaýtadan açanyňyzda serwer özi işe başlaýar, maglumatlar saklanýar.
+- Salgy başda diňe size açyk. Başgalara görkezmek üçin: **Ports → 8000 → sag düwme →
+  Port Visibility → Public**. Şonda salgyny bilýän her kim hasap açyp biler; islemeseňiz
+  ammaryň düýbünde `.env` faýlyna `DFD_ALLOW_REGISTRATION=false` ýazyp, `restart` ediň.
+- Dolandyryş: `bash scripts/codespace.sh {start|stop|restart|info|logs}`.
+
 ## Nähili işleýär
 
 ```
@@ -186,7 +208,8 @@ available in Turkmen, Russian and English.
 
 **Run it:** `docker compose up --build`, then open <http://localhost:8000>. Model weights
 are in the repository; no other setup is required. Without Docker: install CPU PyTorch,
-`pip install -e .`, `dfd serve`.
+`pip install -e .`, `dfd serve`. To try it in the browser without installing anything, open the
+repository in GitHub Codespaces (the dev container installs and starts the server on port 8000).
 
 **Stack:** Python, FastAPI, SQLAlchemy/SQLite, PyTorch + timm, OpenCV (YuNet), FFmpeg,
 fpdf2; plain HTML/CSS/JS front end with no external assets. Clean architecture

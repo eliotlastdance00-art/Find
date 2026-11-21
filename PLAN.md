@@ -420,3 +420,16 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   0.06–0.07) → türgenleşdirişde iki synp üçin hem dereje deňleşdirmesi hökman.
 - `dfd-tk-build` **v2 (doly gurluş)** 07:05 UTC-de goýberildi: 482 wideo × 10 + Common Voice
   (≤120/gepleýji), çäk 225 min. Garaşylýan: ~7 000 hakyky, ~22 000 galp ýazgy.
+
+### 2026-11-21 (4) — Mugt bulutda ýerleşdirmek: GitHub Codespaces
+
+- Mugt hyzmatlar deňeşdirildi: serwer ~1.2 GB RAM alýar, şonuň üçin 512 MB berýänler (Render,
+  Koyeb, Railway) bolmaýar; Hugging Face Docker Space 2026-07-den bäri PRO talap edýär;
+  Oracle (2 ARM ýadro / 12 GB) kart talap edýär. Saýlanan: GitHub Codespaces (2 ýadro, 8 GB,
+  aýda 60 sagat, kartsyz).
+- Goşuldy: `.devcontainer/devcontainer.json`, `scripts/codespace.sh` (setup/start/stop/info/logs;
+  ilkinji başlangyçda tötänleýin parolly administrator döredýär), README bölümi.
+- Hakyky codespace-da barlandy (`basicLinux32gb`): döredilenden ~4 min soň serwer taýýar;
+  `smoke_test.py` geçdi; FF++ hakyky wideo → «Hakyky» (13 s), Deepfakes → «Galp» (11 s);
+  dur/başla aýlawyndan soň serwer ~75 s-de özi işe başlady, hasap saklanyp galdy.
+- Barlanmadyk: portuň «Public» görnüşi; brauzerde janly öňe gidişlik (SSE) proksiniň üsti bilen.
