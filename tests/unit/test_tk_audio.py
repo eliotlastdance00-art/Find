@@ -91,6 +91,17 @@ def test_voice_converted_tts_reads_the_scratch_file_planned_for_it() -> None:
     assert len(ids) == len(set(ids))
 
 
+def test_voice_conversion_reuses_one_reference_set_per_voice() -> None:
+    plan = make_plan(_real(per_group=30), PlanConfig(knnvc_fraction=1.0, vc_references=20))
+    sets: dict[str, set[tuple[str, ...]]] = {}
+    for job in plan["vc_knnvc"]:
+        sets.setdefault(job["ref_group"], set()).add(tuple(job["refs"]))
+        assert len(job["refs"]) == 20
+    assert all(len(variants) == 1 for variants in sets.values())
+    cloning = plan["tts_voxcpm_anadil"]
+    assert len({job["refs"][0] for job in cloning}) > len({job["ref_group"] for job in cloning})
+
+
 def test_a_split_with_one_group_falls_back_to_the_same_speakers_other_clips() -> None:
     real = _real(1, 4)
     plan = make_plan(real, PlanConfig(knnvc_fraction=1.0))

@@ -2,11 +2,14 @@
 
     python -m training.tk_audio.gen_voxcpm       (needs ``pip install voxcpm``)
 
-Slow, so it works through a shuffled job list until its time budget (``TK_DEADLINE``) ends.
+Slow (about 11 s per clip on a T4), so it works through a shuffled job list until its time
+budget (``TK_DEADLINE``) ends. ``TK_SHARD=i/n`` restricts it to every n-th job, which lets
+several workers on different GPUs share the list without overlap.
 """
 
 from __future__ import annotations
 
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -43,9 +46,9 @@ def main() -> None:
         )
         return audio, rate
 
-    run_generator(
-        Sink("tts_voxcpm_anadil", "tts-cloning", MODEL), load_plan("tts_voxcpm_anadil"), synth, 10
-    )
+    index, count = (int(part) for part in os.environ.get("TK_SHARD", "0/1").split("/"))
+    jobs = load_plan("tts_voxcpm_anadil")[index::count]  # the plan is shuffled: any shard is fair
+    run_generator(Sink("tts_voxcpm_anadil", "tts-cloning", MODEL), jobs, synth, every=10)
 
 
 if __name__ == "__main__":

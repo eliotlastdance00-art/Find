@@ -8,6 +8,7 @@ as a real speaker (``tts_mms_knnvc``), which gives the single-voice TTS many voi
 
 from __future__ import annotations
 
+import inspect
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -33,6 +34,13 @@ def main() -> None:
     model = torch.hub.load(
         MODEL, "knn_vc", prematched=True, trust_repo=True, pretrained=True, device=device
     )
+
+    # The built-in voice activity trimming empties quiet clips (and would change durations).
+    def no_vad(function: Any) -> dict[str, int]:
+        accepted = inspect.signature(function).parameters
+        return {"vad_trigger_level": 0} if "vad_trigger_level" in accepted else {}
+
+    source_options, set_options = no_vad(model.get_features), no_vad(model.get_matching_set)
     scratch = Path(tempfile.mkdtemp(prefix="knnvc_"))
     matching_cache: dict[tuple[str, ...], Any] = {}
 
@@ -46,17 +54,19 @@ def main() -> None:
     def synth(job: Job) -> tuple[Any, int]:
         key = tuple(job["refs"])
         if key not in matching_cache:
-            if len(matching_cache) > 64:
-                matching_cache.clear()
-            matching_cache[key] = model.get_matching_set([as_wav(ref) for ref in key])
+            matching_cache.clear()  # jobs arrive grouped by voice; one set in memory is enough
+            matching_cache[key] = model.get_matching_set(
+                [as_wav(ref) for ref in key], **set_options
+            )
         source = as_wav(job["src"])
-        out = model.match(model.get_features(source), matching_cache[key], topk=4)
+        out = model.match(model.get_features(source, **source_options), matching_cache[key], topk=4)
         Path(source).unlink(missing_ok=True)
         return out.float().cpu().numpy(), 16000
 
     results = []
     for name, kind in (("vc_knnvc", "voice-conversion"), ("tts_mms_knnvc", "tts+voice-conversion")):
         jobs = [j for j in load_plan(name) if (work_root() / "audio" / j["src"]).is_file()]
+        jobs.sort(key=lambda j: (j["ref_group"], j["refs"]))
         results.append(generate(name, kind, MODEL, jobs, synth))
     if not all(results):
         raise SystemExit("kNN-VC generation failed")

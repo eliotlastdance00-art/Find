@@ -26,9 +26,9 @@ class PlanConfig:
     resynth_per_clip: int = 2
     mms_fraction: float = 0.30
     mms_vc_fraction: float = 0.12
-    knnvc_fraction: float = 0.35
+    knnvc_fraction: float = 0.25
     voxcpm_fraction: float = 0.35
-    vc_references: int = 8
+    vc_references: int = 20  # a small matching set makes kNN-VC noticeably less intelligible
 
 
 def _unit(salt: str, clip_id: str) -> float:
@@ -62,11 +62,14 @@ class _References:
         others = [g for g in self.groups[clip["split"]] if g != clip["group"]]
         if others:
             group = others[stable_hash(f"{salt}:group:{clip['id']}") % len(others)]
+            # Cloning takes a different reference clip for every fake. Conversion uses one
+            # fixed set per voice, so that set is computed once and reused.
+            key = f"{salt}:{clip['id']}" if count == 1 else f"{salt}:{group}"
             pool = self.by_group[group]
         else:  # a split with a single group (tiny smoke runs): use the speaker's other clips
-            group = clip["group"]
+            group, key = clip["group"], f"{salt}:{clip['id']}"
             pool = [c for c in self.by_group[group] if c["id"] != clip["id"]]
-        ranked = sorted(pool, key=lambda c: stable_hash(f"{salt}:{clip['id']}:{c['id']}"))
+        ranked = sorted(pool, key=lambda c: stable_hash(f"{key}:{c['id']}"))
         return group, ranked[:count]
 
 

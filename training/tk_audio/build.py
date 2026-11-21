@@ -65,6 +65,8 @@ class Builder:
         self.deadline = self.started + args.budget_min * 60.0
         self.only = {s for s in args.only.split(",") if s}
         self.lock = threading.Lock()
+        self.venv_lock = threading.Lock()
+        self.venvs: dict[str, str | None] = {}
         self.report: dict[str, object] = {
             "started": time.strftime("%Y-%m-%d %H:%M:%S"),
             "args": {k: str(v) for k, v in vars(args).items()},
@@ -102,6 +104,7 @@ class Builder:
         minutes: float,
         gpu: int | None = None,
         retries: int = 1,
+        extra_env: dict[str, str] | None = None,
     ) -> bool:
         """Run one step under the watchdog; a failed step is resumed ``retries`` times."""
         outcome = "skipped: time budget"
@@ -111,7 +114,7 @@ class Builder:
             soft = min(now + minutes * 60.0, self.deadline - RESERVE_S)
             if soft - now < 120:
                 break
-            env = {**self.env, "TK_DEADLINE": str(soft)}
+            env = {**self.env, "TK_DEADLINE": str(soft), **(extra_env or {})}
             if gpu is not None:
                 env["CUDA_VISIBLE_DEVICES"] = str(gpu)
             print(
@@ -142,6 +145,12 @@ class Builder:
 
     def virtualenv(self, name: str) -> str | None:
         """An environment that sees the image's packages; extras are installed into it only."""
+        with self.venv_lock:
+            if name not in self.venvs:
+                self.venvs[name] = self._create_virtualenv(name)
+            return self.venvs[name]
+
+    def _create_virtualenv(self, name: str) -> str | None:
         path = self.work / "venvs" / name
         python = str(path / "bin" / "python")
         create = [sys.executable, "-m", "venv", "--system-site-packages", str(path)]
@@ -154,15 +163,21 @@ class Builder:
         pip = [python, "-m", "pip", "install", "-q", "--no-input", *EXTRA_PACKAGES[name]]
         return python if self.stage(f"pip_{name}", pip, 25) else None
 
-    def generate(self, name: str, minutes: float, gpu: int | None) -> None:
-        if not self.wants(name):
+    def generate(
+        self, name: str, minutes: float, gpu: int | None, shard: tuple[int, int] | None = None
+    ) -> None:
+        """Run one generator step. A shard is one of several workers sharing a job list."""
+        if not self.wants(name) or minutes <= 0:
             return
         python: str | None = sys.executable
         if name in EXTRA_PACKAGES:
             python = self.virtualenv(name)
         if python is not None:
-            self.stage(name, self.module(f"gen_{name}", python), minutes, gpu)
-        self.archive(name)
+            stage = name if shard is None else f"{name}_{shard[0]}"
+            env = {} if shard is None else {"TK_SHARD": f"{shard[0]}/{shard[1]}"}
+            self.stage(stage, self.module(f"gen_{name}", python), minutes, gpu, extra_env=env)
+        if shard is None:  # shards write into one directory; it is archived when all are done
+            self.archive(name)
 
     def archive(self, stage: str) -> None:
         """Pack each finished generator directory into the output directory right away."""
@@ -205,14 +220,20 @@ class Builder:
         first = 0 if gpus else None
         second = 1 if gpus > 1 else first
 
+        # VoxCPM is by far the slowest generator. With two GPUs it starts on the second one
+        # at once, and a second worker joins on the first GPU when the fast generators are done.
+        shards = 2 if gpus > 1 and args.voxcpm_extra_min > 0 else 1
+
         def fast_lane() -> None:
-            self.generate("resynth", 70, first)
-            self.generate("mms", 25, first)
+            self.generate("resynth", 80, first)
+            self.generate("mms", 30, first)
             self.generate("knnvc", 50, first)
             self.generate("vocos", 15, first)
+            if shards > 1:
+                self.generate("voxcpm", args.voxcpm_extra_min, first, shard=(1, shards))
 
         def slow_lane() -> None:
-            self.generate("voxcpm", args.voxcpm_min, second)
+            self.generate("voxcpm", args.voxcpm_min, second, shard=(0, shards))
             self.generate("omnivoice", args.omnivoice_min, second)
 
         if gpus > 1:  # one lane per GPU; on a single device they would fight for memory
@@ -225,6 +246,8 @@ class Builder:
             fast_lane()
             slow_lane()
 
+        if self.wants("voxcpm"):
+            self.archive("voxcpm")
         if self.wants("asr"):
             check = self.module("check_asr", sys.executable, "--per-generator", str(args.asr_n))
             self.stage("asr", check, 20, first, retries=0)
@@ -286,14 +309,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     p.add_argument("--out", type=Path, default=Path("/kaggle/working/tkset"))
     p.add_argument("--work", type=Path, default=Path("/tmp/tkset"))
-    p.add_argument("--budget-min", type=float, default=210.0, help="whole run, hard limit")
+    p.add_argument("--budget-min", type=float, default=225.0, help="whole run, hard limit")
     p.add_argument("--stall-min", type=float, default=15.0, help="silence that counts as a hang")
     p.add_argument("--ts-videos", type=int, default=482)
     p.add_argument("--ts-per-video", type=int, default=10)
     p.add_argument("--cv-parts", default="train,dev,test,other")
     p.add_argument("--cv-per-speaker", type=int, default=120)
-    p.add_argument("--voxcpm-min", type=float, default=60.0)
-    p.add_argument("--omnivoice-min", type=float, default=35.0)
+    p.add_argument("--voxcpm-min", type=float, default=120.0)
+    p.add_argument("--voxcpm-extra-min", type=float, default=80.0, help="second worker, 2 GPUs")
+    p.add_argument("--omnivoice-min", type=float, default=50.0)
     p.add_argument("--asr-n", type=int, default=25, help="clips per generator in the ASR check")
     p.add_argument("--samples", type=int, default=3, help="listening samples per generator")
     p.add_argument("--only", default="", help="comma-separated steps to run (default: all)")
