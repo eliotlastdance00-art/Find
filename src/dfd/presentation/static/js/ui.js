@@ -5,8 +5,14 @@ const ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&
 export const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ESCAPES[ch]);
 
 const path = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+let logoCount = 0;
 export const icons = {
-  logo: `<svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c6cff"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#lg)"/><path d="M16 7.5 8.5 10.4v5.3c0 4.4 3 7.5 7.5 9 4.5-1.5 7.5-4.6 7.5-9v-5.3z" fill="none" stroke="#fff" stroke-width="1.9" stroke-linejoin="round"/><path d="m12.6 16.2 2.4 2.4 4.5-4.8" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  // A getter: every copy needs its own gradient id, or a hidden copy can blank the others.
+  get logo() {
+    logoCount += 1;
+    const id = `lg${logoCount}`;
+    return `<svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c6cff"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#${id})"/><path d="M16 7.5 8.5 10.4v5.3c0 4.4 3 7.5 7.5 9 4.5-1.5 7.5-4.6 7.5-9v-5.3z" fill="none" stroke="#fff" stroke-width="1.9" stroke-linejoin="round"/><path d="m12.6 16.2 2.4 2.4 4.5-4.800" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  },
   upload: path('<path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>'),
   scan: path('<path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M4 12h16"/>'),
   result: path('<path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 12 19 5"/><circle cx="12" cy="12" r="1.5"/>'),
@@ -74,7 +80,8 @@ export function verdictBadge(verdict, large = false) {
   return `<span class="badge badge-${esc(verdict)}${large ? " badge-lg" : ""}">${icons[VERDICT_ICON[verdict]]}<span>${esc(t(`verdict.${verdict}`))}</span></span>`;
 }
 
-// Semi-circular gauge. `prob` may be null (inconclusive).
+// Semi-circular gauge. `prob` may be null (inconclusive). It is drawn empty and filled by
+// motion.reveal(), which the application shell runs for everything that enters the page.
 export function gauge(prob, verdict) {
   const radius = 84;
   const length = Math.PI * radius;
@@ -83,12 +90,29 @@ export function gauge(prob, verdict) {
     <div class="gauge gauge-${esc(verdict ?? "inconclusive")}">
       <svg viewBox="0 0 200 116" role="img" aria-label="${esc(t("result.probability"))}: ${esc(pct(prob))}">
         <path class="gauge-track" d="M16 100 A84 84 0 0 1 184 100" pathLength="${length}"/>
-        <path class="gauge-value" d="M16 100 A84 84 0 0 1 184 100" stroke-dasharray="${filled} ${length}"/>
+        <path class="gauge-value" d="M16 100 A84 84 0 0 1 184 100" stroke-dasharray="0 ${length}" data-dash="${filled} ${length}"/>
       </svg>
       <div class="gauge-label">
-        <div class="gauge-number">${prob == null ? "—" : `${(prob * 100).toFixed(1)}<small>%</small>`}</div>
+        <div class="gauge-number">${prob == null ? "—" : `<span data-count="${(prob * 100).toFixed(1)}" data-digits="1">0.0</span><small>%</small>`}</div>
         <div class="gauge-caption">${esc(t("result.probability"))}</div>
       </div>
+    </div>`;
+}
+
+// Circular progress for a running scan; `progress` is 0..1.
+let ringCount = 0;
+export function ring(progress) {
+  const value = Math.round(Math.max(0, Math.min(1, progress)) * 100);
+  ringCount += 1;
+  const id = `ring-g${ringCount}`;
+  return `
+    <div class="ring" role="img" aria-label="${value}%">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c6cff"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+        <circle class="ring-track" cx="60" cy="60" r="52"/>
+        <circle class="ring-value" cx="60" cy="60" r="52" pathLength="100" stroke="url(#${id})" stroke-dasharray="${value} 100"/>
+      </svg>
+      <div class="ring-num"><b data-pct>${value}</b><small>%</small></div>
     </div>`;
 }
 
@@ -102,7 +126,7 @@ export function zoneBar(prob, realMax, fakeMin) {
         <span class="zone zone-real" style="width:${a}%"></span>
         <span class="zone zone-suspicious" style="width:${Math.max(0, b - a)}%"></span>
         <span class="zone zone-fake" style="width:${100 - b}%"></span>
-        <span class="zonebar-marker" style="left:${Math.max(0, Math.min(100, prob * 100))}%"></span>
+        <span class="zonebar-marker" style="left:0%" data-left="${Math.max(0, Math.min(100, prob * 100))}%"></span>
       </div>
       <div class="zonebar-scale"><span>0%</span><span>50%</span><span>100%</span></div>
     </div>`;
@@ -120,7 +144,7 @@ export function timeline(items, realMax, fakeMin) {
   const bars = items.map((item, i) => {
     const h = Math.max(1.5, plot * item.prob);
     const x = i * slot + (slot - bar) / 2;
-    return `<rect class="tl-bar tl-${zoneOf(item.prob, realMax, fakeMin)}" x="${x.toFixed(2)}" y="${(top + plot - h).toFixed(2)}" width="${bar.toFixed(2)}" height="${h.toFixed(2)}" rx="${Math.min(3, bar / 2)}"><title>${esc(item.label)} — ${esc(pct(item.prob))}</title></rect>`;
+    return `<rect class="tl-bar tl-${zoneOf(item.prob, realMax, fakeMin)}" style="animation-delay:${Math.min(i * 18, 700)}ms" x="${x.toFixed(2)}" y="${(top + plot - h).toFixed(2)}" width="${bar.toFixed(2)}" height="${h.toFixed(2)}" rx="${Math.min(3, bar / 2)}"><title>${esc(item.label)} — ${esc(pct(item.prob))}</title></rect>`;
   }).join("");
   const guides = [realMax, fakeMin].map((level) =>
     `<line class="tl-guide" x1="0" x2="${width}" y1="${y(level).toFixed(2)}" y2="${y(level).toFixed(2)}"/>`).join("");

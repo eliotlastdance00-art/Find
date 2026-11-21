@@ -1,17 +1,29 @@
 // One function per screen. Each receives a context and may return a cleanup callback.
 import { api, auth, media } from "./api.js";
 import { errorText, lang, LANGS, t } from "./i18n.js";
+import { countTo, detectMedia, extensionOf, previewFile, wait } from "./motion.js";
 import {
   confirmDialog, emptyState, esc, formatBytes, formatDate, formatDuration, gauge, icons, pct,
-  spinner, timeline, toast, typeIcon, verdictBadge, zoneBar,
+  ring, spinner, timeline, toast, typeIcon, verdictBadge, zoneBar,
 } from "./ui.js";
 
-const FORMATS = ["JPG", "PNG", "WEBP", "BMP", "MP4", "MOV", "MKV", "WEBM", "AVI", "WAV", "MP3", "FLAC", "OGG", "M4A"];
+const KINDS = ["image", "video", "audio"];
 const ACCEPT = "image/*,video/*,audio/*,.mkv,.flac,.m4a,.webm";
 const STAGES = ["preprocessing", "analyzing", "explaining", "done"];
 const ACTIVE = new Set(["queued", "preprocessing", "analyzing", "explaining"]);
 
 const fail = (error) => toast(errorText(error.code ?? "error"), "error");
+
+// Small animated drawings that stand for a picture, a video and a sound recording.
+function kindArt(kind) {
+  if (kind === "image") {
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="9" width="36" height="30" rx="6"/><circle class="art-sun" cx="17" cy="19" r="3.4" fill="currentColor" stroke="none"/><path class="art-hill" d="m7 34 10-9 8 7 6-5 10 8"/></svg>`;
+  }
+  if (kind === "video") {
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="9" width="36" height="30" rx="6"/><path class="art-play" d="m20.500 17.500 10 6.500-10 6.500z" fill="currentColor"/></svg>`;
+  }
+  return `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true">${[10, 17, 24, 31, 38].map((x, i) => `<path class="art-bar" style="animation-delay:${i * -0.18}s" d="M${x} 14v20"/>`).join("")}</svg>`;
+}
 
 function pageHead(title, lead, actions = "") {
   return `<div class="page-head"><div><h1>${esc(title)}</h1>${lead ? `<p>${esc(lead)}</p>` : ""}</div>${actions ? `<div class="actions">${actions}</div>` : ""}</div>`;
@@ -113,6 +125,7 @@ export function login(ctx) {
         <section class="auth-panel">
           <div class="auth-top">${ctx.controls()}</div>
           <div class="auth-box">
+            <div class="auth-brand">${icons.logo}<div><div class="brand-name">${esc(t("app.name"))}</div><div class="brand-tag">${esc(t("app.tagline"))}</div></div></div>
             <div><h2>${esc(t("login.title"))}</h2><p class="muted">${esc(t("login.subtitle"))}</p></div>
             <div class="tabs" role="tablist">
               <button role="tab" data-mode="login" aria-selected="${mode === "login"}">${esc(t("login.tab.login"))}</button>
@@ -168,17 +181,31 @@ export async function upload(ctx) {
   ctx.root.innerHTML = `
     ${pageHead(t("upload.title"), t("upload.lead"))}
     ${modelBanners(ctx.state.meta)}
-    <div class="dropzone" tabindex="0" role="button" aria-label="${esc(t("upload.browse"))}">
-      <div class="dz-icon">${icons.upload}</div>
-      <div>
-        <div class="dz-title">${esc(t("upload.drop"))}</div>
-        <div class="muted">${esc(t("upload.or"))}</div>
+    <div class="dropzone" data-state="idle" tabindex="0" role="button" aria-label="${esc(t("upload.browse"))}">
+      <div class="dz-idle">
+        <div class="dz-orbit" aria-hidden="true"><i></i><i></i><div class="dz-icon">${icons.upload}</div></div>
+        <div>
+          <div class="dz-title"><span class="for-mouse">${esc(t("upload.drop"))}</span><span class="for-touch">${esc(t("upload.tap"))}</span></div>
+          <div class="muted for-mouse">${esc(t("upload.or"))}</div>
+        </div>
+        <button class="btn btn-primary btn-lg" type="button" data-browse>${icons.plus}${esc(t("upload.browse"))}</button>
+        <div class="dz-kinds" aria-label="${esc(t("upload.kinds"))}">
+          ${KINDS.map((kind) => `<div class="dz-kind kind-${kind}"><span class="dz-kind-ico">${kindArt(kind)}</span><b>${esc(t(`type.${kind}`))}</b></div>`).join("")}
+        </div>
+        <div class="muted dz-limit">${esc(t("upload.limit", { mb: limits.max_upload_mb, min: Math.round(limits.max_duration_s / 60) }))}</div>
       </div>
-      <button class="btn btn-primary btn-lg" type="button">${icons.plus}${esc(t("upload.browse"))}</button>
-      <div class="progress" hidden><i></i></div>
-      <div class="muted dz-status" aria-live="polite"></div>
-      <div class="dz-formats">${FORMATS.map((f) => `<span class="chip">${f}</span>`).join("")}</div>
-      <div class="muted" style="font-size:13px">${esc(t("upload.limit", { mb: limits.max_upload_mb, min: Math.round(limits.max_duration_s / 60) }))}</div>
+      <div class="dz-picked" hidden>
+        <div class="dz-preview"><div class="dz-media"></div><i class="dz-sweep" aria-hidden="true"></i><span class="dz-kind-ico dz-fallback" aria-hidden="true"></span></div>
+        <div class="dz-detected" aria-live="polite"><span class="dz-check">${icons.check}</span><b></b></div>
+        <div class="dz-file"><b></b><span></span></div>
+        <div class="progress"><i></i></div>
+        <div class="muted dz-status" aria-live="polite"></div>
+      </div>
+      <div class="dz-bad" hidden role="alert">
+        <div class="dz-bad-ico">${icons.x}</div>
+        <div><div class="dz-title"></div><p class="muted"></p></div>
+        <button class="btn btn-lg" type="button" data-browse>${icons.plus}${esc(t("upload.again"))}</button>
+      </div>
       <input type="file" accept="${ACCEPT}" hidden>
     </div>
     <div>
@@ -191,18 +218,61 @@ export async function upload(ctx) {
 
   const zone = ctx.root.querySelector(".dropzone");
   const input = zone.querySelector("input");
-  const bar = zone.querySelector(".progress");
-  const status = zone.querySelector(".dz-status");
+  const picked = zone.querySelector(".dz-picked");
+  const bad = zone.querySelector(".dz-bad");
+  const bar = picked.querySelector(".progress");
+  const status = picked.querySelector(".dz-status");
   let busy = false;
+  let release = null;
+
+  const show = (state) => {
+    zone.dataset.state = state;
+    zone.querySelector(".dz-idle").hidden = state !== "idle";
+    picked.hidden = state !== "picked";
+    bad.hidden = state !== "bad";
+  };
+
+  // The file is refused: say so in place, in words, without listing extensions.
+  const refuse = (title, text) => {
+    release?.();
+    release = null;
+    bad.querySelector(".dz-title").textContent = title;
+    bad.querySelector("p").textContent = text;
+    show("bad");
+    zone.classList.remove("shake");
+    void zone.offsetWidth;  // restart the animation when the same mistake is repeated
+    zone.classList.add("shake");
+  };
 
   async function send(file) {
     if (busy || !file) return;
-    if (file.size > limits.max_upload_mb * 1024 * 1024) return toast(errorText("file_too_large"), "error");
-    if (file.size === 0) return toast(errorText("empty_file"), "error");
+    if (file.size === 0) return refuse(t("upload.bad.other"), errorText("empty_file"));
+    if (file.size > limits.max_upload_mb * 1024 * 1024) return refuse(t("upload.bad.other"), errorText("file_too_large"));
     busy = true;
-    zone.classList.add("busy");
-    bar.hidden = false;
+    const kind = await detectMedia(file);
+    if (!ctx.alive()) return;
+    if (!kind) {
+      busy = false;
+      input.value = "";
+      const ext = extensionOf(file.name);
+      return refuse(t("upload.bad.title"), t("upload.bad.text", { name: ext ? `.${ext}` : file.name }));
+    }
+
+    // Show what was recognised straight away; the upload runs behind the preview.
+    const started = performance.now();
+    release?.();
+    picked.className = `dz-picked kind-${kind}`;
+    picked.querySelector(".dz-preview").classList.remove("no-preview");
+    picked.querySelector(".dz-fallback").innerHTML = kindArt(kind);
+    picked.querySelector(".dz-detected b").textContent = t(`upload.detected.${kind}`);
+    picked.querySelector(".dz-file b").textContent = file.name;
+    picked.querySelector(".dz-file span").textContent = formatBytes(file.size);
     bar.classList.remove("indeterminate");
+    bar.firstElementChild.style.width = "0%";
+    status.textContent = "";
+    show("picked");
+    release = previewFile(picked.querySelector(".dz-media"), file, kind);
+    zone.classList.add("busy");
     try {
       const scan = await api.upload(file, (fraction) => {
         bar.firstElementChild.style.width = `${(fraction * 100).toFixed(1)}%`;
@@ -213,12 +283,23 @@ export async function upload(ctx) {
           status.textContent = t("upload.uploading", { pct: Math.round(fraction * 100) });
         }
       });
+      bar.classList.remove("indeterminate");
+      bar.firstElementChild.style.width = "100%";
+      status.textContent = t("upload.sent");
+      picked.classList.add("sent");
+      // Small files arrive at once: keep the recognition on screen long enough to be read.
+      await wait(Math.max(350, 1500 - (performance.now() - started)));
+      if (!ctx.alive()) return;
       ctx.setCurrent(scan);
       ctx.navigate(`scan/${scan.id}`);
     } catch (error) {
-      fail(error);
-      bar.hidden = true;
-      status.textContent = "";
+      const code = error.code ?? "error";
+      if (code === "unsupported_media") {
+        const ext = extensionOf(file.name);
+        refuse(t("upload.bad.title"), t("upload.bad.text", { name: ext ? `.${ext}` : file.name }));
+      } else {
+        refuse(t("upload.bad.other"), errorText(code));
+      }
     } finally {
       busy = false;
       zone.classList.remove("busy");
@@ -244,14 +325,25 @@ export async function upload(ctx) {
         <div class="card list">${recent.items.map(scanRow).join("")}</div>`;
     }
   } catch { /* the list is optional */ }
+  return () => release?.();
 }
 
 /* ------------------------------------------------------------------- scan */
+const EQ_BARS = 36;
+
 function previewOf(scan) {
   const src = esc(media.source(scan));
-  if (scan.media_type === "image") return `<div class="preview"><img src="${src}" alt="${esc(scan.filename)}"></div>`;
-  if (scan.media_type === "video") return `<div class="preview"><video src="${src}" controls preload="metadata" playsinline></video></div>`;
-  return `<div class="preview"><div class="preview-audio">${icons.audio}<audio src="${src}" controls preload="metadata"></audio></div></div>`;
+  const phase = ACTIVE.has(scan.status) ? scan.status : "idle";
+  const fx = `
+    <div class="fx" aria-hidden="true">
+      <i class="fx-grid"></i><i class="fx-line"></i><i class="fx-heat"></i>
+      <i class="fx-corner tl"></i><i class="fx-corner tr"></i><i class="fx-corner bl"></i><i class="fx-corner br"></i>
+      <span class="fx-chip"><i></i><span data-fx-label>${esc(phase === "idle" ? "" : t(`scan.fx.${phase}`))}</span></span>
+    </div>`;
+  if (scan.media_type === "image") return `<div class="preview" data-kind="image" data-phase="${phase}"><img src="${src}" alt="${esc(scan.filename)}">${fx}</div>`;
+  if (scan.media_type === "video") return `<div class="preview" data-kind="video" data-phase="${phase}"><video src="${src}" controls preload="metadata" playsinline></video>${fx}</div>`;
+  const bars = Array.from({ length: EQ_BARS }, (_, i) => `<i style="--i:${i};--h:${(0.3 + 0.7 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.6))).toFixed(2)}"></i>`).join("");
+  return `<div class="preview" data-kind="audio" data-phase="${phase}"><div class="preview-audio"><div class="eq" aria-hidden="true">${bars}</div><audio src="${src}" controls preload="metadata"></audio></div>${fx}</div>`;
 }
 
 function factsOf(scan) {
@@ -294,13 +386,27 @@ export async function scan(ctx) {
               <button class="btn btn-primary btn-lg" data-start>${icons.scan}${esc(t("scan.retry"))}</button>`;
     }
     const done = status === "done";
+    const stage = done ? "done" : status;
     return `
-      <div class="scan-progress">
-        <div class="nums"><span data-label>${esc(done ? t("scan.done") : status === "queued" ? t("scan.stage.queued") : t("scan.running"))}</span><span data-pct>${Math.round(current.progress * 100)}%</span></div>
-        <div class="progress"><i style="width:${(current.progress * 100).toFixed(1)}%"></i></div>
+      <div class="scan-hero ${done ? `is-done tone-${esc(current.verdict ?? "inconclusive")}` : "is-live"}">
+        ${ring(done ? 1 : current.progress)}
+        <div class="scan-hero-text">
+          <b data-label>${esc(done ? t("scan.done") : t(`scan.stage.${stage}`))}</b>
+          <span data-sub>${esc(done ? t("scan.stage.done.d") : stage === "queued" ? t("scan.fx.queued") : t(`scan.stage.${stage}.d`))}</span>
+        </div>
       </div>
       <div data-stepper>${stepper(status)}</div>
-      ${done ? `<div class="row">${verdictBadge(current.verdict, true)}<a class="btn btn-primary" href="#/result/${esc(current.id)}">${esc(t("scan.view"))}${icons.arrow}</a></div>` : ""}`;
+      ${done ? `<div class="row scan-outcome">${verdictBadge(current.verdict, true)}<a class="btn btn-primary" href="#/result/${esc(current.id)}">${esc(t("scan.view"))}${icons.arrow}</a></div>` : ""}`;
+  };
+
+  const setPhase = (status) => {
+    const box = ctx.root.querySelector(".preview");
+    if (!box) return;
+    const phase = ACTIVE.has(status) ? status : "idle";
+    if (box.dataset.phase === phase) return;
+    box.dataset.phase = phase;
+    const label = box.querySelector("[data-fx-label]");
+    if (label && phase !== "idle") label.textContent = t(`scan.fx.${phase}`);
   };
 
   const render = () => {
@@ -317,13 +423,17 @@ export async function scan(ctx) {
   };
 
   const updateProgress = (event) => {
+    const before = Math.round(current.progress * 100);
     current = { ...current, status: event.status, progress: event.progress, error: event.error, verdict: event.verdict };
+    setPhase(event.status);
     const box = ctx.root.querySelector("[data-panel]");
     if (!box) return;
     if (!box.querySelector("[data-stepper]") || !ACTIVE.has(event.status)) { box.innerHTML = panel(); bind(); return; }
-    box.querySelector(".progress i").style.width = `${(event.progress * 100).toFixed(1)}%`;
-    box.querySelector("[data-pct]").textContent = `${Math.round(event.progress * 100)}%`;
-    box.querySelector("[data-label]").textContent = event.status === "queued" ? t("scan.stage.queued") : t("scan.running");
+    const value = Math.round(event.progress * 100);
+    box.querySelector(".ring-value").setAttribute("stroke-dasharray", `${value} 100`);
+    countTo(box.querySelector("[data-pct]"), value, { from: before, duration: 450 });
+    box.querySelector("[data-label]").textContent = t(`scan.stage.${event.status}`);
+    box.querySelector("[data-sub]").textContent = event.status === "queued" ? t("scan.fx.queued") : t(`scan.stage.${event.status}.d`);
     box.querySelector("[data-stepper]").innerHTML = stepper(event.status);
   };
 
@@ -332,11 +442,22 @@ export async function scan(ctx) {
     if (!ctx.alive()) return;
     ctx.setCurrent(current);
     if (current.status === "done") {
-      toast(t("scan.done"), "success");
-      setTimeout(() => { if (ctx.alive()) ctx.navigate(`result/${current.id}`); }, 700);
+      setTimeout(() => { if (ctx.alive()) ctx.navigate(`result/${current.id}`); }, 1500);
     }
+    setPhase(current.status);
     const box = ctx.root.querySelector("[data-panel]");
     if (box) { box.innerHTML = panel(); bind(); }
+  };
+
+  // After two missed polls the screen says so instead of animating as if work continued.
+  let misses = 0;
+  const setOffline = (offline) => {
+    const hero = ctx.root.querySelector(".scan-hero");
+    if (!hero || hero.classList.contains("is-offline") === offline) return;
+    hero.classList.toggle("is-offline", offline);
+    ctx.root.querySelector(".preview")?.classList.toggle("is-paused", offline);
+    const sub = hero.querySelector("[data-sub]");
+    if (sub && offline) sub.textContent = t("err.network");
   };
 
   const poll = () => {
@@ -344,10 +465,16 @@ export async function scan(ctx) {
       if (!ctx.alive()) return;
       try {
         const fresh = await api.scan(current.id);
+        misses = 0;
+        setOffline(false);
         updateProgress(fresh);
         if (ACTIVE.has(fresh.status)) poll(); else finish();
-      } catch { poll(); }
-    }, 1500);
+      } catch {
+        misses += 1;
+        if (misses >= 2) setOffline(true);
+        poll();
+      }
+    }, misses >= 2 ? 4000 : 1500);
   };
 
   const follow = async () => {
@@ -364,6 +491,7 @@ export async function scan(ctx) {
       event.currentTarget.disabled = true;
       try {
         current = await api.start(current.id);
+        setPhase(current.status);
         ctx.root.querySelector("[data-panel]").innerHTML = panel();
         follow();
       } catch (error) {

@@ -80,6 +80,9 @@ def create_app(settings: Settings | None = None, container: Container | None = N
             response.headers["Content-Security-Policy"] = pdf_csp
         elif not request.url.path.startswith("/api/docs"):
             response.headers["Content-Security-Policy"] = csp
+        if request.url.path.startswith("/static/"):
+            # Always revalidate: a new release must not run with a cached older script.
+            response.headers["Cache-Control"] = "no-cache"
         if request.url.path.startswith("/api/"):
             log.info(
                 "%s %s -> %d in %.0f ms",

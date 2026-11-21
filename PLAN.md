@@ -438,3 +438,19 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   Barlandy: täze codespace-da tokensiz `smoke_test.py` geçdi; dur/başla aýlawyndan 68 s soň
   salgy ýene tokensiz açyldy. Çäk (GitHub resminamasy): ulanylmasa durýar, iň köp 12 sagat
   yzygiderli, duran gurşawy diňe eýesi açyp bilýär — hakyky önümçilik üçin VPS gerek.
+- **2026-11-21 (5) — UI/UX täzelenişi** (ulanyjynyň islegi: telefon menýusynda geçişler, seljeriş
+  animasiýasy, faýl görnüşini tanamak animasiýasy, ekranda `.png`/`.mp4` ýaly format ýazgylary
+  bolmasyn, nädogry formatda düşnükli habar).
+  - Format çipleri aýryldy; ýerine üç sany janly nyşan (Surat / Wideo / Ses).
+  - `js/motion.js`: faýl görnüşi brauzerde ilkinji baýtlar boýunça kesgitlenýär (serwerdäki
+    `sniff()` bilen deň; soňky söz serwerde). Nädogry faýl ýüklenmän, meýdançanyň içinde
+    «Bu format goldanmaýar» diýlip görkezilýär; serweriň `unsupported_media` jogaby hem şol ýerde.
+  - Tanamak: faýlyň öz suraty/kadry/tolkuny + «Surat tanaldy» nyşany, soň barlag sahypasy.
+  - Seljeriş: deslapky görnüşiň üstünde skaner (tor, çyzyk, burçlar, ýylylyk), ses üçin ekwalaýzer;
+    halka görnüşli göterim; tapgyr ýazgysy. Aragatnaşyk kesilse animasiýa durýar we habar çykýar.
+  - Menýu: gabyk bir gezek gurulýar, işjeň bellik bir elementden beýlekisine süýşýär; telefonda
+    ýüzýän aşaky panel, gysga atlar; sahypalar menýunyň ugruna görä girýär. Taryh telefonda kartlar.
+  - `prefers-reduced-motion` hormatlanýar. `/static/*` üçin `Cache-Control: no-cache`.
+  - Barlandy: Playwright bilen telefon (390×844) we kompýuter (1280×800), ýagty/garaňky tema;
+    surat, wideo, ses, nädogry faýl; konsolda ýalňyşlyk ýok. 136 test, ruff, mypy arassa.
+  - Barlanmadyk: hakyky telefon (iOS Safari), animasiýalaryň hereketi (diňe kadrlar görüldi).
