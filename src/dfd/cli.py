@@ -29,17 +29,30 @@ def _create_user(args: argparse.Namespace) -> None:
     from dfd.domain.entities import Role  # noqa: PLC0415
 
     container = build_container(Settings())
-    password = args.password or getpass.getpass("Password: ")
-    role = Role.ADMIN if args.admin else Role.USER
-    user = container.auth.create_user(args.username, password, role)
-    print(f"created {user.role.value} '{user.username}' (id {user.id})")
-    container.engine.dispose()
+    try:
+        password = args.password or getpass.getpass("Password: ")
+        role = Role.ADMIN if args.admin else Role.USER
+        user = container.auth.create_user(args.username, password, role)
+        print(f"created {user.role.value} '{user.username}' (id {user.id})")
+    finally:
+        container.engine.dispose()
 
 
-def _models(_args: argparse.Namespace) -> None:
+def _models(args: argparse.Namespace) -> None:
+    import sys  # noqa: PLC0415
+
+    from dfd.infrastructure.ml.download import (  # noqa: PLC0415
+        ModelDownloadError,
+        download_smaug,
+    )
     from dfd.infrastructure.ml.registry import ModelRegistry  # noqa: PLC0415
 
     settings = Settings()
+    if args.download:
+        try:
+            download_smaug(settings.weights_dir, lambda message: print(message, file=sys.stderr))
+        except ModelDownloadError as error:
+            raise SystemExit(str(error)) from error
     print(json.dumps(ModelRegistry(settings.weights_dir).status(), indent=2, ensure_ascii=False))
 
 
@@ -60,6 +73,9 @@ def main(argv: list[str] | None = None) -> None:
     user.set_defaults(handler=_create_user)
 
     models = commands.add_parser("models", help="show installed models")
+    models.add_argument(
+        "--download", action="store_true", help="install/verify Smaug (181 MB, resumable)"
+    )
     models.set_defaults(handler=_models)
 
     args = parser.parse_args(argv)

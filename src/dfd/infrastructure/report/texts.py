@@ -45,9 +45,17 @@ TEXTS: dict[str, dict[str, str]] = {
         "en": "Analysis details",
     },
     "modality": {"tk": "Ugur", "ru": "Модальность", "en": "Modality"},
-    "visual": {"tk": "Şekil (ýüz)", "ru": "Изображение (лицо)", "en": "Picture (face)"},
+    "visual": {
+        "tk": "Ýüz çalşygy",
+        "ru": "Подмена лица",
+        "en": "Face swap",
+    },
     "sound": {"tk": "Ses", "ru": "Звук", "en": "Sound"},
-    "band": {"tk": "Şübheli aralygy", "ru": "Зона сомнения", "en": "Suspicious band"},
+    "band": {
+        "tk": "Bosaga / aralyk",
+        "ru": "Порог / диапазон",
+        "en": "Threshold / band",
+    },
     "model": {"tk": "Model", "ru": "Модель", "en": "Model"},
     "timeline_frames": {
         "tk": "Kadrlar boýunça ähtimallyk",
@@ -73,9 +81,15 @@ TEXTS: dict[str, dict[str, str]] = {
     "face": {"tk": "Ýüz", "ru": "Лицо", "en": "Face"},
     "notes": {"tk": "Bellikler", "ru": "Примечания", "en": "Notes"},
     "note_no_face_found": {
-        "tk": "Faýlda ýüz tapylmady, şonuň üçin şekil boýunça baha berilmedi.",
-        "ru": "Лицо не найдено, поэтому оценка по изображению не выполнялась.",
-        "en": "No face was found, so the picture could not be assessed.",
+        "tk": "Ýüz tapylmady; ýüz çalşygy barlanmady. AI-suratyň barlagy ýüz talap etmeýär.",
+        "ru": (
+            "Лицо не найдено; подмена лица не проверялась. Для проверки ИИ-генерации лицо "
+            "не требуется."
+        ),
+        "en": (
+            "No face was found; face swaps were not assessed. AI-image detection does not "
+            "require a face."
+        ),
     },
     "note_faces_truncated": {
         "tk": "Suratda ýüz köp; diňe iň ulylary barlandy.",
@@ -98,15 +112,21 @@ TEXTS: dict[str, dict[str, str]] = {
         "en": "The sound track could not be decoded.",
     },
     "note_audio_capped": {
-        "tk": "Ses modeli diňe iňlis dilindäki gürleýişde ölçenen; türkmen dilinde ol "
-        "ýalňyşýar. Şonuň üçin täze model taýýar bolýança ses boýunça höküm «Şübheli» "
-        "derejesinden ýokary çykarylmaýar, «Hakyky» netijä-de doly ynanmaly däl.",
-        "ru": "Аудиомодель проверена только на английской речи; на туркменской она ошибается. "
-        "Поэтому до выхода новой модели вердикт по звуку не поднимается выше "
-        "«Подозрительный», а результату «Подлинный» не следует полностью доверять.",
-        "en": "The audio model has been measured on English speech only; on Turkmen speech it "
-        "is unreliable. Until the new model is ready, an audio verdict is never stronger "
-        "than “Suspicious”, and a “Real” result should not be fully trusted either.",
+        "tk": (
+            "Ses modeli türkmen sesi bilen goşmaça okadyldy, ýöne ýalňyş duýduryş entek "
+            "ýokary. Şonuň üçin ses hökümi iň köp «Şübheli» bolýar; «Hakyky» netijesi hem "
+            "kepillik däl."
+        ),
+        "ru": (
+            "Аудиомодель дообучена на туркменской речи, но ложных тревог ещё слишком много. "
+            "Поэтому вердикт по звуку не выше «Подозрительный»; «Подлинный» тоже не "
+            "гарантия."
+        ),
+        "en": (
+            "The audio model was fine-tuned on Turkmen speech, but false alarms remain too "
+            "frequent. Audio verdicts are capped at “Suspicious”; “Real” is not a guarantee "
+            "either."
+        ),
     },
     "note_provisional": {
         "tk": "Model synag görnüşinde: bosagalar entek doly barlanmadyk.",
@@ -139,6 +159,119 @@ TEXTS: dict[str, dict[str, str]] = {
     "generated": {"tk": "Döredilen wagty", "ru": "Сформирован", "en": "Generated"},
     "page": {"tk": "Sahypa", "ru": "Страница", "en": "Page"},
     "seconds": {"tk": "s", "ru": "с", "en": "s"},
+    "note_provenance_unverified": {
+        "tk": (
+            "Metadata goly barlanmadyk; ony üýtgedip ýa-da pozup bolýar. Bu bellikler "
+            "hökümi özbaşdak üýtgetmeýär; C2PA golunyň barlagy ýerine ýetirilmedi."
+        ),
+        "ru": (
+            "Подписи метаданных не проверены; метки можно изменить или удалить. Они сами по "
+            "себе не меняют вердикт. Проверка подписи C2PA не выполнялась."
+        ),
+        "en": (
+            "Metadata is unverified and can be edited or stripped. These hints do not "
+            "change the verdict on their own. C2PA signatures were not verified."
+        ),
+    },
+    "note_synthetic_model_unavailable": {
+        "tk": (
+            "Smaug gurnalmadyk ýa-da ýükläp bolmady: AI-suratyň barlagy geçirilmedi. "
+            "Gurnamak/barlamak: dfd models --download, soň serweri täzeden işlediň."
+        ),
+        "ru": (
+            "Smaug не установлен или не загрузился: проверка ИИ-генерации не выполнена. "
+            "Выполните dfd models --download и перезапустите сервер."
+        ),
+        "en": (
+            "Smaug is missing or could not load: AI-generation detection was not performed. "
+            "Run dfd models --download, then restart the server."
+        ),
+    },
+    "note_synthetic_failed": {
+        "tk": (
+            "Smaug barlagy şowsuz boldy. Netije diňe galan barlaglara esaslanýar; "
+            "AI-suratyň barlagy doly däl."
+        ),
+        "ru": (
+            "Проверка Smaug завершилась ошибкой. Результат основан только на остальных "
+            "проверках; ИИ-генерация не оценена."
+        ),
+        "en": (
+            "Smaug inference failed. The result uses only the remaining checks; "
+            "AI-generation detection is incomplete."
+        ),
+    },
+    "note_visual_model_unavailable": {
+        "tk": "Ýüz çalşygyny barlaýan model ýok; bu ugur barlanmady.",
+        "ru": "Модель подмены лица недоступна; эта проверка не выполнена.",
+        "en": "The face-swap model is unavailable; that check was not performed.",
+    },
+    "note_synthetic_score": {
+        "tk": (
+            "Esasy göterim şekil modelleriniň iň uly bahasydyr, birleşdirilip kalibrlenen "
+            "ähtimallyk däl. Höküm her modeliň öz bosagasyna görä çykarylýar. Smaug-yň 50% "
+            "bosagasy wagtlaýyn; ýalňyş duýduryş derejesi entek ölçenmedi."
+        ),
+        "ru": (
+            "Главный процент — максимальная оценка моделей изображения, а не калиброванная "
+            "общая вероятность. Вердикт учитывает собственный порог каждой модели. Порог "
+            "Smaug 50% предварительный; частота ложных тревог ещё не измерена."
+        ),
+        "en": (
+            "The headline percentage is the highest image-model score, not a calibrated "
+            "joint probability. Verdicts use each model’s own threshold. Smaug’s 50% "
+            "threshold is provisional; the false-alarm rate has not been measured locally."
+        ),
+    },
+    "note_synthetic_heatmap": {
+        "tk": (
+            "Ýylylyk kartalary diňe EfficientNet-iň ýüz çalşygy bahasyny düşündirýär. Olar "
+            "Smaug-yň AI-suratyň bahasyny düşündirmeýär; Smaug üçin heatmap döredilmeýär."
+        ),
+        "ru": (
+            "Тепловые карты объясняют только оценку подмены лица EfficientNet, а не оценку "
+            "ИИ-генерации Smaug. Для Smaug тепловая карта не строится."
+        ),
+        "en": (
+            "Heatmaps explain only EfficientNet’s face-swap score, not Smaug’s "
+            "AI-generation score. No heatmap is produced for Smaug."
+        ),
+    },
+    "score": {
+        "tk": "Galplyk bahasy",
+        "ru": "Оценка подделки",
+        "en": "Forgery score",
+    },
+    "synthetic": {
+        "tk": "AI surat",
+        "ru": "ИИ-изображение",
+        "en": "AI-generated image",
+    },
+    "provenance": {
+        "tk": "Faýlyň gelip çykyş belgileri",
+        "ru": "Метки происхождения файла",
+        "en": "File provenance hints",
+    },
+    "provenance_ai_declared": {
+        "tk": "XMP/IPTC-de AI bilen döredilendigi barada bellik bar.",
+        "ru": "В XMP/IPTC есть декларация об ИИ-генерации.",
+        "en": "XMP/IPTC contains an AI-generation declaration.",
+    },
+    "provenance_ai_workflow": {
+        "tk": "PNG metadatasynda generasiýa sazlamalary bar.",
+        "ru": "В метаданных PNG есть параметры генерации.",
+        "en": "PNG metadata contains structured generation settings.",
+    },
+    "provenance_ai_software": {
+        "tk": "Software belliginde AI generatory görkezilen.",
+        "ru": "В теге Software указан ИИ-генератор.",
+        "en": "The Software tag names an AI-generation tool.",
+    },
+    "provenance_none": {
+        "tk": "Goldanýan AI belgisi tapylmady. Bu suratyň hakykydygyny subut etmeýär.",
+        "ru": "Поддерживаемых меток ИИ не найдено. Это не доказывает подлинность изображения.",
+        "en": "No supported AI metadata marker was found. This does not prove authenticity.",
+    },
 }
 
 

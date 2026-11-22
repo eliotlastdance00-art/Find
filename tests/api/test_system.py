@@ -14,7 +14,7 @@ from tests.conftest import CentreFace, make_settings, register
 def test_health_and_meta(client: TestClient) -> None:
     health = client.get("/api/health").json()
     assert health["status"] == "ok" and health["version"] == __version__
-    assert health["models"] == {"visual": True, "audio": True}
+    assert health["models"] == {"visual": True, "audio": True, "synthetic": False}
     meta = client.get("/api/meta").json()
     assert meta["languages"] == ["tk", "ru", "en"]
     assert meta["limits"] == {"max_upload_mb": 200, "max_duration_s": 600}
@@ -90,7 +90,11 @@ def test_openapi_schema_is_served(client: TestClient) -> None:
 def test_scans_fail_cleanly_without_models(tmp_path: Path, media: dict[str, Path]) -> None:
     settings = make_settings(tmp_path, tmp_path / "no-weights")
     with TestClient(create_app(container=build_container(settings, CentreFace()))) as client:
-        assert client.get("/api/health").json()["models"] == {"visual": False, "audio": False}
+        assert client.get("/api/health").json()["models"] == {
+            "visual": False,
+            "audio": False,
+            "synthetic": False,
+        }
         auth = register(client)
         scan_id = upload(client, auth, media["image"]).json()["id"]
         client.post(f"/api/scans/{scan_id}/start", headers=auth)

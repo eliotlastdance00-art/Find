@@ -22,3 +22,8 @@ PLAN.md
 !.env.example
 Dockerfile
 docker-compose.yml
+
+# Host downloads are not part of the build context; the build verifies its own model.
+wheels
+weights/synthetic
+**/*.part

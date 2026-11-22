@@ -35,7 +35,7 @@ function pageHead(title, lead, actions = "") {
 function modelBanners(meta) {
   const models = meta?.models ?? {};
   const out = [];
-  for (const kind of ["visual", "audio"]) {
+  for (const kind of ["visual", "synthetic", "audio"]) {
     if (!models[kind]?.available) out.push(`<div class="banner banner-warn">${icons.alert}<span>${esc(t(`models.missing.${kind}`))}</span></div>`);
   }
   if (Object.values(models).some((m) => m.available && m.provisional)) {
@@ -85,7 +85,7 @@ function pendingState(scan, title) {
 function notesFor(scan) {
   const details = scan.details ?? {};
   const notes = (details.notes ?? []).map((code) => t(`note.${code}`));
-  if (details.visual?.provisional || details.audio?.provisional) notes.push(t("note.provisional"));
+  if (details.visual?.provisional || details.synthetic?.provisional || details.audio?.provisional) notes.push(t("note.provisional"));
   if (scan.media_type === "video" && details.audio) notes.push(t("note.video_audio"));
   notes.push(t("note.disclaimer"));
   return notes;
@@ -579,13 +579,22 @@ function modalityCard(kind, data) {
   return `
     <div class="card modality">
       <div class="modality-top">
-        <span class="file-ico">${kind === "visual" ? icons.regions : icons.audio}</span>
+        <span class="file-ico">${kind === "audio" ? icons.audio : icons.regions}</span>
         <div><b>${esc(t(`result.${kind}`))}</b><br>${verdictBadge(data.verdict)}</div>
-        <span class="val">${esc(pct(data.prob))}</span>
+        <span class="val">${esc(pct(data.prob, kind === "synthetic" ? 2 : 1))}</span>
       </div>
       ${zoneBar(data.prob, data.real_max, data.fake_min)}
-      <small>${esc(t("result.band", { a: (data.real_max * 100).toFixed(0), b: (data.fake_min * 100).toFixed(0) }))} · ${esc(t("result.model"))}: ${esc(data.model)}</small>
+      <small>${esc(data.real_max === data.fake_min ? t("result.threshold", { value: (data.fake_min * 100).toFixed(0) }) : t("result.band", { a: (data.real_max * 100).toFixed(0), b: (data.fake_min * 100).toFixed(0) }))} · ${esc(t("result.model"))}: ${esc(data.model)}</small>
     </div>`;
+}
+
+function provenanceCard(details) {
+  const findings = details.provenance ?? [];
+  return `<div class="card card-pad">
+    <div class="card-head"><h2>${esc(t("result.provenance"))}</h2></div>
+    ${findings.length ? `<ul class="notes">${findings.map((code) => `<li>${icons.info}<span>${esc(t(`provenance.${code}`))}</span></li>`).join("")}</ul>` : `<p class="muted">${esc(t("provenance.none"))}</p>`}
+    ${findings.length ? `<p class="muted">${esc(t("note.provenance_unverified"))}</p>` : ""}
+  </div>`;
 }
 
 export async function result(ctx) {
@@ -608,13 +617,14 @@ export async function result(ctx) {
       <a class="btn" href="#/report/${esc(scan.id)}">${icons.report}${esc(t("result.to.report"))}</a>
       <a class="btn btn-primary" href="#/upload">${icons.plus}${esc(t("result.new"))}</a>`)}
     <div class="card verdict-card tone-${esc(verdict)}">
-      ${gauge(scan.prob_fake, verdict)}
+      ${gauge(scan.prob_fake, verdict, t(details.synthetic ? "result.score" : "result.probability"), details.synthetic ? 2 : 1)}
       <div class="verdict-text">
         ${verdictBadge(verdict, true)}
         <p>${esc(t(`verdict.${verdict}.d`))}</p>
       </div>
     </div>
-    ${details.visual || details.audio ? `<div class="grid-2">${modalityCard("visual", details.visual)}${modalityCard("audio", details.audio)}</div>` : ""}
+    ${details.visual || details.synthetic || details.audio ? `<div class="grid-2">${modalityCard("visual", details.visual)}${modalityCard("synthetic", details.synthetic)}${modalityCard("audio", details.audio)}</div>` : ""}
+    ${scan.media_type === "image" && "provenance" in details ? provenanceCard(details) : ""}
     ${frames.length > 1 && details.visual ? `<div class="card card-pad"><div class="card-head"><h2>${esc(t("result.timeline.frames"))}</h2></div>${timeline(frames, details.visual.real_max, details.visual.fake_min)}</div>` : ""}
     ${segments.length > 1 && details.audio ? `<div class="card card-pad"><div class="card-head"><h2>${esc(t("result.timeline.audio"))}</h2></div>${timeline(segments, details.audio.real_max, details.audio.fake_min)}</div>` : ""}
     <div class="grid-2">
@@ -662,7 +672,8 @@ export async function regions(ctx) {
           </figure>`).join("")}</div>
       </div>`;
   }
-  ctx.root.innerHTML = pageHead(t("regions.title"), t("regions.lead"), `<a class="btn" href="#/result/${esc(scan.id)}">${icons.result}${esc(t("nav.result"))}</a>`) + body;
+  const scopeHint = details.synthetic ? `<div class="banner banner-info">${icons.info}<span>${esc(t("note.synthetic_heatmap"))}</span></div>` : "";
+  ctx.root.innerHTML = pageHead(t("regions.title"), t("regions.lead"), `<a class="btn" href="#/result/${esc(scan.id)}">${icons.result}${esc(t("nav.result"))}</a>`) + scopeHint + body;
 
   const slider = ctx.root.querySelector("input[type=range]");
   const grid = ctx.root.querySelector(".heat-grid");

@@ -21,6 +21,11 @@ uploads/
 !src/dfd/infrastructure/media/assets/*.onnx
 .cache/
 
+# downloaded packages/models (large, never commit)
+wheels/
+*.part
+weights/synthetic/
+
 # generated
 kaggle/_build/
 dist/

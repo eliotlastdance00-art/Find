@@ -5,6 +5,7 @@ Layout::
     weights/
       visual/  model_card.json + weights file
       audio/   model_card.json + weights file
+      synthetic/ model_card.json + downloaded model.onnx
 """
 
 from __future__ import annotations
@@ -17,6 +18,7 @@ from typing import Any
 from dfd.domain import errors
 from dfd.infrastructure.ml.audio import AudioDetector
 from dfd.infrastructure.ml.cards import CARD_FILE, load_card
+from dfd.infrastructure.ml.smaug import SmaugDetector
 from dfd.infrastructure.ml.visual import VisualDetector
 
 log = logging.getLogger(__name__)
@@ -28,6 +30,7 @@ class ModelRegistry:
         self._device = device
         self._visual: VisualDetector | None = None
         self._audio: AudioDetector | None = None
+        self._synthetic: SmaugDetector | None = None
         self._lock = threading.Lock()
 
     def _available(self, kind: str) -> bool:
@@ -51,8 +54,21 @@ class ModelRegistry:
                 log.info("loaded audio model %s", self._audio.card.label)
             return self._audio
 
+    def synthetic(self) -> SmaugDetector:
+        with self._lock:
+            if self._synthetic is None:
+                if not self._available("synthetic"):
+                    raise errors.ModelUnavailable(kind="synthetic")
+                self._synthetic = SmaugDetector.load(self._dir / "synthetic")
+                log.info("loaded AI-image model %s", self._synthetic.card.label)
+            return self._synthetic
+
     def preload(self) -> None:
-        for kind, loader in (("visual", self.visual), ("audio", self.audio)):
+        for kind, loader in (
+            ("visual", self.visual),
+            ("audio", self.audio),
+            ("synthetic", self.synthetic),
+        ):
             try:
                 loader()
             except errors.ModelUnavailable:
@@ -61,7 +77,7 @@ class ModelRegistry:
     def status(self) -> dict[str, dict[str, Any]]:
         """Describe installed models from their cards, without loading any weights."""
         report: dict[str, dict[str, Any]] = {}
-        for kind in ("visual", "audio"):
+        for kind in ("visual", "audio", "synthetic"):
             if not self._available(kind):
                 report[kind] = {"available": False}
                 continue

@@ -6,8 +6,23 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Smaug ONNX AI-image detection alongside the existing face-swap model, including images
+  without faces. Three sequential native-resolution crops; independent model scores/verdicts.
+- Structured PNG/EXIF/XMP AI provenance hints, explicitly unverified and non-decisive.
+- `dfd models --download`: pinned 181 MB model, resumable HTTPS, SHA-256, atomic installation,
+  release asset and upstream mirror. Docker downloads at build time; serving stays offline.
+- Separate AI-image results, metadata hints and honest heatmap scope in all three UI/PDF languages.
+- Integration regression: the generated portrait scores 0.999603; JPEG-60 resized copy 0.999163.
+  These are smoke checks, not benchmark accuracy; Smaug's 0.5 threshold remains provisional.
+
+### Fixed
+- Memory retained between sequential ONNX operations; unused Grad-CAM parameter gradients.
+- macOS instructions now use non-editable installs; offline wheel lists include ONNX Runtime.
+- A malformed optional XMP field cannot crash image analysis.
+
 ### Planned
-- A second image model for fully AI-generated pictures, with a provenance-metadata check.
+- Independent calibration/cross-dataset evaluation, then video-frame AI-generation detection.
 - Longer training of the Turkmen audio model.
 
 ## [0.1.0] — 2026-11-22

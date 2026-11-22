@@ -1,7 +1,7 @@
 """Write the wheel list of one platform for ``scripts/fetch_wheels.py``.
 
 The versions come from ``constraints.txt`` (the tested set); the build tools needed for
-``pip install -e .`` are added. Only macOS on Apple Silicon is generated for now: there every
+``pip install .`` are added. Only macOS on Apple Silicon is generated for now: there every
 package, PyTorch included, is on PyPI.
 
     python scripts/wheel_list.py 3.13 > requirements/wheels/macos-arm64-py313.txt

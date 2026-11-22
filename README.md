@@ -9,7 +9,7 @@
 
 <p align="center">
   <b>Wideo, surat we sesiň hakykydygyny ýa-da galpdygyny barlaýan web ulgam</b><br>
-  ýüz çalşygyny we emeli sesi kesgitleýär · ähtimallygy göterimde görkezýär · şübheli ýerleri belleýär · PDF hasabat berýär
+  AI suratlaryny, ýüz çalşygyny we emeli sesi barlaýar · ähtimallygy göterimde görkezýär · şübheli ýerleri belleýär · PDF hasabat berýär
 </p>
 
 <p align="center">
@@ -41,12 +41,17 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/screen-phone.png" alt="Telefonda: giriş, faýl ýüklemek, derňew, netije" width="760">
+  <img src="docs/assets/screen-result.jpg" alt="Smaug netijesi: AI portret Galp, ýüz çalşygy aýratyn görkezilýär" width="860">
+</p>
+
+<p align="center">
+  <img src="docs/assets/screen-phone.png" alt="Telefonda: faýl ýüklemek we Smaug bilen AI-surat netijesi" width="760">
 </p>
 
 <p align="center"><sub>
-  Suratlar işläp duran ulgamdan alyndy. Mysaldaky portret emeli aň bilen <b>doly döredilen</b>, emma model ony
-  «Hakyky» diýýär: ol diňe ýüz çalşygyny tanamagy öwrendi. Bu — ulgamyň hakyky çägi, seret: <a href="#limits">Çäklendirmeler</a>.
+  Suratlar işläp duran ulgamdan alyndy. Mysaldaky portret AI bilen <b>doly döredilen</b>.
+  Smaug goşulandan soň ol «Galp» çykýar (Smaug bahasy 99.96%; bu kepillik däl).
+  <a href="docs/SMAUG.md">Birikdirme synagy we çäklendirmeler</a>.
 </sub></p>
 
 <a id="features"></a>
@@ -68,7 +73,8 @@ ekranyna uýgunlaşýar. Ähli zat öz kompýuteriňizde işleýär: faýllar hi
 <a id="install"></a>
 ## 🚀 Gurnamak
 
-Modeller ammaryň içinde — aýratyn ýüklemek gerek däl. Usuly saýlaň:
+Ýüz we ses modelleri ammarda. AI-surat modeli **Smaug** bir gezek `dfd models --download` bilen
+ýüklenýär (181 MB, kesilen ýerinden dowam edýär). Docker muny build wagtynda özi edýär. Usuly saýlaň:
 
 | Usul | Haçan laýyk | Näme gerek |
 |---|---|---|
@@ -76,8 +82,10 @@ Modeller ammaryň içinde — aýratyn ýüklemek gerek däl. Usuly saýlaň:
 | 🐳 [Docker](#docker) | bir buýruk bilen, ulgama hiç zat gurmazdan | Docker |
 | ☁️ [GitHub Codespaces](#codespaces) | brauzerde synap görmek, hiç zat ýüklemän | mugt GitHub hasaby |
 
-**Talaplar:** 2 GB boş operatiw ýat (ulgam ≈1,2 GB ulanýar), ≈2 GB disk, ilkinji gurnama üçin
-internet (≈300 MB ýüklenýär). GPU gerek däl. FFmpeg aýratyn gurmak gerek däl.
+**Talaplar:** azyndan 4 GB RAM maslahat berilýär (OS we birnäçe media modeli üçin ätiýaç), ≈3 GB disk.
+Ilkinji gurnama üçin internet gerek: paketler + Smaug 181 MB; soň ähli barlaglar oflaýn.
+GPU gerek däl. FFmpeg aýratyn gurmak gerek däl. Bu 2 ýadroly Linux-da üç yzygiderli surat
+barlagy 18–24 s/surat, prosesiň iň ýokary ýady ≈1.15 GiB boldy; bu ähli faýllar üçin ýat çägi däl.
 
 <a id="macos"></a>
 <details open>
@@ -93,7 +101,7 @@ git --version        # ýok bolsa, macOS özi gurmagy teklip eder
 ```
 
 Python ýok, köne ýa-da **3.14 we ondan täze** bolsa (Homebrew häzir şony gurýar; bu taslama 3.14-de synalmady):
-`brew install python@3.13`, soň aşakdaky `python3` ýerine `python3.13` ýazyň.
+python.org-dan Python 3.13 guruň ýa-da `brew install python@3.13`; soň aşakdaky `python3` ýerine `python3.13` ýazyň.
 
 2\. Ýükläň we gurnaň:
 
@@ -103,7 +111,8 @@ cd Find
 python3 -m venv .venv
 source .venv/bin/activate
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-pip install -e .
+pip install .
+dfd models --download
 ```
 
 3\. Işlediň:
@@ -138,7 +147,8 @@ cd Find
 python3 -m venv .venv
 source .venv/bin/activate
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-pip install -e .
+pip install .
+dfd models --download
 ```
 
 3\. Işlediň:
@@ -172,7 +182,8 @@ cd Find
 py -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-pip install -e .
+pip install .
+dfd models --download
 ```
 
 3\. Işlediň:
@@ -210,10 +221,11 @@ Sazlamak isleseňiz: `cp .env.example .env` we içini düzediň.
 | Ilkinji giriş | Giriş sahypasynda hasap dörediň — **ilkinji hasap administrator bolýar** |
 | Indiki gezek işletmek | `cd Find`, soň `source .venv/bin/activate` (Windows: `.venv\Scripts\Activate.ps1`), soň `dfd serve` |
 | Duruzmak | Terminalda `Ctrl + C` |
-| Täzelemek | `git pull`, soň `pip install -e .` |
+| Täzelemek | `git pull`, soň `pip install .`, `dfd models --download`, serweri täzeden işlediň |
 | Başga port | `dfd serve --port 8080` |
 | Hasap döretmek (terminaldan) | `dfd create-user <at> --admin` |
 | Gurlan modelleri görmek | `dfd models` |
+| Smaug-y gurnamak / barlamak | `dfd models --download` (bar faýl SHA-256 gabat gelse täzeden ýüklenmeýär) |
 
 <a id="troubleshooting"></a>
 ### 🩹 Näsazlyk çyksa
@@ -221,7 +233,7 @@ Sazlamak isleseňiz: `cp .env.example .env` we içini düzediň.
 | Alamat | Sebäbi we çözgüdi |
 |---|---|
 | `command not found: python` | macOS / Linux-da `python3`, Windows-da `py` ýazyň |
-| `command not found: dfd` | Gurşaw işjeň däl ýa-da gurnama tamamlanmady: gurşawy işjeňleşdiriň, soň `pip install -e .` |
+| `command not found: dfd` | Gurşaw işjeň däl ýa-da gurnama tamamlanmady: gurşawy işjeňleşdiriň, soň `pip install .` |
 | `... is not a supported wheel on this platform` | Ýüklenen `.whl` başga Python wersiýasy üçin (`cp313` = Python 3.13). `python --version` bilen deňeşdiriň; gurşawy `python3.13 -m venv .venv` bilen täzeden dörediň |
 | `JSONDecodeError`, `Unterminated string`, `incomplete-download` (pip-de) | Internet kesildi. Aşakdaky «Haýal internet» usulyny ulanyň (`scripts/fetch_wheels.py`) |
 | Gurnama üstünlikli, ýöne `ModuleNotFoundError: No module named 'dfd'` (macOS, Python 3.13+) | macOS `.venv` içindäki `.pth` faýlyny «gizlin» edip belleýär, Python 3.13 bolsa gizlin `.pth`-ni okamaýar. `-e`-siz guruň: `pip uninstall -y dfd`, soň `pip install .` (her `git pull`-dan soň gaýtalamaly) |
@@ -242,8 +254,13 @@ wagt gaýtadan işledip bolýar, taýýar faýllar gaýtadan ýüklenmeýär.
 ```bash
 source .venv/bin/activate
 python scripts/fetch_wheels.py requirements/wheels/macos-arm64-py313.txt   # 3.12 üçin: …-py312.txt
-pip install --no-index --find-links wheels -e .
+pip install --no-index --find-links wheels .
+dfd models --download
 ```
+
+**Täzelemek:** her `git pull`-dan soň `pip install --no-index --find-links wheels --no-deps --force-reinstall .`
+we serweri täzeden işlediň. Baglylyklar üýtgese, ilki wheel sanawyny gaýtadan ýükläň we adaty gurnamany gaýtalaň.
+Smaug paketlerden aýratyn ýüklenýär; `dfd models --download` buýrugyny kesilse gaýtalaň.
 
 **Beýleki ulgamlar — diňe PyTorch üçin.** `pip` kesilen ýüklemäni başdan başlaýar, `curl` bolsa galan ýerinden dowam edýär. Faýlyň anyk
 adyny `pip`-iň `Downloading torch-…whl` diýen setirinden alyň, soň:
@@ -252,14 +269,14 @@ adyny `pip`-iň `Downloading torch-…whl` diýen setirinden alyň, soň:
 # macOS / Linux — kesilse, şol buýrugy gaýtalaň
 curl -L -C - --retry 20 --retry-all-errors -O https://download.pytorch.org/whl/cpu/<torch-…>.whl
 pip install ./torch-*.whl
-pip install -e .
+pip install .
 ```
 
 ```powershell
 # Windows (curl.exe diýip ýazmaly)
 curl.exe -L -C - --retry 20 -O https://download.pytorch.org/whl/cpu/<torch-…>.whl
 pip install (Get-Item .\torch-*.whl).FullName
-pip install -e .
+pip install .
 ```
 
 </details>
@@ -323,11 +340,15 @@ faýl ─► görnüşini anyklamak ─► taýýarlamak ───────�
 ```
 
 * **Şekil (ýüz çalşygy):** EfficientNet-B4, FaceForensics++ (c23) maglumatlarynda okadyldy.
+* **AI-surat:** Smaug ONNX (Apache-2.0), tutuş suratyň üç kesimi; ýüz bolmagy gerek däl. Häzir diňe suratlarda.
+* **Gelip çykyş belgileri:** gurluşly PNG/EXIF/XMP bellikleri; gol barlagy däl, özbaşdak höküm bermeýär.
 * **Ses (emeli ses):** AASIST; awtorlaryň resmi agramlaryndan başlap, ASVspoof 2019 LA we türkmen ses toplumynda bilelikde okadyldy.
-* **Düşündiriş:** Grad-CAM — ýüzüň haýsy ýerleri «galp» bahasyna täsir edendigini görkezýär.
+* **Düşündiriş:** Grad-CAM diňe EfficientNet-iň ýüz çalşygy bahasyny düşündirýär; Smaug üçin heatmap ýok.
 * **Höküm:** iki bosaga barlag maglumatlarynda saýlanýar; aralykdaky bahalar «Şübheli».
   Wideoda ses diňe goşmaça subutnama — ol hökümi «Şübheli» derejesine çenli ýokarlandyryp bilýär.
-  Ýüz tapylmasa we ses bolmasa, ulgam çak etmeýär: «kesgitläp bolmady» diýýär.
+  Ýüz tapylmasa Smaug suratdaky AI generasiýasyny şonda-da barlaýar; wideoda ýüz we peýdaly ses ýok bolsa «kesgitläp bolmady».
+  Smaug-yň 0.5 bosagasy wagtlaýyn. Iki şekil modeliniň hökmi aýratyn çykarylýar; iň güýçli tapyndy alynýar.
+  Esasy göterim iň uly bal — birleşdirilip kalibrlenen ähtimallyk däl.
 
 Jikme-jik: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
@@ -335,6 +356,12 @@ Jikme-jik: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 ## 📊 Modeller we ölçenen netijeler
 
 Bu ýerde diňe hakykatdan ölçenen sanlar ýazylýar. Çig maglumatlar: `docs/metrics/`.
+
+**Smaug — birikdirme synagy, takyklyk ölçegi däl:** öňki AI portret **99.96% — Galp**;
+768×768/JPEG-60, metadata aýrylan nusgasy **99.92% — Galp**; bir hakyky surat **0.016% — Hakyky**
+(Smaug bahalary). Bu üç mysaldan AUC ýa-da ýalňyş duýduryş derejesi çykarylmaýar.
+Doly sanlar: [smaug_integration_smoke.json](docs/metrics/smaug_integration_smoke.json).
+[Smaug gollanmasy](docs/SMAUG.md); [indiki işler we sebäpleri](docs/ROADMAP.md).
 
 | Model | Maglumat | AUC | EER | Bellik |
 |---|---|---|---|---|
@@ -414,16 +441,18 @@ geçirilmedi; adatça şeýle modelleriň takyklygy nätanyş maglumatlarda ep-e
 ## ⚠️ Çäklendirmeler (dogruçyl bellik)
 
 * Netije — awtomatiki modeliň bahasy, kepillik däl. Möhüm karar üçin hünärmeniň barlagy zerur.
-* Şekil modeli FaceForensics++ maglumatlaryndaky bäş usuly öwrendi. Başga usullar bilen
-  (meselem, doly emeli döredilen suratlar, diffuziýa modelleri, täze face-swap programmalary)
-  ýasalan materiallarda takyklyk ep-esli pes bolup biler.
+* EfficientNet diňe ýüz çalşygy üçin; doly AI suratlaryny goşmaça Smaug barlaýar. Smaug-yň
+  uly, garaşsyz synag toplumynda ýerli takyklygy/FPR-i entek ölçenmedi; 0.5 bosaga wagtlaýyn.
+  Köne generatorlary, skrinşotlary, üýtgedilen ýa-da gysylan suratlary sypdyryp biler.
+* Gelip çykyş metadatasy pozulyp/galplaşdyrylyp bilýär. C2PA gollary barlanmaýar.
+* Smaug häzir wideo kadrlaryna ulanylmaýar. Grad-CAM onuň bahasyny düşündirmeýär.
 * Güýçli gysylan, kiçi ýa-da garaňky wideolarda hakyky faýl «Şübheli» diýlip bilner.
 * Ses modeli türkmen dilinde okadyldy, ýöne **entek ygtybarly däl**: türkmen synag böleginde AUC 0.76,
   hakyky sesiň 8.3 %-i «Galp» diýlip bahalanýar. Şonuň üçin ses boýunça höküm «Şübheli» derejesinden
   ýokary çykarylmaýar (`model_card.json` → `max_verdict`); has uzyn okuw meýilleşdirilen.
 * Ses modeli **gürleýiş** üçin okadylan. Aýdym-saz, şowhun ýa-da arassa ton ýaly gürleýiş däl
   seslerde netijä ynanmaly däl (şonuň üçin wideoda ses hökümi «Galp» edip bilmeýär).
-* Ulgam diňe ýüzi barlaýar; ýüz ýok bolsa şekil boýunça baha berilmeýär.
+* Model gurnalmadyk ýa-da näsaz bolsa bu açyk görkezilýär; galan barlaglar diňe öz çäginde işleýär.
 
 ## 🛠 Işläp düzmek
 
@@ -478,32 +507,36 @@ MIT — [LICENSE](LICENSE). Üçünji taraplaryň materiallary: [THIRD_PARTY_NOT
 
 A web application that checks whether a video, image or audio file is genuine or
 manipulated: face-swap detection (EfficientNet-B4 trained on FaceForensics++), synthetic
-voice detection (AASIST, ASVspoof 2019), a fake probability with a three-way verdict
+voice detection (AASIST, ASVspoof 2019), AI-generated image detection (Smaug ONNX), a forgery score with a three-way verdict
 (*Real / Suspicious / Fake*), Grad-CAM heatmaps, PDF reports and a scan history. The UI is
 available in Turkmen, Russian and English. Everything runs locally; files are not sent anywhere.
 
-**Run it** (Python 3.11–3.13; model weights are in the repository):
+**Run it** (Python 3.11–3.13; Smaug downloads once, then runs offline):
 
 ```bash
 git clone --depth 1 https://github.com/eliotlastdance00-art/Find.git && cd Find
 python3 -m venv .venv && source .venv/bin/activate      # Windows: py -m venv .venv; .venv\Scripts\Activate.ps1
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-pip install -e .
+pip install .
+dfd models --download                                  # 181 MB, resumable and SHA-256 verified
 dfd serve                                               # http://localhost:8000
 ```
 
 Or `docker compose up --build`, or open the repository in GitHub Codespaces (the dev container
 installs and starts the server on port 8000).
 
-**Stack:** Python, FastAPI, SQLAlchemy/SQLite, PyTorch + timm, OpenCV (YuNet), FFmpeg,
+**Stack:** Python, FastAPI, SQLAlchemy/SQLite, PyTorch + timm, ONNX Runtime (Smaug), OpenCV (YuNet), FFmpeg,
 fpdf2; plain HTML/CSS/JS front end with no external assets. Clean architecture
 (domain / application / infrastructure / presentation), strict typing (mypy), ruff, and a
 test suite that runs the real pipeline on synthetic media. CI runs the tests on Linux, macOS
 and Windows and builds and smoke-tests the Docker image. See
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for design and security notes.
 
-**Limitations:** the verdict is a model estimate, not proof. The visual model learned five
-face-swap methods and does not recognise fully generated pictures (the portrait in the
-screenshots above is AI-generated and is judged *Real*). The audio model was fine-tuned
+**Limitations:** a verdict is an estimate, not proof. Smaug now flags the generated example
+portrait (99.96% model score), but its 0.5 threshold is provisional: no representative local
+FPR or AUC has been measured. Image scores are not a calibrated joint probability.
+Grad-CAM explains only the face-swap model, not Smaug. Metadata hints are unverified, not
+C2PA verification. Smaug currently handles still images, not video frames. See [docs/SMAUG.md](docs/SMAUG.md).
+The audio model was fine-tuned
 on Turkmen speech but is not reliable yet (Turkmen test AUC 0.76; 8.3 % of real speech is judged
 fake), so audio verdicts stay capped at *Suspicious*.

@@ -106,6 +106,8 @@ class Analysis:
 
     visual: ModalityResult | None = None
     audio: ModalityResult | None = None
+    synthetic: ModalityResult | None = None
+    provenance: list[str] = field(default_factory=list)
     frames: list[FrameFinding] = field(default_factory=list)
     segments: list[SegmentFinding] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)

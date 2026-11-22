@@ -96,7 +96,7 @@ jobs:
           python -m venv .venv
           source .venv/bin/activate 2>/dev/null || source .venv/Scripts/activate
           pip install torch torchvision --index-url "$TORCH_INDEX"
-          pip install -e ".[dev]"
+          pip install ".[dev]"
           dfd models
 
       - name: Tests

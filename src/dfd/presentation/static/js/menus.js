@@ -146,7 +146,7 @@ export function aboutDialog(meta) {
     <div class="about-top">${icons.logo}<div><h2>${esc(t("app.name"))}</h2><p class="muted">${esc(t("app.tagline"))}</p></div></div>
     <dl class="facts"><div><dt>${esc(t("about.version"))}</dt><dd class="mono">${esc(meta?.version ?? "—")}</dd></div></dl>
     <div class="pop-label">${esc(t("about.models"))}</div>
-    ${row("visual", "regions")}${row("audio", "audio")}
+    ${row("visual", "regions")}${row("synthetic", "regions")}${row("audio", "audio")}
     <div class="pop-label">${esc(t("about.limits"))}</div>
     <p class="muted">${esc(t("about.limit.text", { mb: limits.max_upload_mb ?? "—", min: Math.round((limits.max_duration_s ?? 0) / 60) || "—" }))}</p>
     <div class="dialog-actions"><button class="btn btn-primary" value="ok" autofocus>${esc(t("common.close"))}</button></div>`);

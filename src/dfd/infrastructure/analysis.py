@@ -23,8 +23,10 @@ from dfd.infrastructure.media import audio as pcm
 from dfd.infrastructure.media.faces import Face, FaceDetector, Image, crop_face
 from dfd.infrastructure.media.ffmpeg import extract_audio, probe
 from dfd.infrastructure.media.frames import read_image, sample_frames
+from dfd.infrastructure.media.provenance import image_provenance
 from dfd.infrastructure.ml.audio import SAMPLE_RATE, WINDOW
 from dfd.infrastructure.ml.gradcam import overlay_heatmap
+from dfd.infrastructure.ml.memory import release_unused_memory
 from dfd.infrastructure.ml.registry import ModelRegistry
 
 log = logging.getLogger(__name__)
@@ -81,25 +83,43 @@ class TorchMediaAnalyzer:
         self, path: Path, media_type: MediaType, workdir: Path, progress: ProgressCallback
     ) -> Analysis:
         workdir.mkdir(parents=True, exist_ok=True)
-        if media_type is MediaType.IMAGE:
-            return self._image(path, workdir, progress)
-        if media_type is MediaType.VIDEO:
-            return self._video(path, workdir, progress)
-        analysis = Analysis()
-        self._audio(path, workdir, analysis, progress, 0.05, 0.95, required=True)
-        return analysis
+        try:
+            if media_type is MediaType.IMAGE:
+                return self._image(path, workdir, progress)
+            if media_type is MediaType.VIDEO:
+                return self._video(path, workdir, progress)
+            analysis = Analysis()
+            self._audio(path, workdir, analysis, progress, 0.05, 0.95, required=True)
+            return analysis
+        finally:
+            release_unused_memory()
 
     # -- picture ------------------------------------------------------------------------
 
     def _image(self, path: Path, workdir: Path, progress: ProgressCallback) -> Analysis:
-        detector = self._registry.visual()
         image = read_image(path)
         if image is None:
             raise errors.CorruptMedia()
         found = self._faces.detect(image)
-        analysis = Analysis(media_info={"faces_found": len(found)})
+        analysis = Analysis(
+            media_info={"faces_found": len(found)}, provenance=image_provenance(path)
+        )
+        if analysis.provenance:
+            analysis.notes.append("provenance_unverified")
+        progress(ScanStatus.ANALYZING, 0.12)
+        self._synthetic_image(image, analysis)
+        progress(ScanStatus.ANALYZING, 0.35)
         if not found:
             analysis.notes.append("no_face_found")
+            thumbnail, _ = _thumbnail(image)
+            analysis.overview_file = _write(workdir / "overview.jpg", thumbnail)
+            return analysis
+        try:
+            detector = self._registry.visual()
+        except errors.ModelUnavailable:
+            if analysis.synthetic is None:
+                raise  # neither image model could produce a result
+            analysis.notes.append("visual_model_unavailable")
             return analysis
         if len(found) > self._max_faces:
             analysis.notes.append("faces_truncated")
@@ -130,6 +150,24 @@ class TorchMediaAnalyzer:
             )
         analysis.overview_file = _write(workdir / "overview.jpg", overview)
         return analysis
+
+    def _synthetic_image(self, image: Image, analysis: Analysis) -> None:
+        try:
+            detector = self._registry.synthetic()
+        except errors.ModelUnavailable:
+            analysis.notes.append("synthetic_model_unavailable")
+            return
+        try:
+            score = detector.predict(image)
+        except Exception:
+            log.exception("Smaug inference failed; face path will continue")
+            analysis.notes.append("synthetic_failed")
+            return
+        card = detector.card
+        analysis.synthetic = ModalityResult(
+            score, card.thresholds_for("image"), card.label, card.provisional, card.max_verdict
+        )
+        analysis.notes.extend(("synthetic_score", "synthetic_heatmap"))
 
     def _video(self, path: Path, workdir: Path, progress: ProgressCallback) -> Analysis:
         detector = self._registry.visual()

@@ -1,7 +1,7 @@
 # PLAN — Dipfeýkleri (Deepfake) kesgitleýän ulgam
 
 > Bu faýl taslamanyň "ýady". Her täze sessiýada ilki şuny okamaly, soň işe başlamaly.
-> Soňky täzelenen: 2026-11-20
+> Soňky täzelenen: Smaug birikdirmesi we indiki işler analizi (gündelik, 16)
 
 ---
 
@@ -311,36 +311,35 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
 
 | Ädim | Ýagdaý | Bellik |
 |---|---|---|
-| 0. Gurşaw, Kaggle, GPU smoke test | ✅ 2026-11-20 | 2×T4 tassyklandy |
-| 1. Repo skeleti + CI | ✅ kod; ⚠️ CI we Docker entek hiç ýerde işledilmedi | sandbox-da Docker ýok — ilkinji GitHub Actions işi barlamaly |
-| 2. Nazaryýet we maglumatlar | 🟡 | toplumlar tapyldy; ygtyýarnamalary we `THIRD_PARTY_NOTICES.md` barlamaly; nazaryýet ýazgysy (`docs/THEORY.md`) ýok |
-| 3. Ýüzleri kesmek | ✅ | YuNet, okuwda we serwerde şol bir kod |
-| 4. Media kitaphanasy | ✅ | FFmpeg (imageio-ffmpeg), kadrlar, 16 kHz ses bölekleri |
-| 5. Backend + 7 menýu | ✅ | FastAPI + SPA, tk/ru/en, açyk/garaňky |
-| 6. Wizual model | ✅ v2 tamamlandy, ulgama goýuldy | `dfd-train-visual` v2 (199 min). Test: wideo AUC 0.9914, EER 3.0 %; kadr AUC 0.9832, EER 5.27 %. `weights/visual/`, `docs/metrics/visual_effnet_b4_ffpp.json` |
-| 7. Grad-CAM | ✅ kod | hakyky model bilen göz bilen barlamaly |
-| 8. Ses modeli | 🟡 deslapky kart goýuldy | 3000+3000 ýazgyda ölçendi: eval AUC 0.9991, EER 1.62 %; T=1.448, bosagalar 3.0 % / 99.0 %. Doly toplum (GPU) entek edilmedi |
-| 9. Birleşdirme we höküm | ✅ kod | bosagalar hakyky kartlardan gelmeli |
-| 10. PDF hasabat | ✅ | tk/ru/en; soňky ýerleşiş düzedişi göz bilen gaýtadan barlanmady |
-| 11. Berkitmek | 🟡 | howpsuzlyk sözbaşylary, çäkler, testler 95 %; brauzer e2e soňky refaktordan soň gaýtalanmady |
-| 12. Diplom materiallary | ⬜ | düşündiriş ýazgysy, prezentasiýa, görkeziş wideosy |
+| 0. Gurşaw, Kaggle, GPU smoke test | ✅ | 2×T4 tassyklandy; uly çykaryşlar `/tmp`-da |
+| 1. Repo skeleti + CI | ✅ öňki commit-lerde CI ýaşyl | şu üýtgeşmäniň CI-si push-dan soň barlanýar; ýerli Docker ýok |
+| 2. Nazaryýet we maglumatlar | 🟡 | çeşmeler bar; doly licence auditi we `docs/THEORY.md` açyk |
+| 3. Ýüzleri kesmek | ✅ | YuNet; okuw we inference şol bir kesiş kody |
+| 4. Media kitaphanasy | ✅ | surat/wideo/ses, FFmpeg, mazmun boýunça görnüş |
+| 5. Backend + 7 menýu | ✅ | FastAPI + SPA, tk/ru/en, täze Şerlok UI |
+| 6. Ýüz çalşygy modeli | ✅ | FF++: wideo AUC 0.9914, EER 3.0%; başga toplum ölçegi açyk |
+| 6a. AI-surat (Smaug) | ✅ birikdirildi, 🟡 bosaga wagtlaýyn | 3 kesim; portret regression 0.999603; garaşsyz FPR/AUC ýok |
+| 7. Grad-CAM | ✅ diňe EfficientNet | Smaug üçin ýasama heatmap ýok, UI/PDF-de düşündirilýär |
+| 8. Ses modeli | 🟡 `aasist-tk` 2.0.0 deslapky | tk AUC 0.759/EER 31.1%; «Şübheli» çägi; dowam okuwyň netijesi garaşylýar |
+| 9. Birleşdirme we höküm | ✅ | modeller öz bosagalary bilen; iň güýçli höküm; max bal bilelikdäki ähtimallyk däl |
+| 10. PDF hasabat | ✅ | Smaug + metadata + model çäkleri, 3 dil, hakyky model bilen barlandy |
+| 11. Berkitmek | 🟡 | 194 test geçdi, 1 skip, coverage 95.13%; Chromium desktop/mobile/3 dil; Safari/Firefox açyk |
+| 12. Diplom materiallary | ⬜ | nazaryýet, ýazgy, prezentasiýa, kanuny demo toplumy |
 
-### Açyk işler (tertip boýunça)
-1. Kaggle netijelerini almak → `weights/visual/{weights.pth,model_card.json}`, `weights/audio/model_card.json`, README-däki metrika tablisasy (diňe ölçenen sanlar).
-2. Hakyky modeller bilen: FF++ test wideolarynda we öz mysallarymyzda el bilen barlag; Grad-CAM-yň manylydygyny görmek.
-3. GitHub-a push; CI-niň ýaşyl bolmagyny gazanmak (Docker obrazy ilkinji gezek şol ýerde gurlar).
-4. `THIRD_PARTY_NOTICES.md` — ygtyýarnamalary çeşmelerden barlamak (häzir ýatdan ýazylan).
-5. `js/i18n.js`: `err.not_found`, `err.method_not_allowed` goşmak; ulanylmaýan 11 açary aýyrmak.
-6. Brauzer e2e-ni gaýtalamak (rus dilinde gapdal menýu, telefon ekrany).
-7. Ses: doly ASVspoof LA dev+eval (GPU) bilen kalibrleme; gürleýiş däl ses üçin duýduryş.
-   Şeýle hem: uzyn sesde ýat sarp edilişini ölçemek (AASIST, batch 8) we konteýneriň 4 GB çägine sygýandygyny barlamak.
-8. Umumylaşdyrma synagy: Celeb-DF ýa-da başga toplumda ölçemek we dogruçyl ýazmak.
-9. `docs/THEORY.md`, diplom ýazgysy, prezentasiýa.
+### Açyk işler (peýda boýunça)
+1. Öň paýlaşylan tokenleri hasap eýesi täzelemeli; licence/data auditi.
+2. Türkmen ses okuwynyň netijesini diňe tamamlananda almak we öňki model bilen deňeşdirmek.
+3. Garaşsyz şekil dev/test toplumy: Smaug we birleşen ulgamyň FPR/FNR/AUC, soň bosagalary doňdurmak.
+4. Hil/coverage duýduryşlary, pes hilli maglumatda abstention.
+5. Smaug-y wideo geçirmek — wagt býujeti, kadr/wideo aggregation we aýratyn kalibrleme bilen.
+6. Parol üýtgetmek, hasap dolandyryşy, retention/backup, uzyn işi ýatyrmak, stress synaglary.
+7. Hakyky telefon/Safari/Firefox; nazaryýet we demo materiallary.
+Doly analiz we kabul ediş şertleri: **`docs/ROADMAP.md`**. Smaug: **`docs/SMAUG.md`**.
 
-### Ulanyjydan garaşylýan jogaplar
-- [ ] GitHub-a push etmek üçin: fine-grained token (diňe `Find` repo, Contents: Read and write) ýa-da özi push etmek.
-- [ ] Gorag haýsy kompýuterde geçer (OS, RAM, GPU)? Docker gurlup bilermi?
-- [ ] Kaggle tokeni söhbetde açyk ýazyldy — iş gutaransoň täzelemeli.
+### Ulanyjynyň etmeli işleri
+- Öň söhbetde paýlaşylan GitHub/Kaggle tokenlerini täzelemek.
+- Social preview: `docs/assets/social-preview.png` faýlyny repo Settings-den ýüklemek.
+- Mac-da täzelenenden soň editable däl gurnama we `dfd models --download`; maglumatlar `data/`-da galýar.
 
 ### Gündelik
 - **2026-11-20 (1):** Ýumuş kagyzy seljerildi. Kaggle birikdirildi, GPU smoke test geçdi. Toplumlar we taýýar agramlar tapyldy. Plan ýazyldy.
@@ -601,3 +600,48 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   **Release `v0.1.0`** (CHANGELOG-dan; ölçenen sanlar we çäklendirmeler bilen).
   **Social preview:** `docs/assets/social-preview.png` (1280×640) — API ýok, ulanyjy Settings → General → Social preview-dan ýüklemeli.
   Bu faýllarda hem awtor diňe `eliot` (§0a.8); aragatnaşyk — e-poçta däl, GitHub-yň hususy habar beriş ulgamy.
+
+- **(16) — Smaug-y ulgama goşmak: ýerine ýetirmezden öňki analiz (§0a.7).**
+  Ulanyjy indi birikdirmegi tabşyrdy we çözgütleriň sebäplerini işiň dowamynda düşündirmegi isledi.
+  Mesele: FF++ ýüz çalşygy modeli tutuş AI suratyny tanamak üçin okadylmadyk. Ýene şol modeli
+  çylşyrymlaşdyrmak ýa-da el bilen spektr düzgünleri goşmak ýerine ýörite Smaug ONNX şahasy saýlandy.
+  **Kararlar:**
+  1. Diňe suratlar; ýüzi bolmadyk surat hem Smaug bilen barlanýar. Wideo öňküsi ýaly; kadrlara
+     Smaug-y ulanmaga aýratyn çykdajy we cross-dataset ölçegi gerek.
+  2. Asyl `smaug_image_detect.py` bilen deň taýýarlama: EXIF ugry, RGB, 528 kesim, kiçi tarapy
+     >576 bolsa Lanczos bilen kiçeltmek, <528 bolsa bicubic bilen ulaltmak; baş/orta/ahyryndan
+     üç kesim. Logitleriň ortaçasyndan sigmoid. Kesimler yzygiderli (2 GB RAM üçin).
+     Ret: üç kesimi birden ýada geçirmek; diňe ýüzde işletmek; bahalary ýöne ortaçalamak.
+  3. Ýüz we AI-suratyň netijeleri aýratyn saklanýar, her biri öz bosagasy boýunça baha alýar;
+     jemleýji höküm iň güýçli tapyndydyr. AI bahasy bar bolsa iň uly bal ekranda görkezilýär,
+     emma ol kalibrlenen bilelikdäki ähtimallyk däl — düşündirişi görünmeli.
+     Upstream 0.5 bosaga wagtlaýyn (`provisional`); uly synagda FPR ölçenmän «takyk» diýilmeýär.
+  4. Grad-CAM diňe EfficientNet-e degişli. Smaug üçin ýasama heatmap döredilmeýär; tapawut UI/PDF-de.
+  5. Provenance: diňe gurluşly EXIF/PNG/XMP AI belgileri; çig faýlda söz gözlemek ýok.
+     Gollar barlanmaýar, metadata galplaşdyrylyp/pozulyp bilýär → diňe goşmaça setir,
+     özbaşdak höküm ýa-da ýasama 100 % ýok. Prompt/GPS şahsy maglumatlary çykarylmaýar.
+  6. Agramlar Git-e goşulmaýar (181 210 404 baýt); wersiýasy berkidilen, SHA-256 barlanan
+     `dfd models --download`: HTTP Range, ýarym faýly saklamak, atomik çalşyrmak. GitHub Release
+     + pinned Hugging Face ätiýaç çeşmesi. Docker build-de ýüklenýär; runtime oflaýn.
+     Ýüklenmedik bolsa köne ýüz barlagy dowam edýär, ýöne AI barlagynyň ýokdugy açyk ýazylýar.
+  **Barlag meýilnamasy:** internetsiz birlik/API testler (taýýarlama, birleşdirme, metadata, näsazlyk,
+  hash/Range); hakyky agramlar bilen öňki portret regression + täzeden gysylan nusga; PDF 3 dilde;
+  lint/format/mypy/coverage, brauzer. Gurnama README/wheel sanawlary we ygtyýarnama täzelenýär.
+  **Ýerine ýetirilen netije:** Smaug, provenance we garaşsyz kararlar ulgama goşuldy. API/history/PDF
+  täze meýdanlary saklaýar, öňki barlaglar okalýar. Gollanma `docs/SMAUG.md`, analiz `docs/ROADMAP.md`.
+  Agram GitHub Release `v0.1.0`-a goşmaça asset (tag-yň köne kody Smaug-syz), licence we hash bilen:
+  181210404 baýt, SHA `982222b9…`. Downloader hakyky HTTPS-de soňky 1 MiB-den dowam edip,
+  doly hash-i tassyklady; gaýtadan işletse nätwork gerek däl. Docker build-de, Codespaces setup/update-de.
+  Mac wheel sanawlary (3.12/3.13) ONNX Runtime bilen täzelendi; README `-e`-siz.
+  **Hakyky inference:** portret Smaug 0.999603, ýüz 0.000088 → «Galp»; 768×768/JPEG60 metadata-syz
+  nusga 0.999163 → «Galp»; 1 hakyky surat Smaug 0.000156 → «Hakyky». Bu saýlawda ulanylan
+  mysallaryň regression-y, uly/garaşsyz takyklyk ölçegi däl. `docs/metrics/smaug_integration_smoke.json`.
+  **Ýat:** ilkinji birleşdirme gaýtalanýan inferencede bu 2 GB sandbox-da öldürildi. ORT CPU arena,
+  memory pattern we weight prepacking öçürildi; kesimler yzygiderli; Linux/glibc-de boş wagtlaýyn
+  native ýat yzyna berilýär; Grad-CAM parameter gradientleri arassalanýar. Soň 3 barlag yzygiderli
+  18–24 s, peak RSS 1179 MiB bilen geçdi. Runtime üçin OS/ýükleme/işçiler sebäpli 4 GB+ RAM maslahat.
+  **Barlaglar:** 194 passed / 1 skipped, coverage 95.13%; ruff, format, mypy strict we JS syntax arassa.
+  Internet kesilmegi, hash, Range, nädogry metadata, metadata≠höküm, no-face we model fallback testleri.
+  Hakyky web API scan `20dd4656a5cd4684a39bc8d7282f6069` → «Galp», PDF 3 dilde; Chromium desktop
+  we mobile, tk/ru/en, reduced-motion açyk ýagdaýda sahypa; konsol ýalňyşsyz. Täze wheel JSON/licence
+  aktiwlerini öz içine alýar. Häzir diňe surat; uly garaşsyz synag we wideo giňeltmesi indiki işdir.

@@ -132,6 +132,8 @@ class PdfReportRenderer:
         self._verdict(pdf, scan)
         details = scan.details
         self._modalities(pdf, scan, details)
+        if scan.media_type.value == "image":
+            self._provenance(pdf, details)
         self._timelines(pdf, details)
         self._gallery(pdf, details, artifacts)
         self._notes(pdf, scan, details)
@@ -186,16 +188,22 @@ class PdfReportRenderer:
             pdf.set_xy(pdf.l_margin, top + 3.5)
             pdf.set_font("DejaVu", "", 8)
             pdf.cell(
-                width - 6, 4.5, pdf.t("probability"), align="R", new_x=XPos.LMARGIN, new_y=YPos.NEXT
+                width - 6,
+                4.5,
+                pdf.t("score" if scan.details.get("synthetic") else "probability"),
+                align="R",
+                new_x=XPos.LMARGIN,
+                new_y=YPos.NEXT,
             )
             pdf.set_font("DejaVu", "B", 17)
-            pdf.cell(width - 6, 9, f"{scan.prob_fake * 100:.1f}%", align="R")
+            digits = 2 if scan.details.get("synthetic") else 1
+            pdf.cell(width - 6, 9, f"{scan.prob_fake * 100:.{digits}f}%", align="R")
         pdf.set_y(top + 25)
 
     @staticmethod
     def _modalities(pdf: _Report, scan: Scan, details: dict[str, Any]) -> None:
         rows: list[tuple[str, dict[str, Any]]] = [
-            (key, details[key]) for key in ("visual", "audio") if details.get(key)
+            (key, details[key]) for key in ("visual", "synthetic", "audio") if details.get(key)
         ]
         if not rows:
             return
@@ -211,17 +219,30 @@ class PdfReportRenderer:
         pdf.set_font("DejaVu", "", 8.5)
         for key, value in rows:
             pdf.set_text_color(*INK)
-            pdf.cell(widths[0], 6, pdf.t("visual" if key == "visual" else "sound"))
-            pdf.cell(widths[1], 6, f"{value['prob'] * 100:.1f}%")
+            pdf.cell(widths[0], 6, pdf.t("sound" if key == "audio" else key))
+            digits = 2 if key == "synthetic" else 1
+            pdf.cell(widths[1], 6, f"{value['prob'] * 100:.{digits}f}%")
             pdf.set_text_color(*VERDICT_COLOURS[Verdict(value["verdict"])])
             pdf.cell(widths[2], 6, pdf.t(value["verdict"]))
             pdf.set_text_color(*INK)
-            pdf.cell(
-                widths[3], 6, f"{value['real_max'] * 100:.0f}% - {value['fake_min'] * 100:.0f}%"
-            )
+            band = f"{value['fake_min'] * 100:.0f}%"
+            if value["real_max"] != value["fake_min"]:
+                band = f"{value['real_max'] * 100:.0f}% - {band}"
+            pdf.cell(widths[3], 6, band)
             pdf.cell(widths[4], 6, str(value["model"])[:30])
             pdf.ln(6)
         del scan
+
+    @staticmethod
+    def _provenance(pdf: _Report, details: dict[str, Any]) -> None:
+        if "provenance" not in details:
+            return
+        pdf.heading(pdf.t("provenance"))
+        findings = details.get("provenance") or []
+        if not findings:
+            pdf.paragraph(pdf.t("provenance_none"), muted=True)
+        for code in findings:
+            pdf.paragraph(pdf.t(f"provenance_{code}"))
 
     @staticmethod
     def _timelines(pdf: _Report, details: dict[str, Any]) -> None:
@@ -278,7 +299,7 @@ class PdfReportRenderer:
     @staticmethod
     def _notes(pdf: _Report, scan: Scan, details: dict[str, Any]) -> None:
         notes = [pdf.t(f"note_{code}") for code in details.get("notes") or []]
-        if any((details.get(k) or {}).get("provisional") for k in ("visual", "audio")):
+        if any((details.get(k) or {}).get("provisional") for k in ("visual", "synthetic", "audio")):
             notes.append(pdf.t("note_provisional"))
         if scan.media_type.value == "video" and details.get("audio"):
             notes.append(pdf.t("note_video_audio"))

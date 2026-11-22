@@ -86,19 +86,19 @@ export function verdictBadge(verdict, large = false) {
 
 // Semi-circular gauge. `prob` may be null (inconclusive). It is drawn empty and filled by
 // motion.reveal(), which the application shell runs for everything that enters the page.
-export function gauge(prob, verdict) {
+export function gauge(prob, verdict, label = t("result.probability"), digits = 1) {
   const radius = 84;
   const length = Math.PI * radius;
   const filled = prob == null ? 0 : Math.max(0, Math.min(1, prob)) * length;
   return `
     <div class="gauge gauge-${esc(verdict ?? "inconclusive")}">
-      <svg viewBox="0 0 200 116" role="img" aria-label="${esc(t("result.probability"))}: ${esc(pct(prob))}">
+      <svg viewBox="0 0 200 116" role="img" aria-label="${esc(label)}: ${esc(pct(prob, digits))}">
         <path class="gauge-track" d="M16 100 A84 84 0 0 1 184 100" pathLength="${length}"/>
         <path class="gauge-value" d="M16 100 A84 84 0 0 1 184 100" stroke-dasharray="0 ${length}" data-dash="${filled} ${length}"/>
       </svg>
       <div class="gauge-label">
-        <div class="gauge-number">${prob == null ? "—" : `<span data-count="${(prob * 100).toFixed(1)}" data-digits="1">0.0</span><small>%</small>`}</div>
-        <div class="gauge-caption">${esc(t("result.probability"))}</div>
+        <div class="gauge-number">${prob == null ? "—" : `<span data-count="${(prob * 100).toFixed(digits)}" data-digits="${digits}">0.0</span><small>%</small>`}</div>
+        <div class="gauge-caption">${esc(label)}</div>
       </div>
     </div>`;
 }

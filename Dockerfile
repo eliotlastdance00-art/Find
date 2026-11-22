@@ -16,6 +16,9 @@ COPY pyproject.toml README.md LICENSE ./
 COPY src ./src
 RUN pip install --extra-index-url "$TORCH_INDEX" --constraint constraints.txt .
 
+# Download during build, not while serving. Pinned hash, resume and an upstream mirror.
+RUN DFD_WEIGHTS_DIR=/opt/model-weights dfd models --download
+
 # ---------- runtime ----------
 FROM python:3.13-slim AS runtime
 LABEL org.opencontainers.image.title="Deepfake Detektor" \
@@ -37,6 +40,7 @@ RUN groupadd --system --gid 10001 dfd \
 
 COPY --from=build /opt/venv /opt/venv
 COPY weights /app/weights
+COPY --from=build /opt/model-weights/synthetic /app/weights/synthetic
 
 USER dfd
 WORKDIR /app

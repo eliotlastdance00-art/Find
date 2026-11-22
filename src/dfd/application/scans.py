@@ -29,7 +29,7 @@ from dfd.domain.ports import (
     ScanFilter,
     ScanRepository,
 )
-from dfd.domain.scoring import cap, classify, fuse, headline_probability
+from dfd.domain.scoring import cap, classify, fuse, headline_probability, strongest
 
 log = logging.getLogger(__name__)
 
@@ -148,14 +148,22 @@ def _modality(result: ModalityResult | None) -> tuple[dict[str, Any] | None, Ver
 def apply_analysis(scan: Scan, analysis: Analysis) -> None:
     """Derive verdicts from raw analysis output and write them onto the scan."""
     visual, visual_verdict = _modality(analysis.visual)
+    synthetic, synthetic_verdict = _modality(analysis.synthetic)
     audio, audio_verdict = _modality(analysis.audio)
-    scan.visual_prob = analysis.visual.prob_fake if analysis.visual else None
+    picture_scores = [r.prob_fake for r in (analysis.visual, analysis.synthetic) if r is not None]
+    # A display score, not a newly calibrated joint probability. Keep individual
+    # scores AND decisions below; thresholds differ and must never be pooled.
+    scan.visual_prob = max(picture_scores, default=None)
     scan.audio_prob = analysis.audio.prob_fake if analysis.audio else None
-    scan.verdict = fuse(scan.media_type, visual_verdict, audio_verdict)
+    scan.verdict = fuse(
+        scan.media_type, strongest(visual_verdict, synthetic_verdict), audio_verdict
+    )
     scan.prob_fake = headline_probability(scan.visual_prob, scan.audio_prob, scan.media_type)
     scan.details = {
         "media": {**scan.details.get("media", {}), **analysis.media_info},
         "visual": visual,
+        "synthetic": synthetic,
+        "provenance": list(analysis.provenance),
         "audio": audio,
         "frames": [
             {

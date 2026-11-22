@@ -95,3 +95,25 @@ weights file and SHA-256, calibration temperature, decision thresholds per scope
 it was trained/evaluated on, and the measured metrics. The server reads everything from
 the card, so replacing a model needs no code change. `provisional: true` marks a model
 whose thresholds must not be trusted; the UI and the report then show a warning.
+
+
+## AI-generated still images (Smaug)
+
+Still images also use a lazy CPU-only ONNX detector, including when no face was found.
+Its adapter follows the original Smaug preprocessing: 528 px crops, native short-side
+band 528..576, three sequential views, mean of logits then sigmoid. Weights are pinned
+and verified before ONNX Runtime loads them; runtime never accesses the network.
+
+`Analysis.synthetic` and `details.synthetic` are separate from the face-swap `visual`
+result. Each detector classifies using its own thresholds; the strongest verdict wins.
+The displayed image score is the largest individual score, **not** a calibrated joint
+probability. Smaug uses the upstream 0.5 threshold provisionally; the earlier FF++ metrics
+must not be presented as metrics for this combined detector.
+
+`details.provenance` contains normalised, privacy-preserving codes for supported structured
+metadata markers, never raw prompts or GPS. The metadata is unsigned/unverified and cannot
+change a verdict. Absence is not evidence of authenticity. C2PA signatures are not verified.
+
+Grad-CAM continues to explain only the face path; there is no fabricated Smaug heatmap.
+Historical records without the new fields remain readable. Video is unchanged until
+video-specific aggregation and thresholds have been evaluated. See [SMAUG.md](SMAUG.md).

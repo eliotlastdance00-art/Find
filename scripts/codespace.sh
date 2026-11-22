@@ -64,7 +64,7 @@ setup() {
     torch torchvision
   .venv/bin/pip install --quiet --extra-index-url "$TORCH_INDEX" --constraint constraints.txt \
     --editable .
-  .venv/bin/dfd models
+  .venv/bin/dfd models --download
 }
 
 credentials() {
@@ -129,6 +129,7 @@ pull() {
     .venv/bin/pip install --quiet --extra-index-url "$TORCH_INDEX" --constraint constraints.txt \
       --editable .
   fi
+  .venv/bin/dfd models --download
   echo "updated to $(git log -1 --format='%h %s')"
 }
 

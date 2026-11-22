@@ -1,0 +1,32 @@
+{
+  "name": "smaug-onnx",
+  "version": "1.0.0",
+  "kind": "synthetic",
+  "arch": "smaug_image_only_int4_int8",
+  "weights_file": "model.onnx",
+  "sha256": "982222b91a85102fc7fadfce488c182afd9556f7166343f51606670724b951e6",
+  "input_size": 528,
+  "temperature": 1.0,
+  "mean": [0.0, 0.0, 0.0],
+  "std": [1.0, 1.0, 1.0],
+  "thresholds": {"image": {"real_max": 0.5, "fake_min": 0.5}},
+  "provisional": true,
+  "trained_on": "Abacus.AI Smaug pretrained model; not trained or calibrated by this project",
+  "metrics": {},
+  "extra": {
+    "license": "Apache-2.0",
+    "source": "https://huggingface.co/21amd21/smaug-ai-image-detector-web",
+    "revision": "1f7d2da952f86543c6c878450ee8fc82750bd14d",
+    "original": "https://huggingface.co/abacusai/Smaug-AI-Image-Detector",
+    "preprocessing": "native-528-576-three-crops-mean-logits",
+    "score_semantics": "uncalibrated sigmoid score, not a calibrated probability",
+    "threshold_source": "Upstream default 0.5; no local false-positive-rate guarantee",
+    "download": {
+      "size": 181210404,
+      "urls": [
+        "https://github.com/eliotlastdance00-art/Find/releases/download/v0.1.0/smaug-ai-image-detector.onnx",
+        "https://huggingface.co/21amd21/smaug-ai-image-detector-web/resolve/1f7d2da952f86543c6c878450ee8fc82750bd14d/model.onnx"
+      ]
+    }
+  }
+}

@@ -66,6 +66,8 @@ class GradCAM:
     def close(self) -> None:
         self._handle.remove()
         self._activations = self._gradients = None
+        # Parameter gradients are only for this explanation, never for inference.
+        self._model.zero_grad(set_to_none=True)
 
     def __call__(self, batch: Tensor) -> tuple[Tensor, Tensor]:
         """Return (logits [N], cams [N, H, W] in 0..1 at the input resolution).

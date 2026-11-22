@@ -6,7 +6,7 @@ on a half-received package index. This script needs no index. It fetches a fixed
 dropped, checks every file against its SHA-256 and can simply be started again at any time.
 
     python scripts/fetch_wheels.py requirements/wheels/macos-arm64-py313.txt
-    pip install --no-index --find-links wheels -e .
+    pip install --no-index --find-links wheels .
 
 Only the standard library is used, so it runs before anything is installed.
 """
@@ -119,7 +119,7 @@ def main() -> None:
         else:
             raise SystemExit(f"{name}: the checksum never matched")
         print(f"\r  ok {label} ({size / 1e6:.1f} MB)" + " " * 20)
-    print(f"\nAll files are here. Now run:\n  pip install --no-index --find-links {target} -e .")
+    print(f"\nAll files are here. Now run:\n  pip install --no-index --find-links {target} .")
 
 
 if __name__ == "__main__":

@@ -95,7 +95,9 @@ def test_verify_weights_detects_tampering(tmp_path: Path) -> None:
 
 def test_registry_reports_missing_models(tmp_path: Path) -> None:
     registry = ModelRegistry(tmp_path)
-    assert registry.status() == {"visual": {"available": False}, "audio": {"available": False}}
+    assert registry.status() == {
+        kind: {"available": False} for kind in ("visual", "audio", "synthetic")
+    }
     with pytest.raises(errors.ModelUnavailable):
         registry.visual()
 

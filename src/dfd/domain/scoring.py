@@ -50,6 +50,16 @@ def cap(verdict: Verdict, limit: Verdict | None) -> Verdict:
     return limit
 
 
+def strongest(*verdicts: Verdict | None) -> Verdict | None:
+    """Independent detectors keep their own thresholds; no probability averaging.
+
+    A low face-swap score cannot cancel a strong AI-generation finding (or vice
+    versa). The combined false-alarm rate still needs independent measurement.
+    """
+    present = [v for v in verdicts if v is not None]
+    return max(present, key=_SEVERITY.__getitem__) if present else None
+
+
 def fuse(media_type: MediaType, visual: Verdict | None, audio: Verdict | None) -> Verdict:
     """Combine per-modality verdicts into the final one.
 

@@ -1,0 +1,62 @@
+{
+  "scope": "Integration/regression smoke check, NOT accuracy, calibration, AUC or a representative benchmark",
+  "weights_sha256": "982222b91a85102fc7fadfce488c182afd9556f7166343f51606670724b951e6",
+  "preprocessing": "upstream native-band 528-576, three sequential crops, mean logits then sigmoid",
+  "threshold": 0.5,
+  "provisional": true,
+  "onnxruntime": "1.32.0",
+  "cases": [
+    {
+      "case": "generated_portrait",
+      "description": "existing AI-generated regression portrait",
+      "input_sha256": "20a80fa48226e80f7af561335d7ab446c04c3b36cc88b69d4380bdbbee5eb725",
+      "face_score": 8.806418190943077e-05,
+      "synthetic_score": 0.9996030458051891,
+      "verdict": "fake",
+      "faces_found": 1,
+      "provenance": [],
+      "seconds": 23.32,
+      "rss_mib": 1136.3,
+      "peak_rss_mib": 1179.1,
+      "notes": [
+        "synthetic_score",
+        "synthetic_heatmap"
+      ]
+    },
+    {
+      "case": "generated_portrait_jpeg60",
+      "description": "same portrait resized to 768x768 and re-encoded JPEG quality 60, metadata stripped",
+      "input_sha256": "93a69eed9576ecfc96408560e69841a6afb7fc98496c8927d534a8f583c2e241",
+      "face_score": 0.0006157180177979171,
+      "synthetic_score": 0.9991625840221974,
+      "verdict": "fake",
+      "faces_found": 1,
+      "provenance": [],
+      "seconds": 18.056,
+      "rss_mib": 1077.1,
+      "peak_rss_mib": 1179.1,
+      "notes": [
+        "synthetic_score",
+        "synthetic_heatmap"
+      ]
+    },
+    {
+      "case": "real_photo",
+      "description": "one real Wikimedia photo from the existing probe; not an independent test set",
+      "input_sha256": "2407ed0cf143ab39931fd28b09a685110ae243a5bce988c0b689174239280639",
+      "face_score": 0.4926833510398865,
+      "synthetic_score": 0.00015616942824654592,
+      "verdict": "real",
+      "faces_found": 1,
+      "provenance": [],
+      "seconds": 19.049,
+      "rss_mib": 1120.3,
+      "peak_rss_mib": 1179.1,
+      "notes": [
+        "synthetic_score",
+        "synthetic_heatmap"
+      ]
+    }
+  ],
+  "peak_rss_mib": 1179.1
+}

@@ -20,7 +20,7 @@ IMAGENET_STD = (0.229, 0.224, 0.225)
 class ModelCard:
     name: str
     version: str
-    kind: str  # "visual" | "audio"
+    kind: str  # "visual" | "audio" | "synthetic"
     arch: str
     weights_file: str
     sha256: str
