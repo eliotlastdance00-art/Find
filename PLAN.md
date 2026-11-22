@@ -584,3 +584,6 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   (c) Eger AASIST 15–20 % EER-den aşak düşmese — indiki usul: SSL öň bölegi (XLS-R + ýeňil kelle; edebiýatda başga domenlerde has durnukly), ýöne ≈1.2 GB model → Smaug ýaly ýükleme ädimi gerek. Entek başlanmady.
   README (`#results`, çäklendirmeler, English) täze ölçenen sanlar bilen täzelendi; doly sanlar `docs/metrics/audio_tk_*.json`.
 
+  **Dowamy (şol gün):** `--init` düzedildi (resmi agramlaryň bazasy öňküsi ýaly ölçenýär; başlangyç agramlar «iň gowy» hökmünde saklanýar — täze epoha diňe ondan gowy bolsa çalşyrýar; `[train]` setirinde `data wait` paýy çap edilýär — tizligiň päsgelçiligini bilmek üçin).
+  **Kaggle `eliotalderson00/dfd-train-audio-2` v1 iberildi (07:06 UTC, 22 Nov)**: `--init <raw c9f36da weights/audio/AASIST.pth> --lr 7e-5 --budget-min 540` (≈15 epoha, jemi ≈10 sag; GPU kwotasyndan ≈10 sag). Gaýtadan iberme. Netije gelende: `weights/audio` + kart + README sanlary + `max_verdict` kararyny täzeden gözden geçir.
+
