@@ -29,6 +29,7 @@ Aşakdaky bölümlerde bulara gapma-garşy zat bar bolsa, **şu ýer dogry**:
    (a) meseläni analiz et — näme gerek, näme üçin; (b) başga nähili usullar bar — gerek bolsa internetden gözle;
    (c) usullary deňeşdir, iň gowusyny saýla we sebäbini ýaz; (d) diňe şondan soň ýerine ýetir; (e) netijäni barla.
    Saýlanan çözgüt we ret edilen wariantlar şu faýlyň gündeligine (10-njy bölüm) ýazylýar.
+8. **(2026-11-22) Awtor ady diňe `eliot`.** Kodda, resminamalarda, suratlarda, commit-lerde we synag hasabynda başga at, topar ýa-da ýolbaşçy ýazylmaly däl. Iş `eliot` şahasynda, `eliot` ady bilen.
 
 Hakyky kod gurluşy (5-nji bölümdäki köne çyzgynyň ýerine): `docs/ARCHITECTURE.md`.
 Hakyky kararlar (4-nji bölüme goşmaça):
@@ -587,3 +588,8 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   **Dowamy (şol gün):** `--init` düzedildi (resmi agramlaryň bazasy öňküsi ýaly ölçenýär; başlangyç agramlar «iň gowy» hökmünde saklanýar — täze epoha diňe ondan gowy bolsa çalşyrýar; `[train]` setirinde `data wait` paýy çap edilýär — tizligiň päsgelçiligini bilmek üçin).
   **Kaggle `eliotalderson00/dfd-train-audio-2` v1 iberildi (07:06 UTC, 22 Nov)**: `--init <raw c9f36da weights/audio/AASIST.pth> --lr 7e-5 --budget-min 540` (≈15 epoha, jemi ≈10 sag; GPU kwotasyndan ≈10 sag). Gaýtadan iberme. Netije gelende: `weights/audio` + kart + README sanlary + `max_verdict` kararyny täzeden gözden geçir.
 
+- **2026-11-22 (14) — README suratlary we awtor ady.** README suratlary täze interfeýsden täzeden alyndy (`screen-scan.jpg`, `screen-login.jpg`, `screen-upload.jpg`, `screen-phone.png`); README-däki diplom setiri aýryldy.
+  Awtor ady hemme ýerde **`eliot`** (§0a.8). Commit awtory: `eliot <eliotlastdance00-art@users.noreply.github.com>`. Şahalar: `eliot` (iş şahasy) we `main` — bir ýagdaýda saklanýar.
+  Git taryhy täzeden ýazyldy → **ähli commit SHA-lary üýtgedi** (ýokardaky ýazgylardaky köne SHA-lar indi ýok). Köne nusgalar (Mac, Codespace): `git fetch origin && git reset --hard origin/main`.
+  Kaggle `dfd-train-audio-2` şonuň üçin **v2** hökmünde gaýtadan iberildi (07:26 UTC, 22 Nov; sazlamalar öňküsi ýaly); 07:30-da RUNNING. Gaýtadan iberme.
+  Synag sahypasy: giriş `eliot`, maglumat bukjasy `/home/user/dfd-eliot-data`.

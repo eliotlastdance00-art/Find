@@ -30,11 +30,16 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/screen-scan.jpg" alt="Barlag sahypasy: suratyň üstünde skaner, göterim we tapgyrlar" width="860">
+  <img src="docs/assets/screen-scan.jpg" alt="Barlag sahypasy: Şerlok ulaldyjy aýna bilen suraty derňeýär, tapgyrlar we göterim" width="860">
 </p>
 
 <p align="center">
-  <img src="docs/assets/screen-phone.png" alt="Telefonda: faýl ýüklemek, faýlyň tanalmagy, netije" width="640">
+  <img src="docs/assets/screen-login.jpg" alt="Giriş sahypasy" width="427">
+  <img src="docs/assets/screen-upload.jpg" alt="Faýl ýüklemek sahypasy" width="427">
+</p>
+
+<p align="center">
+  <img src="docs/assets/screen-phone.png" alt="Telefonda: giriş, faýl ýüklemek, derňew, netije" width="760">
 </p>
 
 <p align="center"><sub>
