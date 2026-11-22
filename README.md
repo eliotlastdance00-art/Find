@@ -14,10 +14,12 @@
 
 <p align="center">
   <a href="https://github.com/eliotlastdance00-art/Find/actions/workflows/ci.yml"><img src="https://github.com/eliotlastdance00-art/Find/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/eliotlastdance00-art/Find/releases"><img src="https://img.shields.io/github/v/release/eliotlastdance00-art/Find?color=6f5cff&label=release" alt="Release"></a>
   <img src="https://img.shields.io/badge/Python-3.11%20%E2%80%93%203.13-3776AB?logo=python&logoColor=white" alt="Python 3.11–3.13">
   <img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-555" alt="macOS · Linux · Windows">
   <img src="https://img.shields.io/badge/dil-TK%20%C2%B7%20RU%20%C2%B7%20EN-6f5cff" alt="TK · RU · EN">
   <a href="LICENSE"><img src="https://img.shields.io/badge/ygty%C3%BDarnama-MIT-green" alt="MIT"></a>
+  <a href="https://github.com/eliotlastdance00-art/Find/stargazers"><img src="https://img.shields.io/github/stars/eliotlastdance00-art/Find?style=flat&color=f5b301&label=%E2%98%85" alt="Stars"></a>
 </p>
 
 <p align="center">
@@ -213,6 +215,7 @@ Sazlamak isleseňiz: `cp .env.example .env` we içini düzediň.
 | Hasap döretmek (terminaldan) | `dfd create-user <at> --admin` |
 | Gurlan modelleri görmek | `dfd models` |
 
+<a id="troubleshooting"></a>
 ### 🩹 Näsazlyk çyksa
 
 | Alamat | Sebäbi we çözgüdi |
@@ -450,6 +453,19 @@ training/               modeli okatmak we bahalandyrmak
 tests/                  unit we API testleri
 weights/                modeller we olaryň kartlary (model_card.json)
 ```
+
+## 🤝 Goşant goşmak
+
+Ýalňyşlyk tapdyňyzmy, faýl nädogry bahalandymy ýa-da teklibiňiz barmy?
+[Täze issue açyň](https://github.com/eliotlastdance00-art/Find/issues/new/choose) — türkmen, rus ýa-da iňlis dilinde.
+
+| | |
+|---|---|
+| 🧭 Nädip goşant goşmaly | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| 🔒 Howpsuzlyk meselesini hususy habar bermek | [SECURITY.md](SECURITY.md) |
+| 📝 Wersiýalaryň taryhy | [CHANGELOG.md](CHANGELOG.md) |
+| 🤗 Özüni alyp baryş düzgünleri | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) |
+| 📚 Salgylanmak (sitata) | [CITATION.cff](CITATION.cff) — GitHub-da «Cite this repository» düwmesi |
 
 ## 📜 Ygtyýarnama
 

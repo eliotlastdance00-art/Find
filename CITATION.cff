@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Deepfake Detektor: a self-hosted web system that checks video, images and audio for manipulation"
+abstract: >-
+  A web application that analyses video, image and audio files for face swaps and synthetic
+  speech. It reports a fake probability with a three-way verdict (real, suspicious, fake),
+  highlights the regions that influenced the model with Grad-CAM, and produces PDF reports in
+  Turkmen, Russian and English.
+authors:
+  - name: "eliot"
+    website: "https://github.com/eliotlastdance00-art"
+version: 0.1.0
+date-released: "2026-11-22"
+license: MIT
+repository-code: "https://github.com/eliotlastdance00-art/Find"
+keywords:
+  - deepfake detection
+  - audio anti-spoofing
+  - media forensics
+  - explainable AI
+  - Grad-CAM
+  - EfficientNet
+  - AASIST

@@ -593,3 +593,11 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   Git taryhy täzeden ýazyldy → **ähli commit SHA-lary üýtgedi** (ýokardaky ýazgylardaky köne SHA-lar indi ýok). Köne nusgalar (Mac, Codespace): `git fetch origin && git reset --hard origin/main`.
   Kaggle `dfd-train-audio-2` şonuň üçin **v2** hökmünde gaýtadan iberildi (07:26 UTC, 22 Nov; sazlamalar öňküsi ýaly); 07:30-da RUNNING. Gaýtadan iberme.
   Synag sahypasy: giriş `eliot`, maglumat bukjasy `/home/user/dfd-eliot-data`.
+
+- **2026-11-22 (15) — ammaryň «About» bölegi we jemgyýet faýllary (meşhur ammarlardaky ýaly).**
+  Pikirlenme: meşhur ammarlarda (a) gysga iňlisçe düşündiriş + topic-ler (gözlegde tapylmak üçin), (b) jemgyýet faýllary (GitHub «Community standards» 100 %), (c) wersiýa/release, (d) social preview suraty, (e) web sahypa (Pages/demo), (f) Docker obrazy (GHCR) bolýar. Şu gezek (a)–(d) edildi; (e), (f) teklip edildi.
+  **API bilen:** description (iňlisçe, gysga), 20 topic (GitHub-da hakyky ulanylýanlary sanap saýlandy: `deepfake-detection` 1401 ammar, `anti-spoofing` 302, `image-forensics` 323, …), Wiki we Projects öçürildi (boş goşmaçalar), Dependabot duýduryşlary + hususy howpsuzlyk habary açyldy, `detection` belligi döredildi.
+  **Faýllar:** `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `CHANGELOG.md`, `CITATION.cff` (cffconvert bilen barlandy), `.github/ISSUE_TEMPLATE/` (bug, feature, wrong verdict, config), `.github/PULL_REQUEST_TEMPLATE.md`, `.github/dependabot.yml` (diňe Actions, aýda bir toparlanan PR), README: release we ýyldyz nyşanlary, «Goşant goşmak» bölümi, `#troubleshooting` labyry.
+  **Release `v0.1.0`** (CHANGELOG-dan; ölçenen sanlar we çäklendirmeler bilen).
+  **Social preview:** `docs/assets/social-preview.png` (1280×640) — API ýok, ulanyjy Settings → General → Social preview-dan ýüklemeli.
+  Bu faýllarda hem awtor diňe `eliot` (§0a.8); aragatnaşyk — e-poçta däl, GitHub-yň hususy habar beriş ulgamy.

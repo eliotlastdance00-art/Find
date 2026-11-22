@@ -1,0 +1,61 @@
+name: 🐞 Bug report
+description: Something does not work as described
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. Turkmen, Russian and English are all welcome.
+        Please do **not** attach private media files; a description or a synthetic sample is enough.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what did you get instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start the server with `dfd serve`
+        2. Upload a 20-second MP4
+        3. …
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How do you run it?
+      options:
+        - Python virtual environment
+        - Docker
+        - GitHub Codespaces
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Operating system and Python version
+      placeholder: macOS 15 (Apple Silicon), Python 3.13
+    validations:
+      required: true
+  - type: dropdown
+    id: media
+    attributes:
+      label: Kind of file
+      multiple: true
+      options:
+        - Video
+        - Image
+        - Audio
+        - Not related to a file
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Terminal output of `dfd serve` or the browser console. Remove tokens and passwords.
+      render: text

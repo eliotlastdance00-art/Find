@@ -1,0 +1,47 @@
+name: 🎯 Wrong verdict
+description: A file was judged Real / Suspicious / Fake incorrectly
+title: "[Verdict]: "
+labels: ["detection"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Wrong verdicts are the most useful reports. Please read the
+        [limitations](https://github.com/eliotlastdance00-art/Find#limits) first: some cases
+        (fully AI-generated pictures, non-speech audio) are known gaps.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of file
+      options: [Video, Image, Audio]
+    validations:
+      required: true
+  - type: dropdown
+    id: truth
+    attributes:
+      label: What is the file really?
+      options:
+        - Real, but judged Suspicious or Fake
+        - Manipulated or generated, but judged Real
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: verdict
+    attributes:
+      label: Verdict and probability shown
+      placeholder: "Real, 0.4 %"
+    validations:
+      required: true
+  - type: textarea
+    id: origin
+    attributes:
+      label: How was the file made?
+      description: Tool or generator, language of the speech, compression, resolution — anything you know.
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model versions
+      description: Shown in the account menu → “About the system”, or by `dfd models`.
