@@ -389,16 +389,6 @@ def work(args: argparse.Namespace) -> None:
     official = fetch_weights(args.state_dir / "official" / "AASIST.pth")
     model = build_aasist()
     model.load_state_dict(torch.load(official, map_location="cpu", weights_only=True))
-    if args.init:  # continue from weights of an earlier run instead of the official ones
-        start = args.state_dir / "init.pth"
-        if not start.is_file():
-            if args.init.startswith(("http://", "https://")):
-                urllib.request.urlretrieve(args.init, start)
-            else:
-                shutil.copyfile(args.init, start)
-        model.load_state_dict(torch.load(start, map_location="cpu", weights_only=True))
-        digest = hashlib.sha256(start.read_bytes()).hexdigest()
-        print(f"[init] continuing from {args.init} (sha256 {digest[:16]})", flush=True)
     model = model.to(device)
     batch = fitting_batch(model, device, args.batch)
     steps = args.steps * args.batch // batch  # the same number of clips per epoch
@@ -440,6 +430,20 @@ def work(args: argparse.Namespace) -> None:
         best, spent = state["best"], state["spent"]
         print(f"[resume] after epoch {epoch} of {total_epochs}, best {best:.4f}", flush=True)
 
+    if args.init and not history:  # continue from the weights of an earlier run
+        start = args.state_dir / "init.pth"
+        if not start.is_file():
+            if args.init.startswith(("http://", "https://")):
+                urllib.request.urlretrieve(args.init, start)
+            else:
+                shutil.copyfile(args.init, start)
+        digest = hashlib.sha256(start.read_bytes()).hexdigest()
+        model.load_state_dict(torch.load(start, map_location="cpu", weights_only=True))
+        begin = dev_scores()
+        best = begin["score"]  # an epoch must beat the starting weights to replace them
+        torch.save(model.state_dict(), best_path)
+        print(f"[init] {args.init} sha256 {digest[:16]}: {json.dumps(begin)}", flush=True)
+
     budget = args.budget_min * 60.0
     while epoch < total_epochs and spent < budget:
         began = time.time()
@@ -451,7 +455,9 @@ def work(args: argparse.Namespace) -> None:
         )
         model.train()
         running, seen = 0.0, 0
+        waited, mark = 0.0, time.time()  # time spent waiting for data, not computing
         for step, (clips, labels) in enumerate(loader):
+            waited += time.time() - mark
             rate = lr_at((epoch * steps + step) / (total_epochs * steps), args.lr, args.lr_min)
             for group in optimizer.param_groups:
                 group["lr"] = rate
@@ -465,9 +471,11 @@ def work(args: argparse.Namespace) -> None:
                 speed = seen / max(time.time() - began, 1e-6)
                 print(
                     f"[train] epoch {epoch + 1}/{total_epochs} step {step}/{steps} "
-                    f"loss {running / seen:.4f} lr {rate:.2e} {speed:.0f} clips/s",
+                    f"loss {running / seen:.4f} lr {rate:.2e} {speed:.0f} clips/s "
+                    f"(data wait {waited / max(time.time() - began, 1e-6):.0%})",
                     flush=True,
                 )
+            mark = time.time()
         scores = dev_scores()
         epoch += 1
         took = time.time() - began
