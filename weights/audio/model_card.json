@@ -1,11 +1,11 @@
 {
-  "name": "aasist",
-  "version": "1.0.0",
+  "name": "aasist-tk",
+  "version": "2.0.0",
   "kind": "audio",
   "arch": "AASIST",
   "weights_file": "AASIST.pth",
-  "sha256": "51d2d9cf0738172f61e2a384ec50a54a55363240f67c971ed55a92435bc1a1c0",
-  "temperature": 1.4483817680682325,
+  "sha256": "b7b91f75e5d815466427ec4176bdf2f0b0fb212c991bd6a84446bd2b2df6ca78",
+  "temperature": 1.52615368523034,
   "input_size": 0,
   "mean": [
     0.485,
@@ -18,25 +18,29 @@
     0.225
   ],
   "provisional": true,
-  "trained_on": "ASVspoof 2019 LA train (official AASIST weights, clovaai/aasist, MIT)",
+  "trained_on": "ASVspoof 2019 LA train + Turkmen set (Common Voice and broadcast speech; 9 seen generators), fine-tuned from the official AASIST weights (clovaai/aasist, MIT)",
   "thresholds": {
     "audio": {
-      "real_max": 0.029732425099099635,
-      "fake_min": 0.9900958059668292
+      "real_max": 0.32164395662338663,
+      "fake_min": 0.500339221202383
     }
   },
   "metrics": {
-    "eval_auc": 0.9990836814774325,
-    "eval_eer": 0.01619846165859755,
-    "dev_eer": 0.0037588754771984713
+    "eval_auc": 0.9952399745528439,
+    "eval_eer": 0.03398750832469389,
+    "dev_eer": 0.16127906724354985,
+    "tk_test_auc": 0.7590411770684904,
+    "tk_test_eer": 0.3114987409647681,
+    "tk_held_out_eer": 0.37854714127853495,
+    "tk_test_seen_eer": 0.26201317012492165
   },
   "extra": {
-    "calibrated_on": "ASVspoof 2019 LA dev, random subset of 3000 utterances",
-    "evaluated_on": "ASVspoof 2019 LA eval, random subset of 3000 utterances",
-    "source": "https://github.com/clovaai/aasist/raw/main/models/weights/AASIST.pth",
-    "created_at": "2026-11-20T15:26:19+00:00",
-    "note": "Provisional: measured on a subset; rerun training/eval_audio.py without --limit for final values.",
-    "max_verdict_reason": "Unreliable on Turkmen speech (0 of 60 real clips judged real, AUC 0.38-0.55 against MMS-TTS); limit stays until a model trained on Turkmen is deployed."
+    "calibrated_on": "Turkmen dev + ASVspoof 2019 LA dev subset",
+    "evaluated_on": "Turkmen test (incl. 2 unseen generators) and ASVspoof 2019 LA eval",
+    "epochs": 6,
+    "created_at": "2026-11-21T23:20:11+00:00",
+    "note": "Provisional: 6 epochs only (Kaggle time budget); Turkmen dev error was still falling. Turkmen test: AUC 0.759, EER 31.1 % (seen generators 26.2 %, held-out 37.9 %).",
+    "max_verdict_reason": "Real Turkmen speech is still judged fake in 8.3 % of test clips (22.6 % when quiet) and only 44.4 % is judged real; the limit stays until a longer training run lowers this."
   },
   "max_verdict": "suspicious"
 }

@@ -572,3 +572,15 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
   **Ölen ýol:** P100-e geçmek — CLI 2.2.5-de P100 «retired», serwer ony T4 bilen çalyşýar. Gaýtadan ibermek kömek etmeýär — indi iberme.
   **Indiki:** ulanyjy saýtda kwotany barlaýar; kernel nobatda galýar; başlansa ≈4.5–5 sagat.
 
+- **2026-11-22 (13) — ses okuwynyň netijesi (`dfd-train-audio` v2, 6 epoha) we 4-nji ädim.**
+  Kernel GPU nobatyndan soň işledi (jemi 278 min; kwota ýeterlikdi — sebäp Kaggle nobatydy). Tizlik 13–14 kesim/s → epoha 33 min → 240 minuda diňe 6 epoha sygdy.
+  **Ölçeg (türkmen synag bölegi, 6031):** AUC 0.393 → **0.759**, EER 57.9 % → **31.1 %** (görlen generatorlar 26.2 %, görülmedik 37.9 %).
+  Höküm: hakyky ses «Hakyky» 1.9 % → 44.4 %, «Galp» 43.2 % → 8.3 %; galp ses «Galp» 29.1 % → 42.1 %, «Hakyky» 3.6 % → 14.4 %.
+  Generator boýunça «Galp» diýlen paý: tts_mms 99 %, mms+knnvc 89 %, univnet 68 %, knnvc 54 %, voxcpm 50 %, omnivoice (görülmedik) 49 %, encodec 48 %, hifigan 46 %, mimi 32 %, dac 22 %, vocos (görülmedik) 8 %.
+  Şertler: ýuwaş (peak 0.05) AUC 0.678, hakyky→«Galp» 22.6 %; gaty 0.769; mp3 64k 0.751. LA eval (71 237): EER 1.62 %¹ → 3.40 %, AUC 0.9952 (¹ 3000-lik bölekde).
+  **Baha:** gowulaşma uly, ýöne ygtybarly däl. tk_dev EER her epohada peselýärdi (0.389 → 0.347 → 0.317 → 0.278 → 0.245 → 0.246); soňky epohada lr iň pes derejä düşüpdi → **okuw ýetmezçilik edýär**.
+  **Karar:** (a) täze agramlar `weights/audio`-a goýuldy (`aasist-tk` 2.0.0) — hakyky türkmen sesi indi 44 % «Hakyky» (öň 2 %); `provisional: true` we `max_verdict: suspicious` **galdy** (ýalňyş duýduryş 8.3 % pes däl).
+  (b) okuwy dowam etdirmek: `--init` (öňki agramlardan başlamak) goşuldy; Kaggle-da `--init <raw URL> --lr 7e-5 --budget-min 540` (≈16 epoha, ≈10.2 sag GPU).
+  (c) Eger AASIST 15–20 % EER-den aşak düşmese — indiki usul: SSL öň bölegi (XLS-R + ýeňil kelle; edebiýatda başga domenlerde has durnukly), ýöne ≈1.2 GB model → Smaug ýaly ýükleme ädimi gerek. Entek başlanmady.
+  README (`#results`, çäklendirmeler, English) täze ölçenen sanlar bilen täzelendi; doly sanlar `docs/metrics/audio_tk_*.json`.
+

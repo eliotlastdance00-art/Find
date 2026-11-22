@@ -24,14 +24,17 @@ from __future__ import annotations
 import argparse
 import copy
 import csv
+import hashlib
 import json
 import math
 import os
 import random
+import shutil
 import subprocess
 import sys
 import tarfile
 import time
+import urllib.request
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -386,6 +389,16 @@ def work(args: argparse.Namespace) -> None:
     official = fetch_weights(args.state_dir / "official" / "AASIST.pth")
     model = build_aasist()
     model.load_state_dict(torch.load(official, map_location="cpu", weights_only=True))
+    if args.init:  # continue from weights of an earlier run instead of the official ones
+        start = args.state_dir / "init.pth"
+        if not start.is_file():
+            if args.init.startswith(("http://", "https://")):
+                urllib.request.urlretrieve(args.init, start)
+            else:
+                shutil.copyfile(args.init, start)
+        model.load_state_dict(torch.load(start, map_location="cpu", weights_only=True))
+        digest = hashlib.sha256(start.read_bytes()).hexdigest()
+        print(f"[init] continuing from {args.init} (sha256 {digest[:16]})", flush=True)
     model = model.to(device)
     batch = fitting_batch(model, device, args.batch)
     steps = args.steps * args.batch // batch  # the same number of clips per epoch
@@ -618,6 +631,7 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--la-eval", type=int, default=0, help="LA eval clips used (0 = all)")
     p.add_argument("--max-error", type=float, default=0.05)
     p.add_argument("--limit", type=int, default=0, help="clips per partition (smoke test)")
+    p.add_argument("--init", default="", help="weights to continue from: a file or an http(s) URL")
     p.add_argument("--seed", type=int, default=20261121)
     p.add_argument("--stall-min", type=float, default=15.0)
     p.add_argument("--max-restarts", type=int, default=3)
