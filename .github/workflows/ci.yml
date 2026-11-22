@@ -31,9 +31,9 @@ jobs:
           - python: "3.11"   # oldest supported interpreter, latest dependencies
             constraints: ""
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
           cache: pip
@@ -64,7 +64,7 @@ jobs:
 
       - name: Upload coverage
         if: matrix.python == '3.13'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage
           path: coverage.xml
@@ -83,9 +83,9 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
           cache: pip
@@ -124,7 +124,7 @@ jobs:
     timeout-minutes: 30
     needs: test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build and start with docker compose
         run: docker compose up --build --detach
