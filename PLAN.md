@@ -1,7 +1,7 @@
 # PLAN — Dipfeýkleri (Deepfake) kesgitleýän ulgam
 
 > Bu faýl taslamanyň "ýady". Her täze sessiýada ilki şuny okamaly, soň işe başlamaly.
-> Soňky täzelenen: ses okuwynyň dowamy we model 2.1.0 (gündelik, 17)
+> Soňky täzelenen: ses modeli 2.1.0 GitHub-daky `eliot` şahasyna iberildi (gündelik, 18)
 
 ---
 
@@ -312,7 +312,7 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
 | Ädim | Ýagdaý | Bellik |
 |---|---|---|
 | 0. Gurşaw, Kaggle, GPU smoke test | ✅ | 2×T4 tassyklandy; uly çykaryşlar `/tmp`-da |
-| 1. Repo skeleti + CI | 🟡 öňki CI-de Docker smoke şowsuz | köne no-face garaşmasy ýerli gaýtalanyp düzedildi; täze smoke PASS; push autentifikasiýasy ýok, täze CI işlemedi; ýerli Docker ýok |
+| 1. Repo skeleti + CI | 🟡 `eliot`-a push edildi, täze CI netijesi ýok | 519f6d3 remote-da barlandy; täze smoke ýerli PASS; `main` üýtgedilmedi; CI push trigger-i diňe `main` üçin, ýerli Docker ýok |
 | 2. Nazaryýet we maglumatlar | 🟡 | çeşmeler bar; doly licence auditi we `docs/THEORY.md` açyk |
 | 3. Ýüzleri kesmek | ✅ | YuNet; okuw we inference şol bir kesiş kody |
 | 4. Media kitaphanasy | ✅ | surat/wideo/ses, FFmpeg, mazmun boýunça görnüş |
@@ -685,4 +685,19 @@ Doly analiz we kabul ediş şertleri: **`docs/ROADMAP.md`**. Smaug: **`docs/SMAU
   `main` → `1381b068b00e4db2303765af701585ec57421f4c`: ene commiti ýok täze root, diňe CONCEPT.md
   we README.md (2 faýl). Bu daşky üýtgeşme üstünden ýazylmady we awtomatik birleşdirilmedi.
   Bundle görkezmesi diňe `eliot`-a push edýär; `main` baradaky karar ulanyja degişlidir.
-  Push üçin ulanyjynyň howpsuz autentifikasiýasy gerek; täze Kaggle okuw başlanmady.
+  Şol wagt push üçin ulanyjynyň howpsuz autentifikasiýasy gerekdi; bu päsgelçilik (18)-de çözüldi.
+  Täze Kaggle okuw başlanmady.
+
+- **(18) — Ulanyjynyň «Github push et» haýyşy: `eliot`-a üstünlikli push.**
+  GitHub app konnektory goldanylmaýar; ýerine resmi GitHub CLI (neşiriň SHA-256-sy barlanan)
+  bilen brauzerdäki device giriş ulanyldy, ulanyjy rugsat berdi. Parol/token söhbete soralmady;
+  täze credential repo, PLAN, log ýa-da notebook-a ýazylmady. Giriş maglumatlary diňe repo-dan
+  daşardaky snapshot-a goşulmaýan private cache-de, katalog 0700/faýllar 0600 rugsatlary bilen.
+  **Karar:** `main`-daky täze, baglanyşyksyz taryhy goramak; diňe `eliot`-a adaty fast-forward push,
+  force-push we unrelated-history merge ulanylmaýar. `519f6d3e26b3c13814c64aa762d7a47ada065d67`
+  (`aasist-tk` 2.1.0 + metrikalar + smoke düzedişi) iberildi; soň `ls-remote` bilen tassyklanyldy.
+  `main` öňki ýaly `1381b068b00e4db2303765af701585ec57421f4c`, oňa degilmedi. Täze model karty
+  GitHub API arkaly hem elýeterli. Öňki 203 passed / 1 skipped, coverage 95.13% netijeli commit
+  üýtgedilmän iberildi; şu soňky ädim diňe resminama ýazgysydyr. Täze CI geçen diýilmeýär:
+  `.github/workflows/ci.yml` push trigger-i diňe `main` üçin. Bu gezek `eliot`-a push edildi.
+  Bundle diňe ätiýaçlyk: indi adaty GitHub `eliot` şahasyndan täzelenip bolýar.
