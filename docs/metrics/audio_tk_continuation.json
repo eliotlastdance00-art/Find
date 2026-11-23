@@ -1,0 +1,241 @@
+{
+  "source": "Kaggle eliotalderson00/dfd-train-audio-2 version 2, COMPLETE",
+  "scope": "Saved Kaggle evaluation reports, not a full independent local re-evaluation; the same held-out set was reported for both runs.",
+  "weights_sha256": "766a3e59ec53c57948960e5a342824474770ab929dd02af6845dcdb70de74b13",
+  "previous_weights_sha256": "b7b91f75e5d815466427ec4176bdf2f0b0fb212c991bd6a84446bd2b2df6ca78",
+  "epochs_completed": 15,
+  "best_epoch_in_continuation": 13,
+  "continuation_training_minutes": 501.8216695547104,
+  "seed_reused": true,
+  "decision": "Deploy 2.1.0 provisionally with max_verdict=suspicious. Do not retune thresholds on test to force the target.",
+  "comparison": {
+    "tk_test": {
+      "run1": {
+        "auc": 0.7590411770684904,
+        "eer": 0.3114987409647681,
+        "n_real": 1046,
+        "n_fake": 4985,
+        "verdicts": {
+          "real": {
+            "as_real": 0.4435946462715105,
+            "as_suspicious": 0.4732313575525813,
+            "as_fake": 0.08317399617590822,
+            "count": 1046.0
+          },
+          "fake": {
+            "as_real": 0.1440320962888666,
+            "as_suspicious": 0.43490471414242726,
+            "as_fake": 0.42106318956870614,
+            "count": 4985.0
+          }
+        }
+      },
+      "run2": {
+        "auc": 0.9346565509146944,
+        "eer": 0.14527559734653295,
+        "n_real": 1046,
+        "n_fake": 4985,
+        "verdicts": {
+          "real": {
+            "as_real": 0.9024856596558317,
+            "as_suspicious": 0.03441682600382409,
+            "as_fake": 0.06309751434034416,
+            "count": 1046.0
+          },
+          "fake": {
+            "as_real": 0.18194583751253762,
+            "as_suspicious": 0.05376128385155467,
+            "as_fake": 0.7642928786359077,
+            "count": 4985.0
+          }
+        }
+      }
+    },
+    "tk_test_seen_generators": {
+      "run1": {
+        "auc": 0.8105332177852365,
+        "eer": 0.26201317012492165,
+        "n_real": 1046,
+        "n_fake": 2919,
+        "verdicts": {
+          "real": {
+            "as_real": 0.4435946462715105,
+            "as_suspicious": 0.4732313575525813,
+            "as_fake": 0.08317399617590822,
+            "count": 1046.0
+          },
+          "fake": {
+            "as_real": 0.1079136690647482,
+            "as_suspicious": 0.3696471394313121,
+            "as_fake": 0.5224391915039397,
+            "count": 2919.0
+          }
+        }
+      },
+      "run2": {
+        "auc": 0.9677844176447971,
+        "eer": 0.08981146140176084,
+        "n_real": 1046,
+        "n_fake": 2919,
+        "verdicts": {
+          "real": {
+            "as_real": 0.9024856596558317,
+            "as_suspicious": 0.03441682600382409,
+            "as_fake": 0.06309751434034416,
+            "count": 1046.0
+          },
+          "fake": {
+            "as_real": 0.08324768756423433,
+            "as_suspicious": 0.03528605686879068,
+            "as_fake": 0.881466255566975,
+            "count": 2919.0
+          }
+        }
+      }
+    },
+    "tk_test_held_out_generators": {
+      "run1": {
+        "auc": 0.686289353809932,
+        "eer": 0.37854714127853495,
+        "n_real": 1046,
+        "n_fake": 2066,
+        "verdicts": {
+          "real": {
+            "as_real": 0.4435946462715105,
+            "as_suspicious": 0.4732313575525813,
+            "as_fake": 0.08317399617590822,
+            "count": 1046.0
+          },
+          "fake": {
+            "as_real": 0.19506292352371732,
+            "as_suspicious": 0.527105517909003,
+            "as_fake": 0.27783155856727976,
+            "count": 2066.0
+          }
+        }
+      },
+      "run2": {
+        "auc": 0.8878510121997041,
+        "eer": 0.1969698792616134,
+        "n_real": 1046,
+        "n_fake": 2066,
+        "verdicts": {
+          "real": {
+            "as_real": 0.9024856596558317,
+            "as_suspicious": 0.03441682600382409,
+            "as_fake": 0.06309751434034416,
+            "count": 1046.0
+          },
+          "fake": {
+            "as_real": 0.3213939980638916,
+            "as_suspicious": 0.07986447241045498,
+            "as_fake": 0.5987415295256534,
+            "count": 2066.0
+          }
+        }
+      }
+    },
+    "la_eval": {
+      "run1": {
+        "auc": 0.9952399745528439,
+        "eer": 0.03398750832469389,
+        "n_real": 7355,
+        "n_fake": 63882,
+        "verdicts": {
+          "real": {
+            "as_real": 0.9907545887151598,
+            "as_suspicious": 0.006662134602311353,
+            "as_fake": 0.0025832766825288917,
+            "count": 7355.0
+          },
+          "fake": {
+            "as_real": 0.11070411070411071,
+            "as_suspicious": 0.15262515262515264,
+            "as_fake": 0.7366707366707367,
+            "count": 63882.0
+          }
+        }
+      },
+      "run2": {
+        "auc": 0.9932093675177918,
+        "eer": 0.03780074649446612,
+        "n_real": 7355,
+        "n_fake": 63882,
+        "verdicts": {
+          "real": {
+            "as_real": 0.9789259007477906,
+            "as_suspicious": 0.005030591434398368,
+            "as_fake": 0.016043507817811012,
+            "count": 7355.0
+          },
+          "fake": {
+            "as_real": 0.09492501800194107,
+            "as_suspicious": 0.02449829372906296,
+            "as_fake": 0.8805766882689959,
+            "count": 63882.0
+          }
+        }
+      }
+    }
+  },
+  "conditions_uncapped_real_as_fake": {
+    "quiet_peak_0.05": 0.14053537284894838,
+    "loud_peak_0.99": 0.06692160611854685,
+    "mp3_64k": 0.07743785850860421
+  },
+  "initial_weights_url": "https://raw.githubusercontent.com/eliotlastdance00-art/Find/16c22b7ad36ecd8f4f6e7de540588bfd197e7337/weights/audio/AASIST.pth",
+  "previous_weights_git_revision": "570956b1a0db83477be86fc37a07afc9d4bad6f7",
+  "previous_weights_git_path": "weights/audio/AASIST.pth",
+  "raw_export_card": "docs/metrics/audio_tk_run2/exported_model_card.json",
+  "training_log": "docs/metrics/audio_tk_run2/training.txt",
+  "artifact_sha256": {
+    "weights/audio/AASIST.pth": "766a3e59ec53c57948960e5a342824474770ab929dd02af6845dcdb70de74b13",
+    "docs/metrics/audio_tk_metrics.json": "2ebccbb773829423d4fe5572ff4a746aec043fd4f885eed1bb1f6d8a58dbb962",
+    "docs/metrics/audio_tk_history.json": "1e9f325323df49c5e41bf6bd25c2020b16b526aee826f30cbdba69bd782aac79",
+    "docs/metrics/audio_tk_baseline.json": "0c71c7330cf6d15b5c0dd8b813907b2d2f76bb90e268db96aff46e020d4603cf",
+    "docs/metrics/audio_tk_run2/exported_model_card.json": "c055eaa5101137995e7add4ff7b37f99bdab6657e29495ebce6d170dd0f0fb6c",
+    "docs/metrics/audio_tk_run2/training.txt": "9a9b52170fe524da82c503c06dda33a583266800dce5e9202fb7ca90a550394d",
+    "weights/audio/model_card.json": "7e72d14e70d844c31b98c03467ff91fa0cd27a9f88700d795f53eadbf38315db"
+  },
+  "verdict_rates_note": "All verdicts in comparison are uncapped raw threshold decisions; each run uses its own dev-fitted thresholds. AUC is not accuracy.",
+  "capped_application_verdict_rates": {
+    "scope": "Derived audio-only application verdict fractions with max_verdict=suspicious. This is a mapping of saved evaluations, not another inference run; video fusion may differ.",
+    "tk_test": {
+      "run1": {
+        "real": {
+          "as_real": 0.4435946462715105,
+          "as_suspicious": 0.5564053537284895,
+          "as_fake": 0.0,
+          "count": 1046.0
+        },
+        "fake": {
+          "as_real": 0.1440320962888666,
+          "as_suspicious": 0.8559679037111334,
+          "as_fake": 0.0,
+          "count": 4985.0
+        }
+      },
+      "run2": {
+        "real": {
+          "as_real": 0.9024856596558317,
+          "as_suspicious": 0.09751434034416825,
+          "as_fake": 0.0,
+          "count": 1046.0
+        },
+        "fake": {
+          "as_real": 0.18194583751253762,
+          "as_suspicious": 0.8180541624874623,
+          "as_fake": 0.0,
+          "count": 4985.0
+        }
+      }
+    }
+  },
+  "deployment_rationale": [
+    "Checkpoint selection minimized the combined dev EER; test results did not select the checkpoint or fit thresholds.",
+    "The same held-out reports show a large overall ranking/EER improvement and fewer real-speech alarms, but the candidate is not uniformly better.",
+    "Keep provisional status and the suspicious cap because real-as-fake exceeds the 5% target, especially on quiet speech.",
+    "The cap does not repair fake-as-real misses: these rose overall and for unseen generators. LA ranking also slightly regressed; independent evaluation remains required."
+  ],
+  "runtime_smoke": "docs/metrics/audio_tk_runtime_smoke.json"
+}

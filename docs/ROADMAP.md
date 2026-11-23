@@ -39,13 +39,18 @@ haýsydyr biriniň ýalňyşyny hem geçirýär; FF++ sanlaryny täze ulgama gö
 **Taýýar diýilýär:** wersiýaly manifest, bölünişik düzgüni, gaýtadan işledilýän skript, JSON
 netijeler, öňki model bilen deňeşdirme; test bölegi boýunça bosaga saýlanmaýar.
 
-## P1 — Türkmen ses okuwynyň netijesini deňeşdirmek
+## P1 — Türkmen sesindäki galan ýalňyşlyklary azaltmak
 
-Işleýän okuwy gaýtadan ibermeli däl. Tamamlananda öňki agramlar bilen şol bir saklanan
-testlerde deňeşdirmeli: hakyky türkmen sesinde ýalňyş duýduryş, görülmedik generatorlar,
-LA eval, ýuwaş ses we kodekler. Maksat: hakyky türkmen sesinde «Galp» ≤5%; çäk diňe
-ölçeg ýeterlik bolsa aýrylýar. Ýeterlik bolmasa SSL öň bölegi (meselem XLS-R) bilen kiçi
-tejribe; uly modeli diňe netije zerurlygyny görkezse goşmaly.
+Dowam okuwy tamamlandy: 15 goşmaça epoha, saýlanan checkpoint 13. Model 2.1.0 hökmünde
+çäk bilen goýuldy. Türkmen test AUC 0.935, EER 14.5%; emma hakyky sesde çig ýalňyş duýduryş
+6.3%, ýuwaş sesde 14.1%. Şonuň üçin «Şübheli» çägi saklanýar. Galp-as-real 18.2%-e artdy,
+görülmedik Vocos-da 50.4%; şol sebäpli diňe EER gowulaşdy diýip işi gutardy hasaplamaly däl.
+
+Indiki iş: aýratyn çeşmelerde hakyky gürleýiş, pes ses/kodekler, gürleýiş däl ses we görülmedik
+generatorlar bilen barlag. Teste seredip bosagany üýtgedip «5% maksada ýetildi» diýilmeli däl.
+Zerurlyk görkezilse, SSL öň bölegi bilen kiçi deňeşdirme; täze uly model ýa-da täze Kaggle
+okuwy öz-özünden başlanmaýar. Kaggle netijeleri we deployment karary
+`docs/metrics/audio_tk_continuation.json`-da.
 
 ## P1 — Hil/ýeterlik maglumat duýduryşlary
 

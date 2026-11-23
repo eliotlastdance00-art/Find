@@ -366,8 +366,8 @@ Doly sanlar: [smaug_integration_smoke.json](docs/metrics/smaug_integration_smoke
 | Model | Maglumat | AUC | EER | Bellik |
 |---|---|---|---|---|
 | Şekil — EfficientNet-B4 | FaceForensics++ c23, synag bölegi (840 wideo) | 0.9914 | 3.00 % | wideo boýunça |
-| Ses — AASIST (türkmen dili) | türkmen synag bölegi (6031 ýazgy) | 0.759 | 31.1 % | deslapky; höküm «Şübheli» bilen çäklenen |
-| Ses — AASIST (iňlis dili) | ASVspoof 2019 LA, eval (71 237 ýazgy) | 0.9952 | 3.40 % | |
+| Ses — AASIST (türkmen dili) | türkmen synag bölegi (6031 ýazgy) | 0.935 | 14.5 % | deslapky; höküm «Şübheli» bilen çäklenen |
+| Ses — AASIST (iňlis dili) | ASVspoof 2019 LA, eval (71 237 ýazgy) | 0.9932 | 3.78 % | |
 
 <details>
 <summary>Jikme-jik jedweller</summary>
@@ -376,36 +376,46 @@ Doly sanlar: [smaug_integration_smoke.json](docs/metrics/smaug_integration_smoke
 
 ### Ses — AASIST (türkmen dili üçin okadylan, deslapky)
 
-Resmi agramlar diňe iňlis dilindäki studiýa sesini tanaýardy we türkmen sesinde ýalňyşýardy.
-Şonuň üçin model ASVspoof 2019 LA + türkmen ses toplumynda (hakyky: Common Voice we ýaýlym
-sözleýşi; galp: 9 generator) bilelikde okadyldy (`training/train_audio.py`, Kaggle T4, **6 epoha** —
-wagt çägi sebäpli; ýalňyşlyk henizem peselýärdi). Synag böleginde okuwda görülmedik 2 generator bar.
+Resmi agramlardan başlap, ASVspoof 2019 LA + türkmen ses toplumynda bilelikde okadyldy
+(hakyky: Common Voice we ýaýlym sözleýşi; galp: 9 generator). Ilkinji okuw **6 epoha**;
+soň öňki agramlardan **15 goşmaça epoha** (`dfd-train-audio-2` v2, Kaggle T4).
+Iň gowy checkpoint dowam okuwynyň **13-nji epohasynda**, diňe dev netijeleri boýunça saýlandy.
+Testde okuwda görülmedik 2 generator bar. Häzirki model **`aasist-tk` 2.1.0**.
 
-| Görkeziji | Öň (resmi agramlar) | Indi |
+| Görkeziji | Öň (6 epoha) | Indi (dowam okuwy) |
 |---|---|---|
-| Türkmen synag bölegi — AUC | 0.393 | 0.759 |
-| Türkmen synag bölegi — EER | 57.9 % | 31.1 % |
-| şol ýerde: görlen generatorlar — EER | — | 26.2 % |
-| şol ýerde: görülmedik generatorlar — EER | — | 37.9 % |
-| ASVspoof 2019 LA eval (71 237 ýazgy) — AUC | 0.9991¹ | 0.9952 |
-| ASVspoof 2019 LA eval — EER | 1.62 %¹ | 3.40 % |
+| Türkmen synag bölegi — AUC | 0.759 | 0.935 |
+| Türkmen synag bölegi — EER | 31.1 % | 14.5 % |
+| şol ýerde: görlen generatorlar — EER | 26.2 % | 9.0 % |
+| şol ýerde: görülmedik generatorlar — EER | 37.9 % | 19.7 % |
+| ASVspoof 2019 LA eval (71 237) — AUC | 0.9952 | 0.9932 |
+| ASVspoof 2019 LA eval — EER | 3.40 % | 3.78 % |
 
-¹ eval-yň 3000 ýazgylyk böleginde ölçenipdi.
-
-Türkmen synag böleginde höküm (bosagalar: ≤ 32.2 % — Hakyky, ≥ 50.0 % — Galp, arasy — Şübheli):
+Türkmen synag böleginde **çig modeliň hökümi, programmanyň çäginden öň**
+(täze bosagalar: ≤ 36.2 % — Hakyky, ≥ 45.0 % — Galp; temperatura 0.9712):
 
 | Hakykatda | Hakyky | Şübheli | Galp |
 |---|---|---|---|
-| Hakyky ses (1046) — öň | 1.9 % | 54.9 % | 43.2 % |
-| Hakyky ses (1046) — indi | 44.4 % | 47.3 % | 8.3 % |
-| Galp ses (4985) — öň | 3.6 % | 67.3 % | 29.1 % |
-| Galp ses (4985) — indi | 14.4 % | 43.5 % | 42.1 % |
+| Hakyky ses (1046) — öň | 44.4 % | 47.3 % | 8.3 % |
+| Hakyky ses (1046) — indi | 90.2 % | 3.4 % | 6.3 % |
+| Galp ses (4985) — öň | 14.4 % | 43.5 % | 42.1 % |
+| Galp ses (4985) — indi | 18.2 % | 5.4 % | 76.4 % |
 
-**Netije:** model türkmen sesinde ep-esli gowulaşdy, ýöne entek ygtybarly däl. Hakyky sesiň 8.3 %-i
-(ýuwaş ýazgyda 22.6 %-i) «Galp» diýlip bahalanýar, şonuň üçin programmada ses boýunça höküm
-«Şübheli» derejesinden ýokary çykmaýar (`max_verdict`). Güýçli taraplary: MMS-TTS sintezi (99 % tutulýar).
-Gowşak taraplary: neýron kodek/wokoder bilen gaýtadan sintez — DAC (22 %), görülmedik Vocos (8 %).
-Doly sanlar: `docs/metrics/audio_tk_metrics.json`, `audio_tk_baseline.json`, `audio_tk_history.json`.
+**Netije:** umumy tapawutlandyrma ep-esli gowulaşdy, ýöne ähli görkeziji gowulaşmady.
+Galp sesi «Hakyky» hasaplamak **14.4 %-den 18.2 %-e** artdy; görülmedik generatorlarda 32.1 %.
+Iňlis LA eval EER hem biraz ýaramazlaşdy. Türkmen hakyky sesiniň 6.3 %-i (ýuwaş ýazgyda
+14.1 %-i, MP3 64k-da 7.7 %-i) çig modelde «Galp» çykýar — 5 % maksada ýetmedi.
+Şonuň üçin **`provisional: true`, `max_verdict: suspicious` saklanýar**: programmada
+çig «Galp» hem «Şübheli» bolýar; «Hakyky» netijesi-de kepillik däl. Bosagalar test netijesine
+görä üýtgedilmedi. Birnäçe TTS usuly güýçli tutulýar, ýöne görülmedik Vocos-da diňe 39.4 %
+çig «Galp», 50.4 % bolsa ýalňyş «Hakyky» çykýar.
+
+Doly sanlar: `docs/metrics/audio_tk_metrics.json`, `audio_tk_history.json`,
+`audio_tk_continuation.json`; öňki 6 epohaly netijeler `docs/metrics/audio_tk_run1/`-de.
+Çig eksport/log we düşündiriş `docs/metrics/audio_tk_run2/`-de; çig eksport kart deployment üçin däl.
+Hakyky model bilen ýerli HTTP/PDF işlediş barlagy: `docs/metrics/audio_tk_runtime_smoke.json`.
+Bu iki okuw üçin şol bir test toplumynda Kaggle-da çykarylan ölçeglerdir; täze garaşsyz
+real-world toplumyň netijesi hökmünde görkezilmeli däl. AUC 0.935 — «93.5 % takyklyk» diýmek däl.
 
 ### Şekil — EfficientNet-B4
 
@@ -447,9 +457,9 @@ geçirilmedi; adatça şeýle modelleriň takyklygy nätanyş maglumatlarda ep-e
 * Gelip çykyş metadatasy pozulyp/galplaşdyrylyp bilýär. C2PA gollary barlanmaýar.
 * Smaug häzir wideo kadrlaryna ulanylmaýar. Grad-CAM onuň bahasyny düşündirmeýär.
 * Güýçli gysylan, kiçi ýa-da garaňky wideolarda hakyky faýl «Şübheli» diýlip bilner.
-* Ses modeli türkmen dilinde okadyldy, ýöne **entek ygtybarly däl**: türkmen synag böleginde AUC 0.76,
-  hakyky sesiň 8.3 %-i «Galp» diýlip bahalanýar. Şonuň üçin ses boýunça höküm «Şübheli» derejesinden
-  ýokary çykarylmaýar (`model_card.json` → `max_verdict`); has uzyn okuw meýilleşdirilen.
+* Ses modeli türkmen dilinde gowulaşdy (AUC 0.935, EER 14.5 %), ýöne **entek ygtybarly däl**:
+  hakyky sesiň 6.3 %-i çig modelde «Galp» (ýuwaş sesde 14.1 %), galp sesiň 18.2 %-i «Hakyky».
+  Şonuň üçin ses hökümi «Şübheli» bilen çäklenen (`max_verdict`). Giňişleýin synaglar we hil barlagy gerek.
 * Ses modeli **gürleýiş** üçin okadylan. Aýdym-saz, şowhun ýa-da arassa ton ýaly gürleýiş däl
   seslerde netijä ynanmaly däl (şonuň üçin wideoda ses hökümi «Galp» edip bilmeýär).
 * Model gurnalmadyk ýa-da näsaz bolsa bu açyk görkezilýär; galan barlaglar diňe öz çäginde işleýär.
@@ -538,5 +548,7 @@ FPR or AUC has been measured. Image scores are not a calibrated joint probabilit
 Grad-CAM explains only the face-swap model, not Smaug. Metadata hints are unverified, not
 C2PA verification. Smaug currently handles still images, not video frames. See [docs/SMAUG.md](docs/SMAUG.md).
 The audio model was fine-tuned
-on Turkmen speech but is not reliable yet (Turkmen test AUC 0.76; 8.3 % of real speech is judged
-fake), so audio verdicts stay capped at *Suspicious*.
+on Turkmen speech and continued for 15 more epochs (test AUC 0.935, EER 14.5%).
+It remains provisional: 6.3% of real test speech is judged fake before the safety cap
+(14.1% when quiet), while 18.2% of fake speech is judged real. Audio verdicts therefore
+stay capped at *Suspicious*. The LA eval EER slightly regressed from 3.40% to 3.78%.

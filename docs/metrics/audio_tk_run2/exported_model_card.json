@@ -1,0 +1,42 @@
+{
+  "name": "aasist-tk",
+  "version": "2.0.0",
+  "kind": "audio",
+  "arch": "AASIST",
+  "weights_file": "AASIST.pth",
+  "sha256": "766a3e59ec53c57948960e5a342824474770ab929dd02af6845dcdb70de74b13",
+  "temperature": 0.9711591709897913,
+  "input_size": 0,
+  "mean": [
+    0.485,
+    0.456,
+    0.406
+  ],
+  "std": [
+    0.229,
+    0.224,
+    0.225
+  ],
+  "provisional": false,
+  "trained_on": "ASVspoof 2019 LA train + Turkmen set (Common Voice and broadcast speech; 9 seen generators), fine-tuned from the official AASIST weights (clovaai/aasist, MIT)",
+  "thresholds": {
+    "audio": {
+      "real_max": 0.3623849250571387,
+      "fake_min": 0.45000269085291716
+    }
+  },
+  "metrics": {
+    "eval_auc": 0.9932093675177918,
+    "eval_eer": 0.03780074649446612,
+    "dev_eer": 0.05793931873760981,
+    "tk_test_auc": 0.9346565509146944,
+    "tk_test_eer": 0.14527559734653295,
+    "tk_held_out_eer": 0.1969698792616134
+  },
+  "extra": {
+    "calibrated_on": "Turkmen dev + ASVspoof 2019 LA dev subset",
+    "evaluated_on": "Turkmen test (incl. 2 unseen generators) and ASVspoof 2019 LA eval",
+    "epochs": 15,
+    "created_at": "2026-11-22T17:16:12+00:00"
+  }
+}

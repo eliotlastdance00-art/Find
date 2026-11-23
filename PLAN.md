@@ -1,7 +1,7 @@
 # PLAN — Dipfeýkleri (Deepfake) kesgitleýän ulgam
 
 > Bu faýl taslamanyň "ýady". Her täze sessiýada ilki şuny okamaly, soň işe başlamaly.
-> Soňky täzelenen: Smaug birikdirmesi we indiki işler analizi (gündelik, 16)
+> Soňky täzelenen: ses okuwynyň dowamy we model 2.1.0 (gündelik, 17)
 
 ---
 
@@ -36,7 +36,7 @@ Hakyky kararlar (4-nji bölüme goşmaça):
 - Sessiýa: JWT `Authorization: Bearer` (cookie ýok → CSRF ýok); media faýllary üçin gysga möhletli `?t=` tokeni.
 - Höküm bosagalary validasiýada saýlanýar (iki tarapdan iň köp 5 % ýalňyş), `model_card.json` içinde saklanýar.
 - Wideoda ses diňe goşmaça subutnama: hökümi «Şübheli» derejesine çenli ýokarlandyrýar, «Galp» edip bilmeýär. Ýüz ýok + ses ýok → «kesgitläp bolmady».
-- Ses modeli gaýtadan okadylmaýar: resmi AASIST agramlary; temperatura we bosagalar ASVspoof LA dev-de, metrikalar eval-da ölçenýär.
+- Ses modeli: resmi AASIST-den başlanan LA+türkmen bilelikdäki okuw, soň öňki checkpoint-den 15 goşmaça epoha; häzirki `aasist-tk` 2.1.0 deslapky we «Şübheli» bilen çäklenen. Temperatura/bosagalar pooled dev-de; test boýunça üýtgedilmeýär (gündelik 17).
 - Kaggle T4-de `channels_last + AMP + DataParallel` bilelikde «CUDA misaligned address» berýär → okuw NCHW-de.
 - Bir konteýner, bir proses (nobat we SSE ýatda), SQLite + faýllar `/data` tomunda, root däl ulanyjy, diňe okalýan faýl ulgamy.
 - Bagly paketler `constraints.txt` bilen berkidilen; CI = ruff + mypy strict + pytest (≥85 %) + Docker smoke test.
@@ -312,7 +312,7 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
 | Ädim | Ýagdaý | Bellik |
 |---|---|---|
 | 0. Gurşaw, Kaggle, GPU smoke test | ✅ | 2×T4 tassyklandy; uly çykaryşlar `/tmp`-da |
-| 1. Repo skeleti + CI | ✅ öňki commit-lerde CI ýaşyl | şu üýtgeşmäniň CI-si push-dan soň barlanýar; ýerli Docker ýok |
+| 1. Repo skeleti + CI | 🟡 öňki CI-de Docker smoke şowsuz | köne no-face garaşmasy ýerli gaýtalanyp düzedildi; täze smoke PASS; push autentifikasiýasy ýok, täze CI işlemedi; ýerli Docker ýok |
 | 2. Nazaryýet we maglumatlar | 🟡 | çeşmeler bar; doly licence auditi we `docs/THEORY.md` açyk |
 | 3. Ýüzleri kesmek | ✅ | YuNet; okuw we inference şol bir kesiş kody |
 | 4. Media kitaphanasy | ✅ | surat/wideo/ses, FFmpeg, mazmun boýunça görnüş |
@@ -320,15 +320,15 @@ Tertip deadline-lara görä düzüldi: ilki interfeýs (31.12), soň model (15.0
 | 6. Ýüz çalşygy modeli | ✅ | FF++: wideo AUC 0.9914, EER 3.0%; başga toplum ölçegi açyk |
 | 6a. AI-surat (Smaug) | ✅ birikdirildi, 🟡 bosaga wagtlaýyn | 3 kesim; portret regression 0.999603; garaşsyz FPR/AUC ýok |
 | 7. Grad-CAM | ✅ diňe EfficientNet | Smaug üçin ýasama heatmap ýok, UI/PDF-de düşündirilýär |
-| 8. Ses modeli | 🟡 `aasist-tk` 2.0.0 deslapky | tk AUC 0.759/EER 31.1%; «Şübheli» çägi; dowam okuwyň netijesi garaşylýar |
+| 8. Ses modeli | 🟡 `aasist-tk` 2.1.0 deslapky | tk AUC 0.935/EER 14.5%; çig FPR 6.3% → «Şübheli» çägi saklanýar; okuw COMPLETE |
 | 9. Birleşdirme we höküm | ✅ | modeller öz bosagalary bilen; iň güýçli höküm; max bal bilelikdäki ähtimallyk däl |
 | 10. PDF hasabat | ✅ | Smaug + metadata + model çäkleri, 3 dil, hakyky model bilen barlandy |
-| 11. Berkitmek | 🟡 | 194 test geçdi, 1 skip, coverage 95.13%; Chromium desktop/mobile/3 dil; Safari/Firefox açyk |
+| 11. Berkitmek | 🟡 | 203 test geçdi, 1 skip, coverage 95.13%; täze ses bilen HTTP/PDF smoke PASS; Chromium desktop/mobile/3 dil; Safari/Firefox açyk |
 | 12. Diplom materiallary | ⬜ | nazaryýet, ýazgy, prezentasiýa, kanuny demo toplumy |
 
 ### Açyk işler (peýda boýunça)
 1. Öň paýlaşylan tokenleri hasap eýesi täzelemeli; licence/data auditi.
-2. Türkmen ses okuwynyň netijesini diňe tamamlananda almak we öňki model bilen deňeşdirmek.
+2. Türkmen sesiniň çig FPR 6.3% (ýuwaşda 14.1%) we galp-as-real 18.2% meselesini aýratyn çeşmelerde barlamak; täze okuw başlanmady.
 3. Garaşsyz şekil dev/test toplumy: Smaug we birleşen ulgamyň FPR/FNR/AUC, soň bosagalary doňdurmak.
 4. Hil/coverage duýduryşlary, pes hilli maglumatda abstention.
 5. Smaug-y wideo geçirmek — wagt býujeti, kadr/wideo aggregation we aýratyn kalibrleme bilen.
@@ -645,3 +645,44 @@ Doly analiz we kabul ediş şertleri: **`docs/ROADMAP.md`**. Smaug: **`docs/SMAU
   Hakyky web API scan `20dd4656a5cd4684a39bc8d7282f6069` → «Galp», PDF 3 dilde; Chromium desktop
   we mobile, tk/ru/en, reduced-motion açyk ýagdaýda sahypa; konsol ýalňyşsyz. Täze wheel JSON/licence
   aktiwlerini öz içine alýar. Häzir diňe surat; uly garaşsyz synag we wideo giňeltmesi indiki işdir.
+
+
+- **(17) — Kaggle dowam okuwy COMPLETE: netije, deňeşdirme we deployment karary.**
+  Ulanyjy «Kaggle kontrol et» diýdi. Bir gezek status alyndy: `dfd-train-audio-2` COMPLETE.
+  Diňe metrics/history/baseline/card we 1.2 MB `AASIST.pth` `/tmp/dfd-audio-2-result` içine alyndy;
+  dataset ýa-da 2.9 GB arhiw gaýtadan ýüklenmedi. Status gaýtadan soralmady, täze okuw iberilmedi.
+  Init log: öňki `b7b91f75…` agramlardan başlanandygy tassyklandy. 15 goşmaça epoha,
+  dev saýlawy boýunça 13-nji epoha iň gowy (tk_dev EER + LA_dev EER ortaçasy), okuw ≈501.8 min.
+  **Ölçegler:** türkmen test AUC 0.759→0.935, EER 31.1→14.5%; görülen/görülmedik generatorlar
+  EER 9.0/19.7%; hakyky «Hakyky» 44.4→90.2%; çig hakyky→«Galp» 8.3→6.3%.
+  **Regressiýalar gizlenmeýär:** galp→«Hakyky» 14.4→18.2% (held-out 32.1%, Vocos 50.4%);
+  LA eval AUC 0.9952→0.9932, EER 3.40→3.78%. Ýuwaş hakyky sesde çig FPR 14.1%, MP3-da 7.7%.
+  **Karar (§0a.7):** täze agramlar 2.1.0 hökmünde goýulýar (umumy tapawutlandyrma ep-esli gowy),
+  emma upstream kartyň `provisional:false` setiri kabul edilmeýär: 5% FPR maksady ýetilmedi.
+  `provisional:true` + `max_verdict:suspicious` saklanýar. Dev bosagalary 0.362385/0.450003 we
+  temperatura 0.971159 test netijesine görä üýtgedilmedi. Diňe testden FPR-ni 5% etmek ret edildi.
+  SHA-256 `766a3e59ec53c57948960e5a342824474770ab929dd02af6845dcdb70de74b13` barlandy.
+  Öňki JSON-lar `docs/metrics/audio_tk_run1/`-de; öňki agramlar `570956b1a0db83477be86fc37a07afc9d4bad6f7`
+  git revision-dan dikeldilip, hash-y barlandy. Häzirki sanlar öňki root ýollarda; deployment manifesti
+  `audio_tk_continuation.json`. Çig eksport kart we credential barlagyndan geçen okuw logy
+  `audio_tk_run2/`-de saklandy; çig kart runtime üçin däl. Baseline JSON official modeliň init-den
+  öňki ölçegidir, 6 epohaly başlangyç checkpoint-iň ölçegi däl. README/CHANGELOG/ROADMAP täzelendi.
+  Ýerli dataset ýok: doly synag gaýtadan ýerine ýetirilmedi; Kaggle ölçegleri çeşme hökmünde görkezilýär.
+  **Barlaglar tamam:** 203 passed / 1 skipped, coverage 95.13%; Ruff/format, mypy strict, JS syntax PASS.
+  Hakyky agramlary ýüklemek, FFmpeg, inference we tk/ru/en PDF PASS. HTTP smoke modeliň 2.1.0
+  bolandygyny tassyklady; credential-siz ýazgy `audio_tk_runtime_smoke.json`-da. Ton/gradient
+  diňe işlediş synaglary, takyklyk subutnamasy däl. Model karty metrikalar/hash bilen gabat gelýär;
+  FPR maksat geçilmese çägiň ýitmeginiň öňüni alýan regression test goşuldy.
+  **CI tapyndysy:** öňki `45041731746` run-da Linux 3.11/3.13, Windows we macOS PASS, Docker smoke FAIL.
+  Şol skript ýerli serwerde hem köne «no-face → inconclusive» assertion-da ýykyldy: Smaug indi ýüzsüz
+  surata aýratyn netije berýär. Höküm/bosaga üýtgedilmän, smoke testi täze optional şahany we score-nyň
+  höküme ýetmegini barlaýar; 8 unit regression goşuldy, hakyky HTTP smoke indi PASS. Docker ýerli ýok,
+  şonuň üçin täze konteýner build/remote CI geçen diýilmeýär.
+  **Gowşuryş päsgelçiligi:** `git push --dry-run` giriş ýoklugy sebäpli şowsuz (terminal prompts disabled).
+  Token repo/log-a gaýtadan ýazylmady. Üýtgeşmeler `eliot` awtory bilen ýerli commit-de saklanýar;
+  `Find-audio-2.1.0.bundle` goşmaça gowşuryş hökmünde taýýarlanýar; importy we agramlary aýratyn
+  wagtlaýyn git repo-da barlanýar. Remote `eliot` heniz 570956b. Soňky `ls-remote`/GitHub REST barlagynda
+  `main` → `1381b068b00e4db2303765af701585ec57421f4c`: ene commiti ýok täze root, diňe CONCEPT.md
+  we README.md (2 faýl). Bu daşky üýtgeşme üstünden ýazylmady we awtomatik birleşdirilmedi.
+  Bundle görkezmesi diňe `eliot`-a push edýär; `main` baradaky karar ulanyja degişlidir.
+  Push üçin ulanyjynyň howpsuz autentifikasiýasy gerek; täze Kaggle okuw başlanmady.

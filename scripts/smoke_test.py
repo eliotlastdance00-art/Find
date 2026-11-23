@@ -117,6 +117,29 @@ def scan(token: str, filename: str, content: bytes) -> dict[str, Any]:
     raise AssertionError(f"{filename}: scan did not finish")
 
 
+def check_no_face_image(image: dict[str, Any], *, synthetic_available: bool) -> None:
+    """No face disables the face model, not the independent whole-image detector.
+
+    A gradient is a runtime control, not a labelled AI-image accuracy example. Do not
+    require a particular Smaug class or tune its threshold to make this check pass.
+    """
+    assert image["status"] == "done", image
+    details = image["details"]
+    assert "no_face_found" in details["notes"]
+    assert details.get("visual") is None
+    synthetic = details.get("synthetic")
+    if synthetic_available:
+        assert synthetic is not None, "Installed whole-image model did not return a score"
+        assert "synthetic_score" in details["notes"]
+        assert 0.0 <= synthetic["prob"] <= 1.0
+        assert image["verdict"] in {"real", "suspicious", "fake"}
+        assert image["verdict"] == synthetic["verdict"]
+        assert image["prob_fake"] == synthetic["prob"]
+    else:
+        assert synthetic is None
+        assert image["verdict"] == "inconclusive"
+
+
 def main() -> None:
     deadline = time.monotonic() + 120
     while True:  # wait for the server to come up
@@ -153,15 +176,13 @@ def main() -> None:
     else:
         print("audio model not installed: skipped")
 
-    if health["models"]["visual"]:
+    synthetic_available = bool(health["models"].get("synthetic"))
+    if health["models"]["visual"] or synthetic_available:
         image = scan(token, "gradient.png", png_gradient())
         print("image:", image["status"], image["verdict"], image["details"]["notes"])
-        assert image["status"] == "done", image
-        # A synthetic gradient has no face, which the system must report honestly.
-        assert image["verdict"] == "inconclusive"
-        assert "no_face_found" in image["details"]["notes"]
+        check_no_face_image(image, synthetic_available=synthetic_available)
     else:
-        print("visual model not installed: skipped")
+        print("image models not installed: skipped")
 
     history = get_json("/api/scans", token)
     print("history:", history["total"], "scan(s)")

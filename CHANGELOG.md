@@ -16,14 +16,26 @@ All notable changes to this project are documented here. The format follows
 - Integration regression: the generated portrait scores 0.999603; JPEG-60 resized copy 0.999163.
   These are smoke checks, not benchmark accuracy; Smaug's 0.5 threshold remains provisional.
 
+### Changed
+- Deploy `aasist-tk` 2.1.0 after 15 continuation epochs (best checkpoint: epoch 13).
+  Turkmen test AUC 0.759 → 0.935, EER 31.1% → 14.5%; held-out-generator EER 37.9% → 19.7%.
+- Keep the provisional flag and *Suspicious* verdict cap: uncapped real-speech false alarms
+  are still 6.3% (14.1% on quiet speech), above the 5% target. Fake-as-real worsened from
+  14.4% to 18.2%, and LA eval EER from 3.40% to 3.78%. Do not hide these regressions.
+- Archive run-1 metrics and record checkpoint provenance, unchanged dev thresholds and the
+  deployment decision in `docs/metrics/audio_tk_continuation.json`.
+
 ### Fixed
+- Docker smoke check no longer assumes every no-face image is inconclusive: when Smaug is
+  installed, require its score and verdict to reach the result. Keep the fallback assertion
+  without Smaug; do not assign an accuracy ground truth to the generated gradient control.
 - Memory retained between sequential ONNX operations; unused Grad-CAM parameter gradients.
 - macOS instructions now use non-editable installs; offline wheel lists include ONNX Runtime.
 - A malformed optional XMP field cannot crash image analysis.
 
 ### Planned
 - Independent calibration/cross-dataset evaluation, then video-frame AI-generation detection.
-- Longer training of the Turkmen audio model.
+- Reduce Turkmen audio false alarms and held-out-generator misses; test on independent sources.
 
 ## [0.1.0] — 2026-11-22
 

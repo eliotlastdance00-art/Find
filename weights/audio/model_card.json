@@ -1,11 +1,11 @@
 {
   "name": "aasist-tk",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "kind": "audio",
   "arch": "AASIST",
   "weights_file": "AASIST.pth",
-  "sha256": "b7b91f75e5d815466427ec4176bdf2f0b0fb212c991bd6a84446bd2b2df6ca78",
-  "temperature": 1.52615368523034,
+  "sha256": "766a3e59ec53c57948960e5a342824474770ab929dd02af6845dcdb70de74b13",
+  "temperature": 0.9711591709897913,
   "input_size": 0,
   "mean": [
     0.485,
@@ -21,26 +21,32 @@
   "trained_on": "ASVspoof 2019 LA train + Turkmen set (Common Voice and broadcast speech; 9 seen generators), fine-tuned from the official AASIST weights (clovaai/aasist, MIT)",
   "thresholds": {
     "audio": {
-      "real_max": 0.32164395662338663,
-      "fake_min": 0.500339221202383
+      "real_max": 0.3623849250571387,
+      "fake_min": 0.45000269085291716
     }
   },
   "metrics": {
-    "eval_auc": 0.9952399745528439,
-    "eval_eer": 0.03398750832469389,
-    "dev_eer": 0.16127906724354985,
-    "tk_test_auc": 0.7590411770684904,
-    "tk_test_eer": 0.3114987409647681,
-    "tk_held_out_eer": 0.37854714127853495,
-    "tk_test_seen_eer": 0.26201317012492165
+    "eval_auc": 0.9932093675177918,
+    "eval_eer": 0.03780074649446612,
+    "dev_eer": 0.05793931873760981,
+    "tk_test_auc": 0.9346565509146944,
+    "tk_test_eer": 0.14527559734653295,
+    "tk_held_out_eer": 0.1969698792616134,
+    "tk_test_seen_eer": 0.08981146140176084
   },
   "extra": {
     "calibrated_on": "Turkmen dev + ASVspoof 2019 LA dev subset",
     "evaluated_on": "Turkmen test (incl. 2 unseen generators) and ASVspoof 2019 LA eval",
-    "epochs": 6,
-    "created_at": "2026-11-21T23:20:11+00:00",
-    "note": "Provisional: 6 epochs only (Kaggle time budget); Turkmen dev error was still falling. Turkmen test: AUC 0.759, EER 31.1 % (seen generators 26.2 %, held-out 37.9 %).",
-    "max_verdict_reason": "Real Turkmen speech is still judged fake in 8.3 % of test clips (22.6 % when quiet) and only 44.4 % is judged real; the limit stays until a longer training run lowers this."
+    "epochs": 15,
+    "created_at": "2026-11-22T17:16:12+00:00",
+    "kernel": "eliotalderson00/dfd-train-audio-2",
+    "kernel_version": 2,
+    "initial_weights_sha256": "b7b91f75e5d815466427ec4176bdf2f0b0fb212c991bd6a84446bd2b2df6ca78",
+    "epochs_in_continuation": 15,
+    "best_epoch_in_continuation": 13,
+    "selection": "mean(Turkmen dev EER, ASVspoof LA dev EER); no test-based checkpoint or threshold selection",
+    "note": "15 continuation epochs from run 1 (6 epochs); checkpoint selected at continuation epoch 13. Dev-fitted temperature/thresholds unchanged after observing test results. Seed reused from run 1.",
+    "max_verdict_reason": "Uncapped real Turkmen false-fake rate is 6.31% (14.05% for quiet speech), above the 5% target. Fake-as-real rate also increased from 14.40% to 18.19%; held-out Vocos remains weak. The suspicious cap and provisional flag stay."
   },
   "max_verdict": "suspicious"
 }

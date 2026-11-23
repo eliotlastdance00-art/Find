@@ -1,0 +1,59 @@
+{
+  "scope": "Actual local HTTP server, not Docker. Runtime controls only: these generated inputs do not measure detection accuracy.",
+  "audio_model": "aasist-tk 2.1.0",
+  "weights_sha256": "766a3e59ec53c57948960e5a342824474770ab929dd02af6845dcdb70de74b13",
+  "provisional": true,
+  "max_verdict": "suspicious",
+  "inputs": {
+    "tone.wav": "2-second generated 220 Hz tone, not speech",
+    "gradient.png": "Generated RGB gradient, no face; no AI-detection ground truth asserted"
+  },
+  "results": {
+    "tone.wav": {
+      "status": "done",
+      "verdict": "real",
+      "prob_fake": 0.19861456751823425,
+      "audio": {
+        "prob": 0.19861456751823425,
+        "verdict": "real",
+        "capped": false,
+        "real_max": 0.3623849250571387,
+        "fake_min": 0.45000269085291716,
+        "model": "aasist-tk 2.1.0",
+        "provisional": true
+      },
+      "synthetic": null,
+      "notes": [
+        "audio_capped"
+      ]
+    },
+    "gradient.png": {
+      "status": "done",
+      "verdict": "real",
+      "prob_fake": 0.1068493867624413,
+      "audio": null,
+      "synthetic": {
+        "prob": 0.1068493867624413,
+        "verdict": "real",
+        "capped": false,
+        "real_max": 0.5,
+        "fake_min": 0.5,
+        "model": "smaug-onnx 1.0.0",
+        "provisional": true
+      },
+      "notes": [
+        "synthetic_score",
+        "synthetic_heatmap",
+        "no_face_found"
+      ]
+    }
+  },
+  "checks": [
+    "register/upload/start/history/authentication",
+    "real audio weights loaded and inference completed",
+    "audio PDF returned in tk/ru/en",
+    "whole-image score reaches headline without a face",
+    "model hash matches deployment card"
+  ],
+  "result": "PASS"
+}
